@@ -15,7 +15,7 @@ struct PracticeView: View {
     @State private var note1:Int = 0
     @State private var note2:Int = 0
     @State private var timer: Timer?
-    @State var visible: Double = 0.0
+    @State var answer_visible: Double = 0.0
     @State var n_notes:Int = 1
     let player = MidiPlayer()
     
@@ -28,7 +28,7 @@ struct PracticeView: View {
                     Spacer()
                     NavigationLink(destination: ParameterView(params: $params).onAppear {stop()}){
                         Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray))
+                    }.accentColor(Color(.systemGray)).padding()
                 }
             Spacer()
               //      Picker("Number of Notes", selection: $n_notes) {
@@ -37,17 +37,17 @@ struct PracticeView: View {
               //          }
               //      }.onChange(of: n_notes) {
               //  }
-
             HStack {
                 Spacer()
-                Button(action:toggle_start_stop){
-                    button_lbl.resizable().scaledToFit()
-                }.accentColor(Color(.systemGray))
+                button_lbl.resizable().scaledToFit().onTapGesture {
+                    toggle_start_stop()
+                }.foregroundColor(Color(.systemGray))
+                
                 Spacer()
             }
                 Grid{
                     GridRow{
-                        //padding(2)
+                        Spacer()
                         Image(systemName: "music.note").foregroundColor(Color(.systemGray)).padding().overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).padding().onTapGesture {
@@ -55,6 +55,7 @@ struct PracticeView: View {
                                         player.playNote(note: note1, duration: params.delay*0.45)
                                     }
                                 }.opacity(running ? 0.5 : 1.0)
+                        Spacer()
                         Image(systemName: "music.note").foregroundColor(Color(.systemGray)).padding().overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).padding().onTapGesture {
@@ -62,12 +63,12 @@ struct PracticeView: View {
                                         player.playNote(note: note2, duration: params.delay*0.45)
                                     }
                                 }.opacity(running ? 0.5 : 1.0)
+                        Spacer()
                     }
                 }
-                answer.bold().opacity(visible).font(.system(size: 60)).foregroundStyle(Color(.systemGray))
+                answer.bold().opacity(answer_visible).font(.system(size: 60)).foregroundStyle(Color(.systemGray))
                 Spacer()
-                
-        }.background(Color(.black))
+        }
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
@@ -91,18 +92,18 @@ struct PracticeView: View {
     
      func onTick() {
          if ((note2 == 0) && (note1 == 0) ){
-             visible = 0
+             answer_visible = 0
              note1 = Int.random(in: params.lower_bound..<params.upper_bound)
              player.playNote(note: note1, duration: params.delay*0.45)
          }
          else if ((note2 == 0) && (note1 != 0) ){
             note2 = draw_new_note(prev_note: note1, params: params)
             player.playNote(note: note2, duration: params.delay*0.45)
-         } else if (visible == 0){
+         } else if (answer_visible == 0){
              answer = Text("\(interval_name(interval_int: note2-note1, oriented: true))")
-             visible = 1
+             answer_visible = 1
          } else{
-             visible = 0
+             answer_visible = 0
              note1 = note2
              note2 = draw_new_note(prev_note: note1, params: params)
              player.playNote(note: note2, duration: params.delay*0.45)
