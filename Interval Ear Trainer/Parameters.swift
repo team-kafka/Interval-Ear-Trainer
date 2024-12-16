@@ -20,6 +20,6 @@ extension Parameters {
     Parameters(upper_bound: 107,
                lower_bound: 64,
                active_intervals: [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-               delay: 3.0,
+               delay: 2.8,
                largeIntevalsProba: 0.0)
 }
