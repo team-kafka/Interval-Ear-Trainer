@@ -58,9 +58,7 @@ struct ParameterView: View {
                                 Text(preset_values[$0])
                             }
                                 }.onChange(of: preset) {
-                                    //if (preset_values[preset] != ""){
                                         params.active_intervals = PRESET_MAPPING[preset_values[preset]]!
-                                    //}
                             }
                         Grid{
                             GridRow {
@@ -87,7 +85,6 @@ struct ParameterView: View {
                                     }
                                     IntervalCheckBoxView(active: $params.active_intervals , interval_int: 2*interval_int-1)
                                     IntervalCheckBoxView(active: $params.active_intervals ,interval_int: -2*interval_int+1)
-                                    //HStack{Divider().frame(width: 1)}
                                     Spacer()
                                     Text(interval_name(interval_int: 2*interval_int, oriented: false)).bold().gridColumnAlignment(.trailing).onTapGesture {
                                         toggle_active_intervals(intervals: [2*interval_int, -2*interval_int])
@@ -98,7 +95,6 @@ struct ParameterView: View {
                                 if (interval_int < 6) {Divider()}
                             }
                         }
-                        
                     }
                 }.navigationTitle("Parameters").navigationBarTitleDisplayMode(.inline)
             }
