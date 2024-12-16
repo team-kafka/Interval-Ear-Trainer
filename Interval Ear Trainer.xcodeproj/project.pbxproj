@@ -1,0 +1,579 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXContainerItemProxy section */
+		376178B12D085FC900BF2F86 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 376178982D085FC700BF2F86 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3761789F2D085FC700BF2F86;
+			remoteInfo = "Interval Ear Trainer";
+		};
+		376178BB2D085FC900BF2F86 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 376178982D085FC700BF2F86 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3761789F2D085FC700BF2F86;
+			remoteInfo = "Interval Ear Trainer";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		376178A02D085FC700BF2F86 /* Interval Ear Trainer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Interval Ear Trainer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		376178B02D085FC900BF2F86 /* Interval Ear TrainerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Interval Ear TrainerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		376178BA2D085FC900BF2F86 /* Interval Ear TrainerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Interval Ear TrainerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		376178A22D085FC700BF2F86 /* Interval Ear Trainer */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Interval Ear Trainer";
+			sourceTree = "<group>";
+		};
+		376178B32D085FC900BF2F86 /* Interval Ear TrainerTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Interval Ear TrainerTests";
+			sourceTree = "<group>";
+		};
+		376178BD2D085FC900BF2F86 /* Interval Ear TrainerUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "Interval Ear TrainerUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		3761789D2D085FC700BF2F86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178AD2D085FC900BF2F86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178B72D085FC900BF2F86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		376178972D085FC700BF2F86 = {
+			isa = PBXGroup;
+			children = (
+				376178A22D085FC700BF2F86 /* Interval Ear Trainer */,
+				376178B32D085FC900BF2F86 /* Interval Ear TrainerTests */,
+				376178BD2D085FC900BF2F86 /* Interval Ear TrainerUITests */,
+				376178A12D085FC700BF2F86 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		376178A12D085FC700BF2F86 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				376178A02D085FC700BF2F86 /* Interval Ear Trainer.app */,
+				376178B02D085FC900BF2F86 /* Interval Ear TrainerTests.xctest */,
+				376178BA2D085FC900BF2F86 /* Interval Ear TrainerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		3761789F2D085FC700BF2F86 /* Interval Ear Trainer */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 376178C42D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear Trainer" */;
+			buildPhases = (
+				3761789C2D085FC700BF2F86 /* Sources */,
+				3761789D2D085FC700BF2F86 /* Frameworks */,
+				3761789E2D085FC700BF2F86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				376178A22D085FC700BF2F86 /* Interval Ear Trainer */,
+			);
+			name = "Interval Ear Trainer";
+			packageProductDependencies = (
+			);
+			productName = "Interval Ear Trainer";
+			productReference = 376178A02D085FC700BF2F86 /* Interval Ear Trainer.app */;
+			productType = "com.apple.product-type.application";
+		};
+		376178AF2D085FC900BF2F86 /* Interval Ear TrainerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 376178C72D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear TrainerTests" */;
+			buildPhases = (
+				376178AC2D085FC900BF2F86 /* Sources */,
+				376178AD2D085FC900BF2F86 /* Frameworks */,
+				376178AE2D085FC900BF2F86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				376178B22D085FC900BF2F86 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				376178B32D085FC900BF2F86 /* Interval Ear TrainerTests */,
+			);
+			name = "Interval Ear TrainerTests";
+			packageProductDependencies = (
+			);
+			productName = "Interval Ear TrainerTests";
+			productReference = 376178B02D085FC900BF2F86 /* Interval Ear TrainerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		376178B92D085FC900BF2F86 /* Interval Ear TrainerUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 376178CA2D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear TrainerUITests" */;
+			buildPhases = (
+				376178B62D085FC900BF2F86 /* Sources */,
+				376178B72D085FC900BF2F86 /* Frameworks */,
+				376178B82D085FC900BF2F86 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				376178BC2D085FC900BF2F86 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				376178BD2D085FC900BF2F86 /* Interval Ear TrainerUITests */,
+			);
+			name = "Interval Ear TrainerUITests";
+			packageProductDependencies = (
+			);
+			productName = "Interval Ear TrainerUITests";
+			productReference = 376178BA2D085FC900BF2F86 /* Interval Ear TrainerUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		376178982D085FC700BF2F86 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1610;
+				LastUpgradeCheck = 1610;
+				TargetAttributes = {
+					3761789F2D085FC700BF2F86 = {
+						CreatedOnToolsVersion = 16.1;
+					};
+					376178AF2D085FC900BF2F86 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = 3761789F2D085FC700BF2F86;
+					};
+					376178B92D085FC900BF2F86 = {
+						CreatedOnToolsVersion = 16.1;
+						TestTargetID = 3761789F2D085FC700BF2F86;
+					};
+				};
+			};
+			buildConfigurationList = 3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Interval Ear Trainer" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 376178972D085FC700BF2F86;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 376178A12D085FC700BF2F86 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				3761789F2D085FC700BF2F86 /* Interval Ear Trainer */,
+				376178AF2D085FC900BF2F86 /* Interval Ear TrainerTests */,
+				376178B92D085FC900BF2F86 /* Interval Ear TrainerUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		3761789E2D085FC700BF2F86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178AE2D085FC900BF2F86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178B82D085FC900BF2F86 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		3761789C2D085FC700BF2F86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178AC2D085FC900BF2F86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		376178B62D085FC900BF2F86 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		376178B22D085FC900BF2F86 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3761789F2D085FC700BF2F86 /* Interval Ear Trainer */;
+			targetProxy = 376178B12D085FC900BF2F86 /* PBXContainerItemProxy */;
+		};
+		376178BC2D085FC900BF2F86 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 3761789F2D085FC700BF2F86 /* Interval Ear Trainer */;
+			targetProxy = 376178BB2D085FC900BF2F86 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		376178C22D085FC900BF2F86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		376178C32D085FC900BF2F86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		376178C52D085FC900BF2F86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Interval Ear Trainer/Preview Content\"";
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Interval-Ear-Trainer-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Interval Ear Trainer";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-Trainer";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		376178C62D085FC900BF2F86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"Interval Ear Trainer/Preview Content\"";
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Interval-Ear-Trainer-Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Interval Ear Trainer";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-Trainer";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		376178C82D085FC900BF2F86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-TrainerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Interval Ear Trainer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Interval Ear Trainer";
+			};
+			name = Debug;
+		};
+		376178C92D085FC900BF2F86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-TrainerTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Interval Ear Trainer.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Interval Ear Trainer";
+			};
+			name = Release;
+		};
+		376178CB2D085FC900BF2F86 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-TrainerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Interval Ear Trainer";
+			};
+			name = Debug;
+		};
+		376178CC2D085FC900BF2F86 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "team-kafka.Interval-Ear-TrainerUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "Interval Ear Trainer";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Interval Ear Trainer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				376178C22D085FC900BF2F86 /* Debug */,
+				376178C32D085FC900BF2F86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		376178C42D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear Trainer" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				376178C52D085FC900BF2F86 /* Debug */,
+				376178C62D085FC900BF2F86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		376178C72D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear TrainerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				376178C82D085FC900BF2F86 /* Debug */,
+				376178C92D085FC900BF2F86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		376178CA2D085FC900BF2F86 /* Build configuration list for PBXNativeTarget "Interval Ear TrainerUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				376178CB2D085FC900BF2F86 /* Debug */,
+				376178CC2D085FC900BF2F86 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 376178982D085FC700BF2F86 /* Project object */;
+}
