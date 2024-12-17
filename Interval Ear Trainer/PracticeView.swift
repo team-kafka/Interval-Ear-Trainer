@@ -162,7 +162,7 @@ struct NoteButton : View{
                   if ((note != 0) && !running){
                       player.playNote(note: note, duration: 0.8)
                     }
-                }.opacity(running ? 0.5 : 1.0)
+                }.opacity(((note != 0) && !running) ? 1.0 : 0.5)
     }
 }
 
