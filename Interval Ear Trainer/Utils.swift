@@ -24,8 +24,12 @@ let INTERVAL_NAME_TO_INT: [String :Int] = [
 
 func interval_name(interval_int: Int, oriented:Bool) -> String
 {
+    if (interval_int==0){
+        return "0"
+    }
+    
     let direction = oriented ? (interval_int > 0 ? "↑ " : "↓ ") : ""
-    if ( abs(interval_int) % 12 == 0){
+    if (abs(interval_int) % 12 == 0){
         return direction + "8"
     }
     else{
@@ -33,25 +37,29 @@ func interval_name(interval_int: Int, oriented:Bool) -> String
         let octave = abs(interval_int) / 12 == 0 ? "" : " (+8)"
         return direction + quality + octave
     }
-    
 }
+
 
 func draw_new_note(prev_note:Int, params:Parameters) -> Int
 {
-    let raw_interval = params.active_intervals.randomElement() ?? 0
-    let octave = Double.random(in: 0...1) < params.largeIntevalsProba ? 12 : 0
-    let interval = raw_interval > 0 ? raw_interval + octave : raw_interval - octave
-    
-    if (prev_note + interval > params.upper_bound) || (prev_note + interval < params.lower_bound){ // next note outside of range
-        if (prev_note - interval > params.upper_bound) || (prev_note - interval < params.lower_bound){ // reflection outside of range
-            return draw_new_note(prev_note: prev_note, params: params) // reject
-        }
-        else{
-            return prev_note - interval
-        }
+    let acceptable_intervals = params.active_intervals.filter{(prev_note+$0 >= params.lower_bound) && (prev_note+$0 <= params.upper_bound)}
+    print("acceptable")
+    print(acceptable_intervals)
+    if (acceptable_intervals.isEmpty){
+        
+        return Int.random(in: max(prev_note-12, params.lower_bound)..<min(prev_note+12, params.upper_bound))
     }
-    return prev_note + interval
+    
+    let rnd_interval = acceptable_intervals.randomElement()!
+    
+    var octave = Double.random(in: 0...1) < params.largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
+    if (rnd_interval + octave < params.lower_bound) || (rnd_interval + octave > params.upper_bound) {
+        octave = 0
+    }
+    
+    return prev_note + rnd_interval + octave
 }
+
 
 let MIDI_NOTE_MAPPING: [Int: String] = [
     0:"C",
@@ -68,6 +76,7 @@ let MIDI_NOTE_MAPPING: [Int: String] = [
     11:"B",
 
 ]
+
 
 func midi_note_to_name(note_int: Int) -> String
 {
