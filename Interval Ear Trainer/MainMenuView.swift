@@ -12,15 +12,8 @@ struct MainMenu: View {
         NavigationStack{
             List{
                 Section(header: Text("Main Menu")) {
-
-                        NavigationLink(destination: PracticeView()){
-                            Text("Recognize intervals - Practice").font(.headline)
-                        }
-                        NavigationLink(destination: DummyView()){
-                            Text("Sing intervals - Practice").font(.headline)
-                        }
-                        NavigationLink(destination: DummyView()){
-                            Text("Recognize intervals - Quizz").font(.headline)
+                        NavigationLink(destination: PracticeView().navigationBarBackButtonHidden(true)){
+                            Text("Recognize intervals - Practice Mode").font(.headline)
                         }
                 }.navigationTitle(Text("Interval Ear Trainer"))
             }

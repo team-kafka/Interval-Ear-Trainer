@@ -28,13 +28,13 @@ func interval_name(interval_int: Int, oriented:Bool) -> String
         return "0"
     }
     
-    let direction = oriented ? (interval_int > 0 ? "↑ " : "↓ ") : ""
+    let direction = oriented ? (interval_int > 0 ? "↑" : "↓") : ""
     if (abs(interval_int) % 12 == 0){
         return direction + "8"
     }
     else{
         let quality = INTERVAL_NAME_TO_INT.filter{$1 == abs(interval_int) % 12}.map{$0.0}[0]
-        let octave = abs(interval_int) / 12 == 0 ? "" : " (+8)"
+        let octave = abs(interval_int) / 12 == 0 ? "" : ""//+8"
         return direction + quality + octave
     }
 }
@@ -43,8 +43,6 @@ func interval_name(interval_int: Int, oriented:Bool) -> String
 func draw_new_note(prev_note:Int, params:Parameters) -> Int
 {
     let acceptable_intervals = params.active_intervals.filter{(prev_note+$0 >= params.lower_bound) && (prev_note+$0 <= params.upper_bound)}
-    print("acceptable")
-    print(acceptable_intervals)
     if (acceptable_intervals.isEmpty){
         
         return Int.random(in: max(prev_note-12, params.lower_bound)..<min(prev_note+12, params.upper_bound))
@@ -53,7 +51,7 @@ func draw_new_note(prev_note:Int, params:Parameters) -> Int
     let rnd_interval = acceptable_intervals.randomElement()!
     
     var octave = Double.random(in: 0...1) < params.largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
-    if (rnd_interval + octave < params.lower_bound) || (rnd_interval + octave > params.upper_bound) {
+    if (prev_note + rnd_interval + octave < params.lower_bound) || (prev_note + rnd_interval + octave > params.upper_bound) {
         octave = 0
     }
     
