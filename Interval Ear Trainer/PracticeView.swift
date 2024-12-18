@@ -28,7 +28,7 @@ struct PracticeView: View {
                     Spacer()
                     NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                         Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray)).padding()
+                    }.accentColor(Color(.systemGray)).padding().scaleEffect(1.5)
                 }
                 Spacer()
                 HStack{
@@ -55,10 +55,8 @@ struct PracticeView: View {
                 }
                 Grid{
                     GridRow{
-                        //Spacer()
                         ForEach(notes, id: \.self) { note in
                             NoteButton(running: $running, params: $params, player: $player, note: note)
-                            //Spacer()
                         }
                     }
                 }
