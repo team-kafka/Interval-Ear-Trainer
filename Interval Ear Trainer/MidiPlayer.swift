@@ -126,7 +126,7 @@ class MidiPlayer {
     
     
     func playNotes(notes:[Int], duration: Double){
-        var musicSequence = self.prepare_sequence(notes: notes, duration:duration)
+        let musicSequence = self.prepare_sequence(notes: notes, duration:duration)
         self.prepare_song2(musicSequence: musicSequence)
         self.playSong()
     }

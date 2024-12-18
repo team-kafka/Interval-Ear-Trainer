@@ -14,6 +14,7 @@ struct PracticeView: View {
     @State private var answer = Text(" ")
     @State private var notes:[Int] = [0,0]
     @State private var timer: Timer?
+    @State private var timer_answer: Timer?
     @State var answer_visible: Double = 1.0
     @State var n_notes:Int = 2
     @State var player = MidiPlayer()
@@ -110,28 +111,41 @@ struct PracticeView: View {
     }
     
     func onTickMultipleNote() {
-        
-        answer_visible = 0.0
+        if (answer_visible == 1.0){
+            answer_visible = 0.0
+            play_sequence()
+            let delay = params.delay * 0.5 + SEQUENCE_DELAY * Double(n_notes) * 0.4
+            timer_answer?.invalidate()
+            timer_answer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
+                show_answer()
+            }
+        } else{
+            show_answer()
+        }
+    }
+
+    func play_sequence(){
         notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
         for (i, _) in notes[1...].enumerated(){
             notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
         }
         player.playNotes(notes: notes, duration: SEQUENCE_DELAY)
-        let delay = params.delay * 0.5 + SEQUENCE_DELAY * Double(n_notes - 1)
-        var timer_answer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-            var answers = [String]()
-            for (e1, e2) in zip(notes, notes[1...]) {
-                answers.append(interval_name(interval_int:e2-e1, oriented: true))
-            }
-            answer = Text(answers.joined(separator: "  "))
-            answer_visible = 1.0
-        }
     }
-
+    
+    func show_answer(){
+        var answers = [String]()
+        for (e1, e2) in zip(notes, notes[1...]) {
+            answers.append(interval_name(interval_int:e2-e1, oriented: true))
+        }
+        answer = Text(answers.joined(separator: "  "))
+        answer_visible = 1.0
+    }
+    
     func start() {
         button_lbl = Image(systemName: "pause.circle")
         running = true
         timer?.invalidate()
+        timer_answer?.invalidate()
         if (n_notes == 1){
             onTickSingleNote()
             timer = Timer.scheduledTimer(withTimeInterval:params.delay*0.5, repeats: true) { t in
@@ -139,7 +153,7 @@ struct PracticeView: View {
             }
         } else{
             onTickMultipleNote()
-            let delay = params.delay + SEQUENCE_DELAY * Double(n_notes - 1)
+            let delay = params.delay + SEQUENCE_DELAY * Double(n_notes) * 0.4
             timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: true) { t in
                 onTickMultipleNote()
             }
@@ -147,9 +161,10 @@ struct PracticeView: View {
     }
     
     func stop(){
+        timer?.invalidate()
+        timer_answer?.invalidate()
         button_lbl = Image(systemName: "play.circle")
         running = false
-        timer?.invalidate()
     }
 }
 
