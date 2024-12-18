@@ -78,6 +78,8 @@ let MIDI_NOTE_MAPPING: [Int: String] = [
 
 func midi_note_to_name(note_int: Int) -> String
 {
+    if (note_int == 0) {return " "}
+    
     let octave = (note_int - 12) / 12
     let note = (note_int - 12) % 12
     let note_name = MIDI_NOTE_MAPPING[note]!

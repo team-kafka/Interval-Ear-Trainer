@@ -18,6 +18,7 @@ struct PracticeView: View {
     @State var n_notes:Int = 2
     @State var player = MidiPlayer()
     
+    let SEQUENCE_DELAY = 0.8
     
     var body: some View {
         
@@ -56,11 +57,15 @@ struct PracticeView: View {
                 Grid{
                     GridRow{
                         ForEach(notes, id: \.self) { note in
-                            NoteButton(running: $running, params: $params, player: $player, note: note)
+                            VStack{
+                                NoteButton(running: $running, params: $params, player: $player, note: note)
+                                Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray))
+                            }
                         }
                     }
                 }
-                answer.opacity(answer_visible).font(.system(size: 50)).foregroundStyle(Color(.systemGray))
+                Spacer()
+                answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
                 Spacer()
             }
         }
@@ -88,11 +93,11 @@ struct PracticeView: View {
         if ((notes[1] == 0) && (notes[0] == 0) ){
             answer_visible = 0
             notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-            player.playNote(note: notes[0], duration: params.delay*0.45)
+            player.playNote(note: notes[0], duration: params.delay*0.5)
         }
         else if ((notes[1] == 0) && (notes[0] != 0) ){
             notes[1] = draw_new_note(prev_note: notes[0], params: params)
-            player.playNote(note: notes[1], duration: params.delay*0.45)
+            player.playNote(note: notes[1], duration: params.delay*0.5)
         } else if (answer_visible == 0){
             answer = Text("\(interval_name(interval_int: notes[1]-notes[0], oriented: true))")
             answer_visible = 1
@@ -100,26 +105,26 @@ struct PracticeView: View {
             answer_visible = 0
             notes[0] = notes[1]
             notes[1] = draw_new_note(prev_note: notes[0], params: params)
-            player.playNote(note: notes[1], duration: params.delay*0.45)
+            player.playNote(note: notes[1], duration: params.delay*0.5)
         }
     }
     
     func onTickMultipleNote() {
         
-        if (answer_visible == 0.0){
+        answer_visible = 0.0
+        notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
+        for (i, _) in notes[1...].enumerated(){
+            notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
+        }
+        player.playNotes(notes: notes, duration: SEQUENCE_DELAY)
+        let delay = params.delay * 0.5 + SEQUENCE_DELAY * Double(n_notes - 1)
+        var timer_answer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
             var answers = [String]()
             for (e1, e2) in zip(notes, notes[1...]) {
                 answers.append(interval_name(interval_int:e2-e1, oriented: true))
             }
             answer = Text(answers.joined(separator: "  "))
             answer_visible = 1.0
-        } else {
-            answer_visible = 0.0
-            notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-            for (i, _) in notes[1...].enumerated(){
-                notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
-            }
-            player.playNotes(notes: notes, duration: 0.8)
         }
     }
 
@@ -134,7 +139,8 @@ struct PracticeView: View {
             }
         } else{
             onTickMultipleNote()
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay*0.7, repeats: true) { t in
+            let delay = params.delay + SEQUENCE_DELAY * Double(n_notes - 1)
+            timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: true) { t in
                 onTickMultipleNote()
             }
         }
@@ -156,7 +162,7 @@ struct NoteButton : View{
     var body: some View {
         Image(systemName: "music.note").foregroundColor(Color(.systemGray)).padding().overlay(
             RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 4)).padding().onTapGesture {
+                .stroke(.gray, lineWidth: 4)).onTapGesture {
                   if ((note != 0) && !running){
                       player.playNote(note: note, duration: 0.8)
                     }
