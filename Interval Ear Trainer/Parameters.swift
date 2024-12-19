@@ -12,6 +12,7 @@ struct Parameters {
     var lower_bound: Int
     var active_intervals: Set<Int>
     var delay: Double
+    var delay_sequence: Double
     var largeIntevalsProba: Double
 }
 
@@ -21,5 +22,6 @@ extension Parameters {
                lower_bound: 64,
                active_intervals: [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
                delay: 2.8,
+               delay_sequence: 0.8,
                largeIntevalsProba: 0.0)
 }
