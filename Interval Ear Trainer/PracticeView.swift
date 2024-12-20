@@ -17,7 +17,7 @@ struct PracticeView: View {
     @State var answer_visible: Double = 1.0
     @State var n_notes:Int = 2
     @State var player = MidiPlayer()
-        
+    
     var body: some View {
         
         NavigationStack{
@@ -87,49 +87,56 @@ struct PracticeView: View {
         }
     }
     
-    func onTickSingleNote() {
-        if ((notes[1] == 0) && (notes[0] == 0) ){
-            answer_visible = 0
-            notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-            player.playNote(note: notes[0], duration: params.delay*0.5)
-        }
-        else if ((notes[1] == 0) && (notes[0] != 0) ){
-            notes[1] = draw_new_note(prev_note: notes[0], params: params)
-            player.playNote(note: notes[1], duration: params.delay*0.5)
-        } else if (answer_visible == 0){
-            answer = Text("\(interval_name(interval_int: notes[1]-notes[0], oriented: true))")
-            answer_visible = 1
-        } else{
-            answer_visible = 0
-            notes[0] = notes[1]
-            notes[1] = draw_new_note(prev_note: notes[0], params: params)
-            player.playNote(note: notes[1], duration: params.delay*0.5)
-        }
-        timer = Timer.scheduledTimer(withTimeInterval:params.delay*0.5, repeats: false) { t in
-            onTickSingleNote()
-        }
+    func start() {
+        button_lbl = Image(systemName: "pause.circle")
+        running = true
+        timer?.invalidate()
+        loopFunction()
     }
     
-    func onTickMultipleNote() {
+    func stop(){
+        timer?.invalidate()
+        button_lbl = Image(systemName: "play.circle")
+        running = false
+    }
+
+    func loopFunction() {
         var delay = params.delay * 0.5
         if (answer_visible == 1.0){
             answer_visible = 0.0
-            play_sequence()
-            delay += params.delay_sequence * Double(n_notes-1) * 0.5
+            delay += play_sequence()
         } else{
             show_answer()
         }
         timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-            onTickMultipleNote()
+            loopFunction()
         }
     }
-
-    func play_sequence(){
-        notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-        for (i, _) in notes[1...].enumerated(){
-            notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
+    
+    func play_sequence() -> Double {
+        var delay: Double = 0.0
+        if (n_notes == 1) {
+            if (notes[0] == 0) {
+                notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
+                notes[1] = draw_new_note(prev_note: notes[0], params: params)
+                player.playNotes(notes: notes, duration: params.delay*0.5)
+                delay = params.delay * 0.5
+            }
+            else {
+                notes[0] = notes[1]
+                notes[1] = draw_new_note(prev_note: notes[0], params: params)
+                player.playNote(note: notes[1], duration: params.delay*0.5)
+                delay = 0
+            }
+        } else{
+            notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
+            for (i, _) in notes[1...].enumerated(){
+                notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
+            }
+            player.playNotes(notes: notes, duration: params.delay_sequence)
+            delay = params.delay_sequence * Double(n_notes-1) * 0.5
         }
-        player.playNotes(notes: notes, duration: params.delay_sequence)
+        return delay
     }
     
     func show_answer(){
@@ -139,23 +146,6 @@ struct PracticeView: View {
         }
         answer = Text(answers.joined(separator: "  "))
         answer_visible = 1.0
-    }
-    
-    func start() {
-        button_lbl = Image(systemName: "pause.circle")
-        running = true
-        timer?.invalidate()
-        if (n_notes == 1){
-            onTickSingleNote()
-        } else{
-            onTickMultipleNote()
-        }
-    }
-    
-    func stop(){
-        timer?.invalidate()
-        button_lbl = Image(systemName: "play.circle")
-        running = false
     }
 }
 
