@@ -37,23 +37,27 @@ struct PracticeView: View {
                     }.accentColor(Color(.systemGray)).padding().scaleEffect(1.5)
                 }
                 Spacer()
-                HStack{
-                    Text("Number of notes").foregroundColor(Color(.systemGray))
-                    Picker("", selection: $n_notes) {
-                        ForEach(1..<5, id: \.self) {
-                            Text("\($0)")
+                Grid{
+                    GridRow{
+                        Text("Number of notes").foregroundColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                        Picker("", selection: $n_notes) {
+                            ForEach(1..<5, id: \.self) {
+                                Text("\($0)")
+                            }
+                        }.accentColor(Color(.systemGray)).onChange(of: n_notes){
+                            stop()
+                            notes = [Int](repeating: 0, count: max(2, n_notes))
+                            answer = Text(" ")
+                            answer_visible = 1.0
                         }
-                    }.accentColor(Color(.systemGray)).onChange(of: n_notes){
-                        stop()
-                        notes = [Int](repeating: 0, count: max(2, n_notes))
-                        answer = Text(" ")
-                        answer_visible = 1.0
                     }
-                    Text("Chord").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
-                    CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
-
+                    GridRow{
+                        Text("Harmonic").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
+                        CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
+                    }
+                    
                 }.scaleEffect(1.2)
-                
+
                 Spacer()
                 HStack {
                     Spacer()
