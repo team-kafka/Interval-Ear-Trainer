@@ -29,42 +29,7 @@ class MidiPlayer {
         }
 
     }
-    
-    func prepareSong(note:Int, duration:Double){
-        var data: Unmanaged<CFData>?
-        var musicSequence: MusicSequence?
-        NewMusicSequence(&musicSequence)
-        var musicNote = MIDINoteMessage(channel: 0,
-                                        note: UInt8(note),
-                                        velocity: 64,
-                                        releaseVelocity: 0,
-                                        duration: Float(duration))
-        var track: MusicTrack?
-        
-        guard MusicSequenceNewTrack(musicSequence!, &track) == OSStatus(noErr) else {
-            fatalError("Cannot add track")
-        }
-        guard MusicTrackNewMIDINoteEvent(track!, MusicTimeStamp(0), &musicNote) == OSStatus(noErr) else {
-            fatalError("Cannot add Note")
-        }
-        
-        guard MusicSequenceFileCreateData(musicSequence!,
-                                          MusicSequenceFileTypeID.midiType,
-                                          MusicSequenceFileFlags.eraseFile,
-                                          480, &data) == OSStatus(noErr) else {
-            fatalError("Cannot create music midi data")
-        }
-        
-        if let md = data {
-            let midiData = md.takeUnretainedValue() as Data
-            do {
-                try self.midiPlayer = AVMIDIPlayer(data: midiData, soundBankURL: self.bankURL)
-            } catch let error {
-                fatalError(error.localizedDescription)
-            }
-        }
-        self.midiPlayer!.prepareToPlay()
-    }
+
     
     func playSong() {
         if let md = self.midiPlayer {
@@ -72,13 +37,8 @@ class MidiPlayer {
             md.play()
         }
     }
-    func playNote(note:Int, duration: Double){
-        self.prepareSong(note: note, duration:duration)
-        self.playSong()
-    }
-    
-    //test playing whole stream of notes in one go
-    func prepare_sequence(notes:[Int], duration:Double) -> MusicSequence {
+
+    func prepare_sequence(notes:[Int], duration:Double, chord:Bool = false) -> MusicSequence {
         
         var musicSequence: MusicSequence?
         NewMusicSequence(&musicSequence)
@@ -90,21 +50,23 @@ class MidiPlayer {
         
         var position = 0.0
         for note in notes{
-            var musicNote = MIDINoteMessage(channel: 0,
-                                            note: UInt8(note),
-                                            velocity: 64,
-                                            releaseVelocity: 0,
-                                            duration: Float(duration))
-            
-            guard MusicTrackNewMIDINoteEvent(track!, MusicTimeStamp(position), &musicNote) == OSStatus(noErr) else {
-                fatalError("Cannot add Note")
+                var musicNote = MIDINoteMessage(channel: 0,
+                                                note: UInt8(note),
+                                                velocity: 64,
+                                                releaseVelocity: 0,
+                                                duration: Float(duration))
+                
+                guard MusicTrackNewMIDINoteEvent(track!, MusicTimeStamp(position), &musicNote) == OSStatus(noErr) else {
+                    fatalError("Cannot add Note")
             }
-            position += duration
+            if (!chord){
+                position += duration
+            }
         }
         return musicSequence!
     }
     
-    func prepare_song2(musicSequence: MusicSequence){
+    func prepare_song(musicSequence: MusicSequence){
         var data: Unmanaged<CFData>?
         guard MusicSequenceFileCreateData(musicSequence,
                                           MusicSequenceFileTypeID.midiType,
@@ -124,10 +86,9 @@ class MidiPlayer {
         self.midiPlayer!.prepareToPlay()
     }
     
-    
-    func playNotes(notes:[Int], duration: Double){
-        let musicSequence = self.prepare_sequence(notes: notes, duration:duration)
-        self.prepare_song2(musicSequence: musicSequence)
+    func playNotes(notes:[Int], duration: Double, chord:Bool = false){
+        let musicSequence = self.prepare_sequence(notes: notes, duration:duration, chord:chord)
+        self.prepare_song(musicSequence: musicSequence)
         self.playSong()
     }
     

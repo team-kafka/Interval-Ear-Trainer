@@ -7,8 +7,13 @@
 
 import SwiftUI
 
+enum playMode {
+    case melodic
+    case harmonic
+}
+
 struct PracticeView: View {
-    @State var params  = Parameters.init_value
+    @State var params = Parameters.init_value
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
     @State private var answer = Text(" ")
@@ -16,6 +21,8 @@ struct PracticeView: View {
     @State private var timer: Timer?
     @State var answer_visible: Double = 1.0
     @State var n_notes:Int = 2
+    @State var chord: Bool = false
+
     @State var player = MidiPlayer()
     
     var body: some View {
@@ -42,7 +49,10 @@ struct PracticeView: View {
                         answer = Text(" ")
                         answer_visible = 1.0
                     }
-                }.scaleEffect(1.5)
+                    Text("Chord").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
+                    CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
+
+                }.scaleEffect(1.2)
                 
                 Spacer()
                 HStack {
@@ -54,6 +64,12 @@ struct PracticeView: View {
                 }
                 Grid{
                     GridRow{
+                        if chord{
+                            VStack{
+                                ChordButton(running: $running, params: $params, player: $player, notes: notes)
+                                Text(" ").opacity(0.0)
+                            }
+                        }
                         ForEach(notes, id: \.self) { note in
                             VStack{
                                 NoteButton(running: $running, params: $params, player: $player, note: note)
@@ -125,15 +141,20 @@ struct PracticeView: View {
             else {
                 notes[0] = notes[1]
                 notes[1] = draw_new_note(prev_note: notes[0], params: params)
-                player.playNote(note: notes[1], duration: params.delay*0.5)
+                player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
                 delay = 0
             }
-        } else{
+        } else if chord{
+            notes = draw_random_chord(params: params, n_notes: n_notes)
+            player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
+            delay = params.delay * 0.5
+        } else {
             notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
             for (i, _) in notes[1...].enumerated(){
                 notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
             }
-            player.playNotes(notes: notes, duration: params.delay_sequence)
+            let duration = params.delay_sequence
+            player.playNotes(notes: notes, duration: duration, chord: false)
             delay = params.delay_sequence * Double(n_notes-1) * 0.5
         }
         return delay
@@ -141,8 +162,14 @@ struct PracticeView: View {
     
     func show_answer(){
         var answers = [String]()
-        for (e1, e2) in zip(notes, notes[1...]) {
-            answers.append(interval_name(interval_int:e2-e1, oriented: true))
+        if chord{
+            for i in notes[1...] {
+                answers.append(interval_name(interval_int:i-notes[0], oriented: false, octave: false))
+            }
+        } else{
+            for (e1, e2) in zip(notes, notes[1...]) {
+                answers.append(interval_name(interval_int:e2-e1, oriented: true))
+            }
         }
         answer = Text(answers.joined(separator: "  "))
         answer_visible = 1.0
@@ -160,9 +187,40 @@ struct NoteButton : View{
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 4)).onTapGesture {
                   if ((note != 0) && !running){
-                      player.playNote(note: note, duration: 0.8)
+                      player.playNotes(notes: [note], duration: 0.8)
                     }
                 }.opacity(((note != 0) && !running) ? 1.0 : 0.5)
+    }
+}
+
+
+struct ChordButton : View{
+    @Binding var running : Bool
+    @Binding var params : Parameters
+    @Binding var player : MidiPlayer
+    var notes : [Int]
+
+    var body: some View {
+        Image(systemName: "music.quarternote.3").foregroundColor(Color(.systemGray)).padding().overlay(
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(.gray, lineWidth: 4)).onTapGesture {
+                  if ((notes[0] != 0) && !running){
+                      player.playNotes(notes: notes, duration: params.delay*0.5, chord: true)
+                    }
+                }.opacity(((notes[0] != 0) && !running) ? 1.0 : 0.5)
+    }
+}
+
+
+struct CheckBoxView: View {
+    @Binding var checked: Bool
+    
+    var body: some View {
+        Image(systemName: checked ? "checkmark.square.fill" : "square")
+            .foregroundColor(Color.secondary)
+            .onTapGesture {
+                checked.toggle()
+            }
     }
 }
 

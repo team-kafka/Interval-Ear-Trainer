@@ -40,7 +40,7 @@ struct ParameterView: View {
                             Text(midi_note_to_name(note_int: params.lower_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNote(note: params.lower_bound, duration: 1)
+                                player.playNotes(notes: [params.lower_bound], duration: 1)
                             }
                         }
                         HStack{
@@ -48,7 +48,7 @@ struct ParameterView: View {
                             Text(midi_note_to_name(note_int: params.upper_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNote(note: params.upper_bound, duration: 1)
+                                player.playNotes(notes: [params.upper_bound], duration: 1)
                             }
                         }
                     }
