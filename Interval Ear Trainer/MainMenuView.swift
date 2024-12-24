@@ -11,15 +11,25 @@ struct MainMenu: View {
     var body: some View {
         NavigationStack{
             List{
-                Section(header: Text("Main Menu")) {
-                        NavigationLink(destination: PracticeView().navigationBarBackButtonHidden(true)){
-                            Text("Recognize intervals - Practice Mode").font(.headline)
+                Section(header: Text("Practice")) {
+                        NavigationLink(destination: IntervalPracticeView().navigationBarBackButtonHidden(true)){
+                            Text("Interval Recognition").font(.headline)
                         }
                 }.navigationTitle(Text("Interval Ear Trainer"))
+                Section(header: Text("Quizz")) {
+                        NavigationLink(destination: IntervalQuizzView().navigationBarBackButtonHidden(true)){
+                            Text("Interval Recognition").font(.headline)
+                        }
+                }
+                Section(header: Text("Passive Listening")) {
+                    IntervalListeningView(params:Parameters.init_value_passive1)
+                    IntervalListeningView(params:Parameters.init_value_passive2)
+                    IntervalListeningView(params:Parameters.init_value_passive3)
+                }
             }
         }
-        }
     }
+}
 
 #Preview {
     MainMenu()

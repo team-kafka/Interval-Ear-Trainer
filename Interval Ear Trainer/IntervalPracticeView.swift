@@ -12,7 +12,7 @@ enum playMode {
     case harmonic
 }
 
-struct PracticeView: View {
+struct IntervalPracticeView: View {
     @State var params = Parameters.init_value
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
@@ -32,25 +32,17 @@ struct PracticeView: View {
                 
                 HStack{
                     Spacer()
+                    NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().scaleEffect(1.5).onChange(of: n_notes){
+                        stop()
+                        answer = Text(" ")
+                        answer_visible = 1.0
+                    }
                     NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                         Image(systemName: "gearshape.fill")
                     }.accentColor(Color(.systemGray)).padding().scaleEffect(1.5)
                 }
                 Spacer()
                 Grid{
-                    GridRow{
-                        Text("Number of notes").foregroundColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                        Picker("", selection: $n_notes) {
-                            ForEach(1..<5, id: \.self) {
-                                Text("\($0)")
-                            }
-                        }.accentColor(Color(.systemGray)).onChange(of: n_notes){
-                            stop()
-                            notes = [Int](repeating: 0, count: max(2, n_notes))
-                            answer = Text(" ")
-                            answer_visible = 1.0
-                        }
-                    }
                     GridRow{
                         Text("Harmonic").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
                         CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
@@ -165,72 +157,15 @@ struct PracticeView: View {
     }
     
     func show_answer(){
-        var answers = [String]()
-        if chord{
-            for i in notes[1...] {
-                answers.append(interval_name(interval_int:i-notes[0], oriented: false, octave: false))
-            }
-        } else{
-            for (e1, e2) in zip(notes, notes[1...]) {
-                answers.append(interval_name(interval_int:e2-e1, oriented: true))
-            }
-        }
-        answer = Text(answers.joined(separator: "  "))
+        let answerStr = answer_string(notes: notes, chord: chord, oriented: !chord)
+        answer = Text(answerStr)
         answer_visible = 1.0
-    }
-}
-
-struct NoteButton : View{
-    @Binding var running : Bool
-    @Binding var params : Parameters
-    @Binding var player : MidiPlayer
-    var note : Int
-
-    var body: some View {
-        Image(systemName: "music.note").foregroundColor(Color(.systemGray)).padding().overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 4)).onTapGesture {
-                  if ((note != 0) && !running){
-                      player.playNotes(notes: [note], duration: 0.8)
-                    }
-                }.opacity(((note != 0) && !running) ? 1.0 : 0.5)
-    }
-}
-
-
-struct ChordButton : View{
-    @Binding var running : Bool
-    @Binding var params : Parameters
-    @Binding var player : MidiPlayer
-    var notes : [Int]
-
-    var body: some View {
-        Image(systemName: "music.quarternote.3").foregroundColor(Color(.systemGray)).padding().overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 4)).onTapGesture {
-                  if ((notes[0] != 0) && !running){
-                      player.playNotes(notes: notes, duration: params.delay*0.5, chord: true)
-                    }
-                }.opacity(((notes[0] != 0) && !running) ? 1.0 : 0.5)
-    }
-}
-
-
-struct CheckBoxView: View {
-    @Binding var checked: Bool
-    
-    var body: some View {
-        Image(systemName: checked ? "checkmark.square.fill" : "square")
-            .foregroundColor(Color.secondary)
-            .onTapGesture {
-                checked.toggle()
-            }
     }
 }
 
 
 #Preview {
-    PracticeView()
+    IntervalPracticeView()
 }
 
 

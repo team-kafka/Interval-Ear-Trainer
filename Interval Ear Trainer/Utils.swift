@@ -91,7 +91,6 @@ let MIDI_NOTE_MAPPING: [Int: String] = [
 
 ]
 
-
 func midi_note_to_name(note_int: Int) -> String
 {
     if (note_int == 0) {return " "}
@@ -101,3 +100,52 @@ func midi_note_to_name(note_int: Int) -> String
     let note_name = MIDI_NOTE_MAPPING[note]!
     return note_name + String(format:"%d", octave)
 }
+
+func active_intervals_string(intervals:Set<Int>) -> String
+{
+    let intervals_abs = Set<Int>(intervals.map{$0 > 0 ? $0 : -$0}).sorted()
+    let intervals_strs = intervals_abs.map{helper_func(interval_abs: $0, intervals:intervals)}
+    return intervals_strs.joined(separator: " ")
+}
+
+func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
+{
+    var rv = interval_name(interval_int: interval_abs, oriented: false, octave: false)
+    if ((intervals.contains(interval_abs)) && (!intervals.contains(-interval_abs))){
+        rv += "↑"
+    } else if ((!intervals.contains(interval_abs)) && (intervals.contains(-interval_abs))){
+        rv += "↓"
+    }
+    return rv
+}
+
+func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
+{
+    var answers = [String]()
+    if chord{
+        for i in notes[1...] {
+            answers.append(interval_name(interval_int:i-notes[0], oriented: oriented))
+        }
+    } else{
+        for (e1, e2) in zip(notes, notes[1...]) {
+            answers.append(interval_name(interval_int:e2-e1, oriented: oriented))
+        }
+    }
+    return answers.joined(separator: "  ")
+}
+
+func answer_from_notes(notes: [Int], chord: Bool, oriented: Bool) -> [Int]
+{
+    var answers = [Int]()
+    if chord{
+        for i in notes[1...] {
+            answers.append(oriented ? i-notes[0] : abs(i-notes[0]))
+        }
+    } else{
+        for (e1, e2) in zip(notes, notes[1...]) {
+            answers.append(oriented ? e2-e1 : abs(e2-e1))
+        }
+    }
+    return answers
+}
+
