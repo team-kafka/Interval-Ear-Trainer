@@ -23,7 +23,7 @@ struct CheckBoxView: View {
 
 struct ChordButton : View{
     @Binding var running : Bool
-    @Binding var params : Parameters
+    @Binding var params : IntervalParameters
     @Binding var player : MidiPlayer
     var notes : [Int]
 
@@ -41,7 +41,7 @@ struct ChordButton : View{
 
 struct NoteButton : View{
     @Binding var running : Bool
-    @Binding var params : Parameters
+    @Binding var params : IntervalParameters
     @Binding var player : MidiPlayer
     var note : Int
 

@@ -13,7 +13,7 @@ enum playMode {
 }
 
 struct IntervalPracticeView: View {
-    @State var params = Parameters.init_value
+    @State var params = IntervalParameters.init_value
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
     @State private var answer = Text(" ")
@@ -32,7 +32,7 @@ struct IntervalPracticeView: View {
                 VStack {
                     HStack{
                         Spacer()
-                        NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+                        NavigationLink(destination: IntervalParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                             Image(systemName: "gearshape.fill")
                         }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
                     }

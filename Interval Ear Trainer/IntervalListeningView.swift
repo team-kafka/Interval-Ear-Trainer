@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct IntervalListeningView: View {
-    @State var params = Parameters.init_value
+    @State var params = IntervalParameters.init_value
     @State private var playing:Bool = false
     @State private var spakerImg:Image = Image(systemName:"speaker.wave.2.fill")
     @State private var timer: Timer?
@@ -23,7 +23,7 @@ struct IntervalListeningView: View {
                     stop()
                 }
             }
-            NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true)){
+            NavigationLink(destination: IntervalParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
             Text(active_intervals_string(intervals:params.active_intervals)).lineLimit(1)
             //Spacer()

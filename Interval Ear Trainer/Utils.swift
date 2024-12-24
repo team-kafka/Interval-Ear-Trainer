@@ -39,7 +39,7 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
     }
 }
 
-func draw_new_note(prev_note:Int, params:Parameters) -> Int
+func draw_new_note(prev_note:Int, params:IntervalParameters) -> Int
 {
     let acceptable_intervals = params.active_intervals.filter{(prev_note+$0 >= params.lower_bound) && (prev_note+$0 <= params.upper_bound)}
     if (acceptable_intervals.isEmpty){
@@ -56,7 +56,7 @@ func draw_new_note(prev_note:Int, params:Parameters) -> Int
     return prev_note + rnd_interval + octave
 }
 
-func draw_random_chord(params:Parameters, n_notes:Int) -> [Int]
+func draw_random_chord(params:IntervalParameters, n_notes:Int) -> [Int]
 {
     let note_0 = Int.random(in: params.lower_bound...params.upper_bound-12)
     let pos_intervals = Set<Int>(params.active_intervals.map{$0 > 0 ? $0 : -$0})

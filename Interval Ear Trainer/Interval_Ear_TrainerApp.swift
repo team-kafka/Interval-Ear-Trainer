@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftData
 
 @main
 struct Interval_Ear_TrainerApp: App {
@@ -15,3 +16,4 @@ struct Interval_Ear_TrainerApp: App {
         }
     }
 }
+

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct IntervalQuizzView: View {
-        @State var params = Parameters.init_value
+        @State var params = IntervalParameters.init_value
         @State private var run_btn = Image(systemName: "play.circle")
         @State private var running = false
         @State private var answer = Text(" ")
@@ -31,7 +31,7 @@ struct IntervalQuizzView: View {
                 VStack {
                     HStack{
                         Spacer()
-                        NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+                        NavigationLink(destination: IntervalParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                             Image(systemName: "gearshape.fill")
                         }.accentColor(Color(.systemGray)).scaleEffect(1.5).padding([.trailing])
                     }
@@ -171,7 +171,7 @@ struct IntervalQuizzView: View {
 
 struct AnswerButtonsView: View {
     public var loopFunction: (() -> Void)
-    var params: Parameters
+    var params: IntervalParameters
     var running: Bool
     var notes: [Int]
     @Binding var guess_str: Text

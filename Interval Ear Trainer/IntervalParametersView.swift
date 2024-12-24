@@ -12,11 +12,11 @@ let PRESET_MAPPING: [String : Set<Int>] = [
     "Large Intervals": [-11, -10, -9, -8, 8, 9, 10, 11],
     "3rds": [-3, -4, 3, 4],
     "4ths and 5ths": [-5, -6, -7, 5, 6, 7],
-    "": Parameters.init_value.active_intervals
+    "": IntervalParameters.init_value.active_intervals
               ]
 
-struct ParameterView: View {
-    @Binding var params : Parameters
+struct IntervalParametersView: View {
+    @Binding var params : IntervalParameters
     @State private var preset = 0
     let player = MidiPlayer()
     
@@ -164,8 +164,8 @@ struct NoteStepperView: View {
 
 
 #Preview {
-    @State @Previewable var params = Parameters.init_value
-    ParameterView(params: $params)
+    @State @Previewable var params = IntervalParameters.init_value
+    IntervalParametersView(params: $params)
 }
 
 
