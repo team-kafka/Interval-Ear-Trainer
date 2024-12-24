@@ -29,28 +29,21 @@ struct IntervalPracticeView: View {
         
         NavigationStack{
             VStack {
-                
-                HStack{
-                    Spacer()
-                    NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().scaleEffect(1.5).onChange(of: n_notes){
-                        stop()
-                        answer = Text(" ")
-                        answer_visible = 1.0
+                VStack {
+                    HStack{
+                        Spacer()
+                        NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+                            Image(systemName: "gearshape.fill")
+                        }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
                     }
-                    NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
-                        Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray)).padding().scaleEffect(1.5)
+                    //Spacer()
+                    HStack{
+                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){reset_state()}
+                        ChordArpSwitchView(chord: $chord).padding().onChange(of: chord){reset_state()}
+                    }.scaleEffect(2.0)
+                    //Spacer()
                 }
-                Spacer()
-                Grid{
-                    GridRow{
-                        Text("Harmonic").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
-                        CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
-                    }
-                    
-                }.scaleEffect(1.2)
-
-                Spacer()
+                    //Spacer()
                 HStack {
                     Spacer()
                     button_lbl.resizable().scaledToFit().onTapGesture {
@@ -160,6 +153,13 @@ struct IntervalPracticeView: View {
         let answerStr = answer_string(notes: notes, chord: chord, oriented: !chord)
         answer = Text(answerStr)
         answer_visible = 1.0
+    }
+        
+    func reset_state(){
+        stop()
+        answer = Text(" ")
+        answer_visible = 1.0
+        notes = notes.map{$0 * 0}
     }
 }
 

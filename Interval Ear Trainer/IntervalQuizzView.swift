@@ -17,7 +17,7 @@ struct IntervalQuizzView: View {
         @State var answer_visible: Double = 1.0
         @State var n_notes:Int = 2
         @State var chord: Bool = false
-        @State var useTimer: Bool = true
+        @State var use_timer: Bool = true
 
         @State var correct: Bool = false
         @State private var guess_str = Text(" ")
@@ -29,29 +29,18 @@ struct IntervalQuizzView: View {
             
             NavigationStack{
                 VStack {
-                    
                     HStack{
                         Spacer()
-                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().scaleEffect(1.5).onChange(of: n_notes){
-                            stop()
-                            answer = Text(" ")
-                            answer_visible = 1.0
-                            guess_str = Text(" ")
-                            guess = [Int](repeating: 0, count: notes.count)
-                        }
-                        TimerView(active: $useTimer).padding().scaleEffect(1.5)
                         NavigationLink(destination: ParameterView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                             Image(systemName: "gearshape.fill")
-                        }.accentColor(Color(.systemGray)).padding().scaleEffect(1.5)
+                        }.accentColor(Color(.systemGray)).scaleEffect(1.5).padding([.trailing])
                     }
                     Spacer()
-                    Grid{
-                        GridRow{
-                            Text("Harmonic").foregroundColor(Color(.systemGray)).opacity(n_notes > 1 ? 1.0 : 0.0)
-                            CheckBoxView(checked: $chord).opacity(n_notes > 1 ? 1.0 : 0.0)
-                        }.frame(maxHeight: .infinity)
-                    }.fixedSize(horizontal: false, vertical: true).scaleEffect(1.2)
-
+                    HStack{
+                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){reset_state()}
+                        TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
+                        ChordArpSwitchView(chord: $chord).padding().onChange(of: chord){reset_state()}
+                    }.scaleEffect(2.0)
                     Spacer()
                     Spacer()
                     HStack {
@@ -65,7 +54,7 @@ struct IntervalQuizzView: View {
                     answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(correct ? Color.green : Color.red)
                     guess_str.foregroundColor(Color(.systemGray)).font(.system(size: 45))
                     Spacer()
-                    AnswerButtonsView(params: $params, running: $running, notes: $notes, correct: $correct, chord: $chord, guess_str: $guess_str, guess: $guess)
+                    AnswerButtonsView(loopFunction: self.loopFunction, params: $params, running: $running, notes: $notes, correct: $correct, guess_str: $guess_str, guess: $guess, use_timer: $use_timer)
                     Spacer()
                 }
             }
@@ -118,8 +107,10 @@ struct IntervalQuizzView: View {
                 show_answer()
                 notes[0] = notes[1]
             }
-            timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-                loopFunction()
+            if (use_timer){
+                timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
+                    loopFunction()
+                }
             }
         }
         
@@ -137,11 +128,13 @@ struct IntervalQuizzView: View {
                     notes[1] = draw_new_note(prev_note: notes[0], params: params)
                     player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
                     delay = 0
+                    print(answer_string(notes: notes, chord: false, oriented: true))
                 }
             } else if chord{
                 notes = draw_random_chord(params: params, n_notes: n_notes)
                 player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
                 delay = params.delay * 0.5
+                print(answer_string(notes: notes, chord: true, oriented: false))
             } else {
                 notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
                 for (i, _) in notes[1...].enumerated(){
@@ -163,17 +156,28 @@ struct IntervalQuizzView: View {
             answer = Text(answerStr)
             answer_visible = 1.0
         }
+    
+        func reset_state(){
+            stop()
+            answer = Text(" ")
+            answer_visible = 1.0
+            guess_str = Text(" ")
+            guess = [Int](repeating: 0, count: notes.count)
+        }
     }
 
 struct AnswerButtonsView: View {
+    public var loopFunction: (() -> Void)
     @Binding var params: Parameters
     @Binding var running: Bool
     @Binding var notes: [Int]
     @Binding var correct: Bool
-    @Binding var chord: Bool
     @Binding var guess_str: Text
     @Binding var guess: [Int]
-
+    @Binding var use_timer: Bool
+    
+    @State private var timer: Timer?
+    
     var body: some View {
         let activeIntAbs = params.active_intervals.map{$0 > 0 ? $0 : -$0}
         HStack{
@@ -182,7 +186,7 @@ struct AnswerButtonsView: View {
                     ForEach(0..<3){ j in
                         let thisInt = j*4+i+1
                         let active = (activeIntAbs.contains(thisInt) && running)
-                        Text(interval_name(interval_int: thisInt, oriented: false)).bold().gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
+                        Text(interval_name(interval_int: thisInt, oriented: false)).bold().font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
                                     if (active) {
@@ -190,10 +194,23 @@ struct AnswerButtonsView: View {
                                             guess.append(thisInt)
                                         }
                                         guess_str = Text(answer_string(notes: guess, chord: true, oriented: false))
+                                        if ((guess.count == notes.count) && !use_timer){
+                                            set_timer()
+                                        }
                                     }
                                 }
+                    
                     }
-                }.fixedSize(horizontal: true, vertical: false)
+                }.fixedSize(horizontal: false, vertical: true)
+            }
+        }.padding()
+    }
+    
+    func set_timer() {
+        timer = Timer.scheduledTimer(withTimeInterval:0.2, repeats: false) { t in
+            loopFunction()
+            timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
+                loopFunction()
             }
         }
     }

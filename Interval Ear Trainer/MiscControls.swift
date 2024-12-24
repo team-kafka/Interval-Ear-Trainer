@@ -69,6 +69,19 @@ struct TimerView: View {
     }
 }
 
+struct ChordArpSwitchView: View {
+    @Binding var chord: Bool
+    
+    var body: some View {
+        let rotation = chord ? 90.0 : 0.0
+        Image(systemName:"00.square").rotationEffect(Angle(degrees: rotation))
+            .foregroundColor(Color.secondary)
+            .onTapGesture {
+                chord.toggle()
+            }
+    }
+}
+
 
 struct NumberOfNotesView: View {
     @Binding var n_notes: Int
