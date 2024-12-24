@@ -37,9 +37,12 @@ struct IntervalQuizzView: View {
                     }
                     Spacer()
                     HStack{
-                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){reset_state()}
+                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){
+                            reset_state()
+                            if (n_notes == 1) {chord = false}
+                        }
                         TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
-                        ChordArpSwitchView(chord: $chord).padding().onChange(of: chord){reset_state()}
+                        ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
                     }.scaleEffect(2.0)
                     Spacer()
                     Spacer()
@@ -54,7 +57,7 @@ struct IntervalQuizzView: View {
                     answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(correct ? Color.green : Color.red)
                     guess_str.foregroundColor(Color(.systemGray)).font(.system(size: 45))
                     Spacer()
-                    AnswerButtonsView(loopFunction: self.loopFunction, params: $params, running: $running, notes: $notes, correct: $correct, guess_str: $guess_str, guess: $guess, use_timer: $use_timer)
+                    AnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                     Spacer()
                 }
             }
@@ -168,13 +171,12 @@ struct IntervalQuizzView: View {
 
 struct AnswerButtonsView: View {
     public var loopFunction: (() -> Void)
-    @Binding var params: Parameters
-    @Binding var running: Bool
-    @Binding var notes: [Int]
-    @Binding var correct: Bool
+    var params: Parameters
+    var running: Bool
+    var notes: [Int]
     @Binding var guess_str: Text
     @Binding var guess: [Int]
-    @Binding var use_timer: Bool
+    var use_timer: Bool
     
     @State private var timer: Timer?
     

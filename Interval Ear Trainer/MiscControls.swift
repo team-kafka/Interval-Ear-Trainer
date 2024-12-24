@@ -71,13 +71,15 @@ struct TimerView: View {
 
 struct ChordArpSwitchView: View {
     @Binding var chord: Bool
-    
+    var active: Bool
     var body: some View {
-        let rotation = chord ? 90.0 : 0.0
+        let rotation = (chord && active) ? 90.0 : 0.0
         Image(systemName:"00.square").rotationEffect(Angle(degrees: rotation))
             .foregroundColor(Color.secondary)
             .onTapGesture {
-                chord.toggle()
+                if active {
+                    chord.toggle()
+                }
             }
     }
 }

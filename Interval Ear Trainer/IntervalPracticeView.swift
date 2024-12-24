@@ -38,8 +38,11 @@ struct IntervalPracticeView: View {
                     }
                     //Spacer()
                     HStack{
-                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){reset_state()}
-                        ChordArpSwitchView(chord: $chord).padding().onChange(of: chord){reset_state()}
+                        NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){
+                            reset_state()
+                            if (n_notes == 1) {chord = false}
+                        }
+                        ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
                     }.scaleEffect(2.0)
                     //Spacer()
                 }
