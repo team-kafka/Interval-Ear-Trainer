@@ -8,11 +8,14 @@
 import SwiftUI
 
 struct IntervalListeningView: View {
-    @State var params = IntervalParameters.init_value
+    @State var params: IntervalParameters
     @State private var playing:Bool = false
     @State private var spakerImg:Image = Image(systemName:"speaker.wave.2.fill")
     @State private var timer: Timer?
-    @State var player = MidiPlayer()
+    @Binding var dftDelay: Double
+    @Binding var dftFilterStr: String
+
+    var player = MidiPlayer()
     
     var body: some View {
         HStack{
@@ -25,10 +28,9 @@ struct IntervalListeningView: View {
             }
             NavigationLink(destination: IntervalParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
-            Text(active_intervals_string(intervals:params.active_intervals)).lineLimit(1)
-            //Spacer()
+            Text(interval_filter_to_str(intervals:params.active_intervals)).lineLimit(1)
             Image(systemName: "gearshape.fill")
-        }
+        }.onAppear{ update_function(newParams: params)}
     }
     
     func start() {
@@ -53,8 +55,10 @@ struct IntervalListeningView: View {
             loopFunction()
         }
     }
+    
+    func update_function(newParams: IntervalParameters){
+        dftDelay = newParams.delay
+        dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
+    }
 }
 
-#Preview {
-    IntervalListeningView()
-}

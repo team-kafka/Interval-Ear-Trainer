@@ -13,7 +13,7 @@ enum playMode {
 }
 
 struct IntervalPracticeView: View {
-    @State var params = IntervalParameters.init_value
+    @State var params: IntervalParameters
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
     @State private var answer = Text(" ")
@@ -22,9 +22,10 @@ struct IntervalPracticeView: View {
     @State var answer_visible: Double = 1.0
     @State var n_notes:Int = 2
     @State var chord: Bool = false
-
     @State var player = MidiPlayer()
-    
+    @Binding var dftDelay: Double
+    @Binding var dftFilterStr: String
+
     var body: some View {
         
         NavigationStack{
@@ -77,6 +78,7 @@ struct IntervalPracticeView: View {
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
+            update_function(newParams: params)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -164,12 +166,13 @@ struct IntervalPracticeView: View {
         answer_visible = 1.0
         notes = notes.map{$0 * 0}
     }
+    
+    func update_function(newParams: IntervalParameters){
+        dftDelay = newParams.delay
+        dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
+    }
 }
 
-
-#Preview {
-    IntervalPracticeView()
-}
 
 
         

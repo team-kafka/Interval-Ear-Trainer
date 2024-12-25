@@ -101,7 +101,7 @@ func midi_note_to_name(note_int: Int) -> String
     return note_name + String(format:"%d", octave)
 }
 
-func active_intervals_string(intervals:Set<Int>) -> String
+func interval_filter_to_str(intervals:Set<Int>) -> String
 {
     let intervals_abs = Set<Int>(intervals.map{$0 > 0 ? $0 : -$0}).sorted()
     let intervals_strs = intervals_abs.map{helper_func(interval_abs: $0, intervals:intervals)}
@@ -117,6 +117,24 @@ func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
         rv += "↓"
     }
     return rv
+}
+ 
+func str_to_interval_filter(filter_str: String) -> Set<Int>
+{
+    var rv = [Int]()
+    for int_str in filter_str.split(separator: " ") {
+        if int_str.contains("↑"){
+            let this_str: String = int_str.replacingOccurrences(of: "↑", with: "")
+            rv.append(INTERVAL_NAME_TO_INT[this_str]!)
+        } else if int_str.contains("↓"){
+            let this_str: String = int_str.replacingOccurrences(of: "↓", with: "")
+            rv.append(-INTERVAL_NAME_TO_INT[this_str]!)
+        } else {
+            rv.append(INTERVAL_NAME_TO_INT[String(int_str)]!)
+            rv.append(-INTERVAL_NAME_TO_INT[String(int_str)]!)
+        }
+    }
+    return Set<Int>(rv)
 }
 
 func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String

@@ -12,15 +12,16 @@ let PRESET_MAPPING: [String : Set<Int>] = [
     "Large Intervals": [-11, -10, -9, -8, 8, 9, 10, 11],
     "3rds": [-3, -4, 3, 4],
     "4ths and 5ths": [-5, -6, -7, 5, 6, 7],
-    "": IntervalParameters.init_value.active_intervals
+    "": IntervalParameters().active_intervals
               ]
 
 struct IntervalParametersView: View {
     @Binding var params : IntervalParameters
     @State private var preset = 0
+    
     let player = MidiPlayer()
     
-    let preset_values = ["", "3rds", "Large Intervals", "4ths and 5ths"]
+    let preset_values = ["", "3rds", "Large Intervals", "4ths and 5ths"] // get this from dict
     
     var body: some View {
         NavigationView{
@@ -162,11 +163,3 @@ struct NoteStepperView: View {
     }
 }
 
-
-#Preview {
-    @State @Previewable var params = IntervalParameters.init_value
-    IntervalParametersView(params: $params)
-}
-
-
-        
