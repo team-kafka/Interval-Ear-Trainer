@@ -224,3 +224,10 @@ func draw_random_triad(params:TriadParameters) -> ([Int], [String], Int)
     
     return (notes:notes, tags:intervals_tags.1, root_note:root_note)
 }
+
+func triad_filter_to_str(active_qualities: Set<String>) -> String
+{
+    let sorted_qualities = TRIAD_KEYS.filter{active_qualities.contains($0)}
+    let qualities = sorted_qualities.map{$0.prefix(3)}
+    return qualities.joined(separator: " ")
+}

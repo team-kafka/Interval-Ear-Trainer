@@ -51,6 +51,8 @@ struct MainMenu: View {
                     let dftParamsIL3 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3),
                                                    delay: dftDelayIL3)
                     IntervalListeningView(params:dftParamsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    
+                    TriadListeningView()
                 }
             }
         }
