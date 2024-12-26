@@ -20,24 +20,23 @@ struct CheckBoxView: View {
     }
 }
 
-
 struct ChordButton : View{
     var running : Bool
     var duration : Double
     @Binding var player : MidiPlayer
     var notes : [Int]
-
+    var chord : Bool
+    var chord_delay: Double
     var body: some View {
         Image(systemName: "music.quarternote.3").foregroundColor(Color(.systemGray)).padding().overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 4)).onTapGesture {
                   if ((notes[0] != 0) && !running){
-                      player.playNotes(notes: notes, duration: duration, chord: true)
+                      player.playNotes(notes: notes, duration: chord ? duration : chord_delay, chord: chord)
                     }
                 }.opacity(((notes[0] != 0) && !running) ? 1.0 : 0.5)
     }
 }
-
 
 struct NoteButton : View{
     var running : Bool
@@ -54,7 +53,6 @@ struct NoteButton : View{
                 }.opacity(((note != 0) && !running) ? 1.0 : 0.5)
     }
 }
-
 
 struct TimerView: View {
     @Binding var active: Bool
@@ -82,7 +80,6 @@ struct ChordArpSwitchView: View {
             }
     }
 }
-
 
 struct NumberOfNotesView: View {
     @Binding var n_notes: Int

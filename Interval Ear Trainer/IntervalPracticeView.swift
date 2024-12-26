@@ -11,6 +11,7 @@ struct IntervalPracticeView: View {
     @State var params: IntervalParameters
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
+    @State private var use_timer = true
     @State private var answer = Text(" ")
     @State private var notes:[Int] = [0,0]
     @State private var timer: Timer?
@@ -38,6 +39,7 @@ struct IntervalPracticeView: View {
                             reset_state()
                             if (n_notes == 1) {chord = false}
                         }
+                        TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
                         ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
                     }.scaleEffect(2.0)
                     //Spacer()
@@ -54,7 +56,7 @@ struct IntervalPracticeView: View {
                     GridRow{
                         if chord{
                             VStack{
-                                ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes)
+                                ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_sequence)
                                 Text(" ").opacity(0.0)
                             }
                         }
@@ -83,18 +85,24 @@ struct IntervalPracticeView: View {
     }
     
     func toggle_start_stop() {
-        running.toggle()
-        if running {
+        if use_timer{
+            running.toggle()
+            if running {
+                start()
+            }
+            else{
+                stop()
+            }
+        } else {
             start()
-        }
-        else{
-            stop()
         }
     }
     
     func start() {
-        button_lbl = Image(systemName: "pause.circle")
-        running = true
+        if use_timer{
+            button_lbl = Image(systemName: "pause.circle")
+            running = true
+        }
         timer?.invalidate()
         loopFunction()
     }

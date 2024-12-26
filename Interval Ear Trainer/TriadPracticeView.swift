@@ -55,7 +55,7 @@ struct TriadPracticeView: View {
                 GridRow{
                     
                     VStack{
-                        ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes)
+                        ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_arpeggio)
                         Text(" ").opacity(0.0)
                     }
                     
@@ -87,18 +87,24 @@ struct TriadPracticeView: View {
 }
     
     func toggle_start_stop() {
-        running.toggle()
-        if running {
+        if use_timer{
+            running.toggle()
+            if running {
+                start()
+            }
+            else{
+                stop()
+            }
+        } else {
             start()
-        }
-        else{
-            stop()
         }
     }
     
     func start() {
-        button_lbl = Image(systemName: "pause.circle")
-        running = true
+        if (use_timer){
+            button_lbl = Image(systemName: "pause.circle")
+            running = true
+        }
         timer?.invalidate()
         loopFunction()
     }
@@ -117,8 +123,10 @@ struct TriadPracticeView: View {
         } else{
             show_answer()
         }
-        timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-            loopFunction()
+        if (use_timer){
+            timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
+                loopFunction()
+            }
         }
     }
     
@@ -133,11 +141,10 @@ struct TriadPracticeView: View {
         root_note = res.2
         
         if chord {
-            player.playNotes(notes: notes, duration: params.delay , chord: true)
+            player.playNotes(notes: notes, duration: params.delay * 0.5 , chord: true)
         } else {
-            let duration = 0.6
-            player.playNotes(notes: notes, duration: duration, chord: false)
-            delay = duration * 2.0 * 0.5
+            player.playNotes(notes: notes, duration: params.delay_arpeggio, chord: false)
+            delay = params.delay_arpeggio * 2.0 * 0.5 // x  n_notes - 1 (triad) and x 0.5 (tempo = 120)
         }
         return delay
     }
