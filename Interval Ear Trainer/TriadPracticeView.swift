@@ -14,10 +14,10 @@ struct TriadPracticeView: View {
     @State private var chord = true
     @State private var use_timer = true
     @State private var root_note: Int = 0
-    @State private var quality: String = " "
-    @State private var inversion: String = " "
-    @State private var voicing: String = " "
-    @State private var answer = Text(" ")
+    @State private var quality: String = ""
+    @State private var inversion: String = ""
+    @State private var voicing: String = ""
+    @State private var answer = Text("")
     @State private var notes:[Int] = [0,0,0]
     @State private var timer: Timer?
     @State private var answer_visible: Double = 1.0
@@ -62,7 +62,7 @@ struct TriadPracticeView: View {
                     ForEach(notes, id: \.self) { note in
                         VStack{
                             NoteButton(running: running, player: $player, note: note)
-                            Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray))
+                                Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
                         }
                     }
                 }
@@ -158,7 +158,9 @@ struct TriadPracticeView: View {
         
     func reset_state(){
         stop()
-        answer = Text(" ")
+        answer = Text("")
+        voicing = ""
+        inversion = ""
         answer_visible = 1.0
         notes = notes.map{$0 * 0}
     }

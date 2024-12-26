@@ -179,7 +179,7 @@ let TRIADS: [String: [Int]] = [
     "Augmented":  [0, 4, 8],
     "Lydian":     [0, 4, 6],
 ]
-    
+
 let TRIAD_INVERSION_KEYS = ["Root position", "1st inversion", "2nd inversion"]
 let TRIAD_INVERSIONS: [String: [Int]] = [
     "Root position": [0, 0, 0],
