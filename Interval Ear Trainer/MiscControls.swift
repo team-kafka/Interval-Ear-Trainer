@@ -128,6 +128,25 @@ struct IntervalCheckBoxView: View {
     }
 }
 
+struct ChordCheckBoxView: View {
+    @Binding var active: Set<String>
+    var key: String
+    
+    var body: some View {
+        Image(systemName: active.contains(key) ? "checkmark.square.fill" : "square")
+            .foregroundColor(active.contains(key) ? Color(UIColor.systemBlue) : Color.secondary)
+            .onTapGesture {
+                if (active.contains(key))
+                {
+                    active.remove(at: active.firstIndex(of: key)!)
+                } else
+                {
+                    active.insert(key)
+                }
+            }
+    }
+}
+
 struct NoteStepperView: View {
     @Binding var value: Int
     var caption: String

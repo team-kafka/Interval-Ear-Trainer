@@ -171,6 +171,7 @@ func answer_from_notes(notes: [Int], chord: Bool, oriented: Bool) -> [Int]
 // Triads
 //-------------------------
 
+let TRIAD_KEYS = ["Major", "Minor", "Diminished", "Augmented", "Lydian"]
 let TRIADS: [String: [Int]] = [
     "Major":      [0, 4, 7],
     "Minor":      [0, 3, 7],
@@ -179,12 +180,14 @@ let TRIADS: [String: [Int]] = [
     "Lydian":     [0, 4, 6],
 ]
     
+let TRIAD_INVERSION_KEYS = ["Root position", "1st inversion", "2nd inversion"]
 let TRIAD_INVERSIONS: [String: [Int]] = [
     "Root position": [0, 0, 0],
     "1st inversion": [12, 0, 0],
     "2nd inversion": [12, 12, 0],
 ]
 
+let TRIAD_VOICING_KEYS = ["Close", "Spread"]
 let TRIAD_VOICINGS: [String: [Int]] = [
     "Close":  [0, 0, 0],
     "Spread": [0, -12, 0],

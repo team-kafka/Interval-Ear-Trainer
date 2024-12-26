@@ -39,9 +39,37 @@ struct TriadParametersView: View {
                             }
                         }
                     }
-                    Section(header: Text("filters")) {
+                    Section(header: Text("Qualities")) {
                         Grid{
-                            
+                            ForEach(TRIAD_KEYS, id: \.self) { key in
+                                GridRow{
+                                    Text(key).gridColumnAlignment(.leading)
+                                    ChordCheckBoxView(active: $params.active_qualities, key: key).gridColumnAlignment(.trailing)
+                                }
+                                if (TRIAD_KEYS.firstIndex(of: key) != TRIAD_KEYS.count-1 ) {Divider()}
+                            }
+                        }
+                    }
+                    Section(header: Text("Inversions")) {
+                        Grid{
+                            ForEach(TRIAD_INVERSION_KEYS, id: \.self) { key in
+                                GridRow{
+                                    Text(key.split(separator: " ")[0]).gridColumnAlignment(.leading)
+                                    ChordCheckBoxView(active: $params.active_inversions, key: key).gridColumnAlignment(.trailing)
+                                }
+                                if (TRIAD_INVERSION_KEYS.firstIndex(of: key) != TRIAD_INVERSION_KEYS.count-1 ) {Divider()}
+                            }
+                        }
+                    }
+                    Section(header: Text("Voicings")) {
+                        Grid{
+                            ForEach(TRIAD_VOICING_KEYS, id: \.self) { key in
+                                GridRow{
+                                    Text(key).gridColumnAlignment(.leading)
+                                    ChordCheckBoxView(active: $params.active_voicings, key: key).gridColumnAlignment(.trailing)
+                                }
+                                if (TRIAD_VOICING_KEYS.firstIndex(of: key) != TRIAD_VOICING_KEYS.count-1 ) {Divider()}
+                            }
                         }
                     }
                 }.navigationTitle("Parameters").navigationBarTitleDisplayMode(.inline)

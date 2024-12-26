@@ -134,9 +134,9 @@ struct TriadPracticeView: View {
     }
     
     func show_answer(){
-        let note_name = midi_note_to_name(note_int: root_note)
-        let test = note_name.replacing(/[0-9]+/, with: "")
-        answer = Text(test + " " + quality + " triad")
+        //let note_name = midi_note_to_name(note_int: root_note)
+        //let name_trimmed = note_name.replacing(/[0-9]+/, with: "")
+        answer = Text(quality + " triad")
         answer_visible = 1.0
     }
         
