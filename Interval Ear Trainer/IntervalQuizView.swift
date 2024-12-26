@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct IntervalQuizzView: View {
+struct IntervalQuizView: View {
     @State var params: IntervalParameters
     @State private var run_btn = Image(systemName: "play.circle")
     @State private var running = false
@@ -133,14 +133,10 @@ struct IntervalQuizzView: View {
                 notes[0] = notes[1]
                 notes[1] = draw_new_note(prev_note: notes[0], params: params)
                 player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
-                delay = 0
-                print(answer_string(notes: notes, chord: false, oriented: true))
             }
         } else if chord{
             notes = draw_random_chord(params: params, n_notes: n_notes)
             player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
-            delay = params.delay * 0.5
-            print(answer_string(notes: notes, chord: true, oriented: false))
         } else {
             notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
             for (i, _) in notes[1...].enumerated(){
@@ -149,7 +145,6 @@ struct IntervalQuizzView: View {
             let duration = params.delay_sequence
             player.playNotes(notes: notes, duration: duration, chord: false)
             delay = params.delay_sequence * Double(n_notes-1) * 0.5
-            print(answer_string(notes: notes, chord: chord, oriented: !chord))
         }
         return delay
     }
@@ -196,7 +191,7 @@ struct AnswerButtonsView: View {
                     ForEach(0..<3){ j in
                         let thisInt = j*4+i+1
                         let active = (activeIntAbs.contains(thisInt) && running)
-                        Text(interval_name(interval_int: thisInt, oriented: false)).bold().font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
+                        Text(interval_name(interval_int: thisInt, oriented: false)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
                                     if (active) {

@@ -36,8 +36,11 @@ struct MainMenu: View {
                 let dftParamsIQ = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ),
                                                delay: dftDelayIQ)
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: IntervalQuizzView(params: dftParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: IntervalQuizView(params: dftParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
+                    }
+                    NavigationLink(destination: TriadQuizView().navigationBarBackButtonHidden(true)){
+                        Text("Triad Recognition").font(.headline)
                     }
                 }
 

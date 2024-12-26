@@ -68,7 +68,7 @@ struct TimerView: View {
 
 struct ChordArpSwitchView: View {
     @Binding var chord: Bool
-    var active: Bool
+    var active: Bool = true
     var body: some View {
         let rotation = (chord && active) ? 90.0 : 0.0
         Image(systemName:"00.square").rotationEffect(Angle(degrees: rotation))
