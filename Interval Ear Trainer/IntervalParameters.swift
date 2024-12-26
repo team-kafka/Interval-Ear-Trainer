@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import SwiftData
 
 struct IntervalParameters {
     var upper_bound: Int = 107
@@ -15,4 +14,13 @@ struct IntervalParameters {
     var delay: Double = 2.8
     var delay_sequence: Double = 0.8
     var largeIntevalsProba: Double = 0.0
+}
+
+struct TriadParameters {
+    var upper_bound: Int = 107
+    var lower_bound: Int = 64
+    var active_qualities: Set<String> = Set<String>(TRIADS.keys)
+    var active_inversions: Set<String> = Set<String>(TRIAD_INVERSIONS.keys)
+    var active_voicings: Set<String> = Set<String>(TRIAD_VOICINGS.keys)
+    var delay: Double = 2.8
 }

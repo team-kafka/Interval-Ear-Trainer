@@ -7,11 +7,6 @@
 
 import SwiftUI
 
-enum playMode {
-    case melodic
-    case harmonic
-}
-
 struct IntervalPracticeView: View {
     @State var params: IntervalParameters
     @State private var button_lbl = Image(systemName: "play.circle")
@@ -59,13 +54,13 @@ struct IntervalPracticeView: View {
                     GridRow{
                         if chord{
                             VStack{
-                                ChordButton(running: $running, params: $params, player: $player, notes: notes)
+                                ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes)
                                 Text(" ").opacity(0.0)
                             }
                         }
                         ForEach(notes, id: \.self) { note in
                             VStack{
-                                NoteButton(running: $running, params: $params, player: $player, note: note)
+                                NoteButton(running: running, player: $player, note: note)
                                 Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray))
                             }
                         }

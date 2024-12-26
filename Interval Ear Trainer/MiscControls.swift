@@ -22,8 +22,8 @@ struct CheckBoxView: View {
 
 
 struct ChordButton : View{
-    @Binding var running : Bool
-    @Binding var params : IntervalParameters
+    var running : Bool
+    var duration : Double
     @Binding var player : MidiPlayer
     var notes : [Int]
 
@@ -32,7 +32,7 @@ struct ChordButton : View{
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 4)).onTapGesture {
                   if ((notes[0] != 0) && !running){
-                      player.playNotes(notes: notes, duration: params.delay*0.5, chord: true)
+                      player.playNotes(notes: notes, duration: duration, chord: true)
                     }
                 }.opacity(((notes[0] != 0) && !running) ? 1.0 : 0.5)
     }
@@ -40,8 +40,7 @@ struct ChordButton : View{
 
 
 struct NoteButton : View{
-    @Binding var running : Bool
-    @Binding var params : IntervalParameters
+    var running : Bool
     @Binding var player : MidiPlayer
     var note : Int
 
@@ -98,3 +97,52 @@ struct NumberOfNotesView: View {
             }
     }
 }
+
+struct ParamSlider: View {
+    @Binding var value : Double
+    var valueRange: ClosedRange<Double>
+    var body: some View {
+            Slider(
+                value: $value,
+                in: valueRange
+            )
+    }
+}
+
+struct IntervalCheckBoxView: View {
+    @Binding var active: Set<Int>
+    var interval_int: Int
+    
+    var body: some View {
+        Image(systemName: active.contains(interval_int) ? "checkmark.square.fill" : "square")
+            .foregroundColor(active.contains(interval_int) ? Color(UIColor.systemBlue) : Color.secondary)
+            .onTapGesture {
+                if (active.contains(interval_int))
+                {
+                    active.remove(at: active.firstIndex(of: interval_int)!)
+                } else
+                {
+                    active.insert(interval_int)
+                }
+            }
+    }
+}
+
+struct NoteStepperView: View {
+    @Binding var value: Int
+    var caption: String
+    var other_bond: Int
+    
+    var body: some View {
+        Stepper {
+            Text(caption)
+        } onIncrement: {
+            if (abs(value+1-other_bond)>30){
+                value += 1}
+        } onDecrement: {
+            if (abs(value-1-other_bond)>30){
+                value -= 1}
+        }
+    }
+}
+

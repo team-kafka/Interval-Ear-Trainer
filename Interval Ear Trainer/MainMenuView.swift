@@ -29,10 +29,13 @@ struct MainMenu: View {
                     NavigationLink(destination: IntervalPracticeView(params: dftParamsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }
+                    NavigationLink(destination: TriadPracticeView().navigationBarBackButtonHidden(true)){
+                        Text("Triad Recognition").font(.headline)
+                    }
                 }.navigationTitle(Text("Interval Ear Trainer"))
                 let dftParamsIQ = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ),
                                                delay: dftDelayIQ)
-                Section(header: Text("Quizz")) {
+                Section(header: Text("Quiz")) {
                     NavigationLink(destination: IntervalQuizzView(params: dftParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }

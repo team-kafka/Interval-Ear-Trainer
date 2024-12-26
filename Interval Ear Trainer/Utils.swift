@@ -167,3 +167,57 @@ func answer_from_notes(notes: [Int], chord: Bool, oriented: Bool) -> [Int]
     return answers
 }
 
+//-------------------------
+// Triads
+//-------------------------
+
+let TRIADS: [String: [Int]] = [
+    "Major":      [0, 4, 7],
+    "Minor":      [0, 3, 7],
+    "Diminished": [0, 3, 6],
+    "Augmented":  [0, 4, 8],
+    "Lydian":     [0, 4, 6],
+]
+    
+let TRIAD_INVERSIONS: [String: [Int]] = [
+    "Root position": [0, 0, 0],
+    "1st inversion": [12, 0, 0],
+    "2nd inversion": [12, 12, 0],
+]
+
+let TRIAD_VOICINGS: [String: [Int]] = [
+    "Close":  [0, 0, 0],
+    "Spread": [0, -12, 0],
+]
+    
+func draw_random_triad_intervals(params:TriadParameters) -> ([Int], [String], Int)
+{
+    let quality   = params.active_qualities.randomElement()  ?? "Major"
+    let inversion = params.active_inversions.randomElement() ?? "Root position"
+    let voicing   = params.active_voicings.randomElement()   ?? "Close"
+    
+    var rv            = (TRIADS[quality]             ?? [0, 4, 7])
+    let inversion_int = (TRIAD_INVERSIONS[inversion] ?? [0, 0, 0])
+    let voicing_int   = (TRIAD_VOICINGS[voicing]     ?? [0, 0, 0])
+    
+    for i in 0..<rv.count {
+        rv[i] += inversion_int[i] + voicing_int[i]
+    }
+    rv = rv.map{$0 - rv.min()!}
+    let root = rv[0]
+    rv = rv.sorted()
+    let root_idx = rv.firstIndex(of: root)!
+
+    return (intervals:rv, tags:[quality, inversion, voicing], root_idx:root_idx)
+}
+
+func draw_random_triad(params:TriadParameters) -> ([Int], [String], Int)
+{
+    let intervals_tags = draw_random_triad_intervals(params:params)
+    let intervals = intervals_tags.0
+    let lower_note = Int.random(in: params.lower_bound..<params.upper_bound-intervals.max()!)
+    let notes = intervals.map{lower_note + $0}
+    let root_note = notes[intervals_tags.2]
+    
+    return (notes:notes, tags:intervals_tags.1, root_note:root_note)
+}
