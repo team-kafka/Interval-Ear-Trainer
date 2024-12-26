@@ -11,6 +11,8 @@ struct TriadPracticeView: View {
     @State var params: TriadParameters = TriadParameters()
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
+    @State private var chord = true
+    @State private var use_timer = true
     @State private var root_note: Int = 0
     @State private var quality: String = " "
     @State private var inversion: String = " "
@@ -35,7 +37,10 @@ struct TriadPracticeView: View {
                  }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
                 }
                 //Spacer()
-                
+                HStack{
+                    ChordArpSwitchView(chord: $chord, active: true).padding().onChange(of: chord){reset_state()}
+                    TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
+                }.scaleEffect(2.0)
                 //Spacer()
             }
             //Spacer()
@@ -65,8 +70,8 @@ struct TriadPracticeView: View {
             Spacer()
             VStack(alignment: .leading){
                 answer.font(.system(size: 40)).foregroundStyle(Color(.systemGray))
-                Text(inversion).font(.system(size: 40)).foregroundStyle(Color(.systemGray))
-                Text(voicing).font(.system(size: 40)).foregroundStyle(Color(.systemGray))
+                Text(inversion).font(.system(size: 30)).foregroundStyle(Color(.systemGray))
+                Text(voicing).font(.system(size: 30)).foregroundStyle(Color(.systemGray))
             }.opacity(answer_visible).padding()
             Spacer()
         
@@ -127,9 +132,13 @@ struct TriadPracticeView: View {
         voicing = (res.1)[2] + " voicing"
         root_note = res.2
         
-        player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
-        delay = params.delay * 0.5
-
+        if chord {
+            player.playNotes(notes: notes, duration: params.delay , chord: true)
+        } else {
+            let duration = 0.6
+            player.playNotes(notes: notes, duration: duration, chord: false)
+            delay = duration * 2.0 * 0.5
+        }
         return delay
     }
     

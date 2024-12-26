@@ -12,7 +12,7 @@ struct IntervalParameters {
     var lower_bound: Int = 64
     var active_intervals: Set<Int> = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     var delay: Double = 2.8
-    var delay_sequence: Double = 0.8
+    var delay_sequence: Double = 0.6
     var largeIntevalsProba: Double = 0.0
 }
 
@@ -23,4 +23,5 @@ struct TriadParameters {
     var active_inversions: Set<String> = Set<String>(TRIAD_INVERSIONS.keys)
     var active_voicings: Set<String> = Set<String>(TRIAD_VOICINGS.keys)
     var delay: Double = 2.8
+    var delay_arpeggio: Double = 0.6
 }

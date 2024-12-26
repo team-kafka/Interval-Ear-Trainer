@@ -36,22 +36,6 @@ struct IntervalParametersView: View {
                             HStack{Text("Probability of large intervals (>octave)");Spacer()}
                             HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
                         }
-                        HStack{
-                            NoteStepperView(value: $params.lower_bound, caption: "Lowest note", other_bond: params.upper_bound)
-                            Text(midi_note_to_name(note_int: params.lower_bound)).bold()
-                            Spacer()
-                            Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.lower_bound], duration: 1)
-                            }
-                        }
-                        HStack{
-                            NoteStepperView(value: $params.upper_bound, caption: "Highest note", other_bond: params.lower_bound)
-                            Text(midi_note_to_name(note_int: params.upper_bound)).bold()
-                            Spacer()
-                            Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.upper_bound], duration: 1)
-                            }
-                        }
                     }
                     Section(header: Text("filters")) {
                         Picker("Preset", selection: $preset) {
@@ -95,6 +79,28 @@ struct IntervalParametersView: View {
                                 }
                                 if (interval_int < 6) {Divider()}
                             }
+                        }
+                    }
+                    Section(header: Text("Misc")) {
+                        HStack{
+                            NoteStepperView(value: $params.lower_bound, caption: "Lowest note", other_bond: params.upper_bound)
+                            Text(midi_note_to_name(note_int: params.lower_bound)).bold()
+                            Spacer()
+                            Image(systemName: "speaker.wave.2.fill").onTapGesture {
+                                player.playNotes(notes: [params.lower_bound], duration: 1)
+                            }
+                        }
+                        HStack{
+                            NoteStepperView(value: $params.upper_bound, caption: "Highest note", other_bond: params.lower_bound)
+                            Text(midi_note_to_name(note_int: params.upper_bound)).bold()
+                            Spacer()
+                            Image(systemName: "speaker.wave.2.fill").onTapGesture {
+                                player.playNotes(notes: [params.upper_bound], duration: 1)
+                            }
+                        }
+                        VStack{
+                            HStack{Text("Sequence speed (seconds)");Spacer()}
+                            HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.2...1.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
                         }
                     }
                 }.navigationTitle("Parameters").navigationBarTitleDisplayMode(.inline)
