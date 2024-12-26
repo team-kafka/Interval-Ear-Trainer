@@ -85,7 +85,7 @@ struct IntervalPracticeView: View {
     }
     
     func toggle_start_stop() {
-        if use_timer{
+        if use_timer {
             running.toggle()
             if running {
                 start()
@@ -118,11 +118,13 @@ struct IntervalPracticeView: View {
         if (answer_visible == 1.0){
             answer_visible = 0.0
             delay += play_sequence()
-        } else{
+        } else {
             show_answer()
         }
-        timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-            loopFunction()
+        if (use_timer){
+            timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
+                loopFunction()
+            }
         }
     }
     
