@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TriadPracticeView: View {
-    @State var params: TriadParameters = TriadParameters()
+    @State var params: TriadParameters
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
     @State private var chord = true
@@ -22,6 +22,9 @@ struct TriadPracticeView: View {
     @State private var timer: Timer?
     @State private var answer_visible: Double = 1.0
     
+    @Binding var dftDelay: Double
+    @Binding var dftFilterStr: String
+
     
     @State var player = MidiPlayer()
     
@@ -78,7 +81,7 @@ struct TriadPracticeView: View {
     }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            //update_function(newParams: params)
+            update_function(newParams: params)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -137,7 +140,7 @@ struct TriadPracticeView: View {
         notes = res.0
         quality = (res.1)[0]
         inversion = (res.1)[1]
-        voicing = (res.1)[2] + " voicing"
+        voicing = (res.1)[2] + " position"
         root_note = res.2
         
         if chord {
@@ -150,8 +153,6 @@ struct TriadPracticeView: View {
     }
     
     func show_answer(){
-        //let note_name = midi_note_to_name(note_int: root_note)
-        //let name_trimmed = note_name.replacing(/[0-9]+/, with: "")
         answer = Text(quality + " triad")
         answer_visible = 1.0
     }
@@ -165,16 +166,10 @@ struct TriadPracticeView: View {
         notes = notes.map{$0 * 0}
     }
     
-    //func update_function(newParams: IntervalParameters){
-    //    dftDelay = newParams.delay
-    //    dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
-    //}
+    func update_function(newParams: TriadParameters){
+        dftDelay = newParams.delay
+        dftFilterStr = triad_filters_to_str(active_qualities: newParams.active_qualities, active_inversions: newParams.active_inversions, active_voicings: newParams.active_voicings)
+    }
 }
 
 
-
-        
-
-#Preview {
-    TriadPracticeView()
-}

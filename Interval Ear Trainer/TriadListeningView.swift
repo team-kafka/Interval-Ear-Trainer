@@ -8,13 +8,14 @@
 import SwiftUI
 
 struct TriadListeningView: View {
-    @State var params: TriadParameters = TriadParameters()
+    @State var params: TriadParameters
     @State private var playing: Bool = false
-    @State private var chord: Bool = true
+    @State var chord: Bool = true
     @State private var spakerImg: Image = Image(systemName:"speaker.wave.2.fill")
     @State private var timer: Timer?
-    //@Binding var dftDelay: Double
-    //@Binding var dftFilterStr: String
+    
+    @Binding var dftDelay: Double
+    @Binding var dftFilterStr: String
 
     var player = MidiPlayer()
     
@@ -30,9 +31,9 @@ struct TriadListeningView: View {
             ChordArpSwitchView(chord: $chord, active: true)
             NavigationLink(destination: TriadParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
-            Text(triad_filter_to_str(active_qualities:params.active_qualities)).lineLimit(1)
+            Text(triad_qualities_to_str(active_qualities:params.active_qualities)).lineLimit(1)
             Image(systemName: "gearshape.fill")
-        }.onAppear{}// update_function(newParams: params)}
+        }.onAppear{update_function(newParams: params)}
     }
     
     func start() {
@@ -62,9 +63,9 @@ struct TriadListeningView: View {
         }
     }
     
-    func update_function(newParams: IntervalParameters){
-     //   dftDelay = newParams.delay
-     //   dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
+    func update_function(newParams: TriadParameters){
+        dftDelay = newParams.delay
+        dftFilterStr = triad_filters_to_str(active_qualities: newParams.active_qualities, active_inversions: newParams.active_inversions, active_voicings: newParams.active_voicings)
     }
 }
 

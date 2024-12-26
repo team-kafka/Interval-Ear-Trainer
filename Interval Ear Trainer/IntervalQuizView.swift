@@ -22,6 +22,7 @@ struct IntervalQuizView: View {
     @State var correct: Bool = false
     @State private var guess_str = Text(" ")
     @State private var guess: [Int] = [0]
+    
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
 

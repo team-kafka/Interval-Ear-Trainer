@@ -187,10 +187,10 @@ let TRIAD_INVERSIONS: [String: [Int]] = [
     "2nd inversion": [12, 12, 0],
 ]
 
-let TRIAD_VOICING_KEYS = ["Close", "Spread"]
+let TRIAD_VOICING_KEYS = ["Close", "Open"]
 let TRIAD_VOICINGS: [String: [Int]] = [
     "Close":  [0, 0, 0],
-    "Spread": [0, -12, 0],
+    "Open": [0, -12, 0],
 ]
     
 func draw_random_triad_intervals(params:TriadParameters) -> ([Int], [String], Int)
@@ -225,9 +225,30 @@ func draw_random_triad(params:TriadParameters) -> ([Int], [String], Int)
     return (notes:notes, tags:intervals_tags.1, root_note:root_note)
 }
 
-func triad_filter_to_str(active_qualities: Set<String>) -> String
+func triad_qualities_to_str(active_qualities: Set<String>) -> String
 {
     let sorted_qualities = TRIAD_KEYS.filter{active_qualities.contains($0)}
     let qualities = sorted_qualities.map{$0.prefix(3)}
     return qualities.joined(separator: " ")
+}
+
+func triad_filters_to_str(active_qualities: Set<String>, active_inversions: Set<String>, active_voicings: Set<String>) -> String
+{
+    let sorted_qualities  = TRIAD_KEYS.filter{active_qualities.contains($0)}
+    let sorted_inversions = TRIAD_INVERSION_KEYS.filter{active_inversions.contains($0)}
+    let sorted_voicings   = TRIAD_VOICING_KEYS.filter{active_voicings.contains($0)}
+    
+    return sorted_qualities.joined(separator: "/") + "|" + sorted_inversions.joined(separator: "/") + "|" + sorted_voicings.joined(separator: "/")
+}
+
+func triad_filters_from_str(filter_str: String) -> (Set<String>, Set<String>, Set<String>)
+{
+    if filter_str.isEmpty { return (Set<String>(), Set<String>(), Set<String>()) }
+    
+    let split_str = filter_str.split(separator: "|")
+    let qualities  = Set(split_str[0].split(separator: "/").map{String($0)})
+    let inversions = Set(split_str[1].split(separator: "/").map{String($0)})
+    let voicings   = Set(split_str[2].split(separator: "/").map{String($0)})
+    
+    return (qualities, inversions, voicings)
 }
