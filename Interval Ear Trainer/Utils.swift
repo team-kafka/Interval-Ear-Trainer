@@ -39,34 +39,34 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
     }
 }
 
-func draw_new_note(prev_note:Int, params:IntervalParameters) -> Int
+func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> Int
 {
-    let acceptable_intervals = params.active_intervals.filter{(prev_note+$0 >= params.lower_bound) && (prev_note+$0 <= params.upper_bound)}
+    let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
     if (acceptable_intervals.isEmpty){
         
-        return Int.random(in: max(prev_note-12, params.lower_bound)..<min(prev_note+12, params.upper_bound))
+        return Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
     }
     
     let rnd_interval = acceptable_intervals.randomElement()!
-    var octave = Double.random(in: 0...1) < params.largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
-    if (prev_note + rnd_interval + octave < params.lower_bound) || (prev_note + rnd_interval + octave > params.upper_bound) {
+    var octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
+    if (prev_note + rnd_interval + octave < lower_bound) || (prev_note + rnd_interval + octave > upper_bound) {
         octave = 0
     }
     
     return prev_note + rnd_interval + octave
 }
 
-func draw_random_chord(params:IntervalParameters, n_notes:Int) -> [Int]
+func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> [Int]
 {
-    let note_0 = Int.random(in: params.lower_bound...params.upper_bound-12)
-    let pos_intervals = Set<Int>(params.active_intervals.map{$0 > 0 ? $0 : -$0})
+    let note_0 = Int.random(in: lower_bound...upper_bound-12)
+    let pos_intervals = Set<Int>(active_intervals.map{$0 > 0 ? $0 : -$0})
     print(pos_intervals)
-    var acceptable_intervals = pos_intervals.filter{note_0+$0 <= params.upper_bound}
+    var acceptable_intervals = pos_intervals.filter{note_0+$0 <= upper_bound}
     var rv = [note_0]
     for _ in (0..<n_notes-1){
         let rnd_int = acceptable_intervals.randomElement()!
-        let octave = (Double.random(in: 0...1) < params.largeIntevalsProba)
-                    && (note_0 + rnd_int + 12 < params.upper_bound) ? 12 : 0
+        let octave = (Double.random(in: 0...1) < largeIntevalsProba)
+                    && (note_0 + rnd_int + 12 < upper_bound) ? 12 : 0
         if (acceptable_intervals.count > 1){
             acceptable_intervals.remove(at:acceptable_intervals.firstIndex{$0 == rnd_int}!)
         }
@@ -193,11 +193,11 @@ let TRIAD_VOICINGS: [String: [Int]] = [
     "Open": [0, -12, 0],
 ]
     
-func draw_random_triad_intervals(params:TriadParameters) -> ([Int], [String], Int)
+func draw_random_triad_intervals(active_qualities: Set<String>, active_inversions: Set<String>, active_voicings: Set<String>) -> ([Int], [String], Int)
 {
-    let quality   = params.active_qualities.randomElement()  ?? "Major"
-    let inversion = params.active_inversions.randomElement() ?? "Root position"
-    let voicing   = params.active_voicings.randomElement()   ?? "Close"
+    let quality   = active_qualities.randomElement()  ?? "Major"
+    let inversion = active_inversions.randomElement() ?? "Root position"
+    let voicing   = active_voicings.randomElement()   ?? "Close"
     
     var rv            = (TRIADS[quality]             ?? [0, 4, 7])
     let inversion_int = (TRIAD_INVERSIONS[inversion] ?? [0, 0, 0])
@@ -214,11 +214,11 @@ func draw_random_triad_intervals(params:TriadParameters) -> ([Int], [String], In
     return (intervals:rv, tags:[quality, inversion, voicing], root_idx:root_idx)
 }
 
-func draw_random_triad(params:TriadParameters) -> ([Int], [String], Int)
+func draw_random_triad(active_qualities: Set<String>, active_inversions: Set<String>, active_voicings: Set<String>, upper_bound:Int, lower_bound:Int) -> ([Int], [String], Int)
 {
-    let intervals_tags = draw_random_triad_intervals(params:params)
+    let intervals_tags = draw_random_triad_intervals(active_qualities:active_qualities, active_inversions:active_inversions, active_voicings:active_voicings)
     let intervals = intervals_tags.0
-    let lower_note = Int.random(in: params.lower_bound..<params.upper_bound-intervals.max()!)
+    let lower_note = Int.random(in: lower_bound..<upper_bound-intervals.max()!)
     let notes = intervals.map{lower_note + $0}
     let root_note = notes[intervals_tags.2]
     

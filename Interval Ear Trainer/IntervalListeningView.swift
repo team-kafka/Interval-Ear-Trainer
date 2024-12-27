@@ -49,7 +49,7 @@ struct IntervalListeningView: View {
     func loopFunction() {
         var notes: [Int] = [0, 0]
         notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-        notes[1] = draw_new_note(prev_note: notes[0], params: params)
+        notes[1] = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
         player.playNotes(notes: notes, duration: params.delay_sequence, chord: false)
         timer = Timer.scheduledTimer(withTimeInterval:params.delay, repeats: false) { t in
             loopFunction()

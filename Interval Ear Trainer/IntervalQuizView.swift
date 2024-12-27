@@ -126,22 +126,22 @@ struct IntervalQuizView: View {
         if (n_notes == 1) {
             if (notes[0] == 0) {
                 notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-                notes[1] = draw_new_note(prev_note: notes[0], params: params)
+                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 player.playNotes(notes: notes, duration: params.delay*0.5)
                 delay = params.delay * 0.5
             }
             else {
                 notes[0] = notes[1]
-                notes[1] = draw_new_note(prev_note: notes[0], params: params)
+                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
             }
         } else if chord{
-            notes = draw_random_chord(params: params, n_notes: n_notes)
+            notes = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
             player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
         } else {
             notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
             for (i, _) in notes[1...].enumerated(){
-                notes[i+1] = draw_new_note(prev_note: notes[i], params: params)
+                notes[i+1] = draw_new_note(prev_note: notes[i], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
             }
             let duration = params.delay_sequence
             player.playNotes(notes: notes, duration: duration, chord: false)

@@ -117,7 +117,7 @@ struct TriadQuizView: View {
     
     func play_sequence() -> Double {
         var delay: Double = 0.0
-        let res = draw_random_triad(params: params)
+        let res = draw_random_triad(active_qualities: params.active_qualities, active_inversions: params.active_inversions, active_voicings: params.active_voicings, upper_bound: params.upper_bound, lower_bound: params.lower_bound)
         quality = (res.1)[0]
         if chord {
             player.playNotes(notes: res.0, duration: params.delay * 0.5, chord: true)
