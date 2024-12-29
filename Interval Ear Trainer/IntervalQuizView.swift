@@ -13,6 +13,7 @@ struct IntervalQuizView: View {
     @State private var run_btn = Image(systemName: "play.circle")
     @State private var running = false
     @State private var answer = Text(" ")
+    @State private var answer_str = String(" ")
     @State private var notes: [Int] = [0,0]
     @State private var timer: Timer?
     @State var answer_visible: Double = 1.0
@@ -127,23 +128,27 @@ struct IntervalQuizView: View {
         if (n_notes == 1) {
             if (notes[0] == 0) {
                 notes[0] = Int.random(in: seqParams.lower_bound..<seqParams.upper_bound)
-                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                (notes[1], answer_str) = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
                 player.playNotes(notes: notes, duration: seqParams.delay*0.5)
                 delay = seqParams.delay * 0.5
             }
             else {
                 notes[0] = notes[1]
-                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                (notes[1], answer_str) = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
                 player.playNotes(notes: [notes[1]], duration: seqParams.delay*0.5)
             }
         } else if chord{
-            notes = draw_random_chord(n_notes: n_notes, active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+            (notes, answer_str) = draw_random_chord(n_notes: n_notes, active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
             player.playNotes(notes: notes, duration: seqParams.delay * 0.5, chord: true)
         } else {
             notes[0] = Int.random(in: seqParams.lower_bound..<seqParams.upper_bound)
+            var answers = [String]()
             for (i, _) in notes[1...].enumerated(){
-                notes[i+1] = draw_new_note(prev_note: notes[i], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                var answer: String
+                (notes[i+1], answer) = draw_new_note(prev_note: notes[i], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                answers.append(answer)
             }
+            answer_str = answers.joined(separator: " ")
             let duration = seqParams.delay_sequence
             player.playNotes(notes: notes, duration: duration, chord: false)
             delay = seqParams.delay_sequence * Double(n_notes-1) * 0.5
@@ -152,11 +157,10 @@ struct IntervalQuizView: View {
     }
     
     func show_answer(){
-        let answerStr = answer_string(notes: notes, chord: chord, oriented: !chord)
         let answerInt = answer_from_notes(notes: notes, chord: chord, oriented: false)
-        print(answerInt)
+
         correct = (answerInt[...] == guess[1...])
-        answer = Text(answerStr)
+        answer = Text(answer_str)
         answer_visible = 1.0
     }
 

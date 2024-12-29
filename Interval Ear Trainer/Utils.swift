@@ -32,19 +32,19 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
     if (abs(interval_int) % 12 == 0){
         return direction + "8"
     }
-    else{
+    else {
         let quality = INTERVAL_NAME_TO_INT.filter{$1 == abs(interval_int) % 12}.map{$0.0}[0]
-        let octave = (octave && abs(interval_int) / 12 != 0) ? "+8" : ""//+8"
+        let octave = (octave && abs(interval_int) / 12 != 0) ? "+8" : ""
         return direction + quality + octave
     }
 }
 
-func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> Int
+func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> (Int, String)
 {
     let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
     if (acceptable_intervals.isEmpty){
-        
-        return Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
+        let new_note = Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
+        return (new_note, interval_name(interval_int: new_note-prev_note, oriented: true, octave: false))
     }
     
     let rnd_interval = acceptable_intervals.randomElement()!
@@ -53,16 +53,16 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
         octave = 0
     }
     
-    return prev_note + rnd_interval + octave
+    return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
 }
 
-func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> [Int]
+func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> ([Int], String)
 {
     let note_0 = Int.random(in: lower_bound...upper_bound-12)
     let pos_intervals = Set<Int>(active_intervals.map{$0 > 0 ? $0 : -$0})
     print(pos_intervals)
     var acceptable_intervals = pos_intervals.filter{note_0+$0 <= upper_bound}
-    var rv = [note_0]
+    var notes = [note_0]
     for _ in (0..<n_notes-1){
         let rnd_int = acceptable_intervals.randomElement()!
         let octave = (Double.random(in: 0...1) < largeIntevalsProba)
@@ -70,9 +70,14 @@ func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, 
         if (acceptable_intervals.count > 1){
             acceptable_intervals.remove(at:acceptable_intervals.firstIndex{$0 == rnd_int}!)
         }
-        rv.append(note_0 + octave + rnd_int)
+        notes.append(note_0 + octave + rnd_int)
     }
-    return rv.sorted()
+    let rv = notes.sorted()
+    var answers = [String]()
+    for i in notes[1...] {
+        answers.append(interval_name(interval_int:i-notes[0], oriented: false))
+    }
+    return (rv, answers.joined(separator: "  "))
 }
 
 let MIDI_NOTE_MAPPING: [Int: String] = [
@@ -88,7 +93,6 @@ let MIDI_NOTE_MAPPING: [Int: String] = [
     9:"A",
     10:"A#",
     11:"B",
-
 ]
 
 func midi_note_to_name(note_int: Int) -> String
@@ -136,7 +140,7 @@ func str_to_interval_filter(filter_str: String) -> Set<Int>
     }
     return Set<Int>(rv)
 }
-
+// ##########  to disappear ##########################
 func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
 {
     var answers = [String]()
@@ -166,6 +170,7 @@ func answer_from_notes(notes: [Int], chord: Bool, oriented: Bool) -> [Int]
     }
     return answers
 }
+// ##########  end of: to disappear ##########################
 
 //-------------------------
 // Triads
