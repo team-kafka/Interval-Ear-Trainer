@@ -31,10 +31,10 @@ struct MainMenu: View {
     var body: some View {
         NavigationStack{
             List{
-                let dftParamsIP = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP),
-                                               delay: dftDelayIP)
+                let intParamsIP = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
+                let seqParamsIP = SequenceParameters(delay: dftDelayIP)
                 Section(header: Text("Practice")) {
-                    NavigationLink(destination: IntervalPracticeView(params: dftParamsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: IntervalPracticeView(intParams: intParamsIP, seqParams: seqParamsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }
                     let filtersTP = triad_filters_from_str(filter_str: dftFilterStrTP)
@@ -44,10 +44,10 @@ struct MainMenu: View {
                         Text("Triad Recognition").font(.headline)
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
-                let dftParamsIQ = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ),
-                                               delay: dftDelayIQ)
+                let intParamsIQ = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
+                let seqParamsIQ = SequenceParameters(delay: dftDelayIQ)
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: IntervalQuizView(params: dftParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: IntervalQuizView(intParams: intParamsIQ, seqParams: seqParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }
                     let filtersTQ = triad_filters_from_str(filter_str: dftFilterStrTQ)
@@ -57,15 +57,18 @@ struct MainMenu: View {
                     }
                 }
                 Section(header: Text("Passive Listening")) {
-                    let dftParamsIL1 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1),
-                                                   delay: dftDelayIL1)
-                    IntervalListeningView(params:dftParamsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
-                    let dftParamsIL2 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2),
-                                                   delay: dftDelayIL2)
-                    IntervalListeningView(params:dftParamsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL3)
-                    let dftParamsIL3 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3),
-                                                   delay: dftDelayIL3)
-                    IntervalListeningView(params:dftParamsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    let intParamsIL1 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
+                    let seqParamsIL1 = SequenceParameters(delay: dftDelayIL1)
+                    IntervalListeningView(intParams:intParamsIL1, seqParams: seqParamsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
+                    
+                    let intParamsIL2 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
+                    let seqParamsIL2 = SequenceParameters(delay: dftDelayIL2)
+                    IntervalListeningView(intParams:intParamsIL2, seqParams: seqParamsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
+                    
+                    let intParamsIL3 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
+                    let seqParamsIL3 = SequenceParameters(delay: dftDelayIL3)
+                    IntervalListeningView(intParams:intParamsIL3, seqParams: seqParamsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
                     let dftParamsTL = TriadParameters(active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2, delay: dftDelayTQ)
                     TriadListeningView(params: dftParamsTL, dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)

@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct IntervalQuizView: View {
-    @State var params: IntervalParameters
+    @State var intParams: IntervalParameters
+    @State var seqParams: SequenceParameters
     @State private var run_btn = Image(systemName: "play.circle")
     @State private var running = false
     @State private var answer = Text(" ")
@@ -34,7 +35,7 @@ struct IntervalQuizView: View {
             VStack {
                 HStack{
                     Spacer()
-                    NavigationLink(destination: IntervalParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+                    NavigationLink(destination: IntervalParametersView(intParams: $intParams, seqParams: $seqParams).navigationBarBackButtonHidden(true).onAppear {stop()}){
                         Image(systemName: "gearshape.fill")
                     }.accentColor(Color(.systemGray)).scaleEffect(1.5).padding([.trailing])
                 }
@@ -60,13 +61,13 @@ struct IntervalQuizView: View {
                 answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(correct ? Color.green : Color.red)
                 guess_str.foregroundColor(Color(.systemGray)).font(.system(size: 45))
                 Spacer()
-                AnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
+                AnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: intParams.active_intervals, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 Spacer()
             }
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            update_function(newParams: params)
+            update_function(newIntParams: intParams, newSeqParams: seqParams)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -103,7 +104,7 @@ struct IntervalQuizView: View {
     }
 
     func loopFunction() {
-        var delay = params.delay * 0.5
+        var delay = seqParams.delay * 0.5
         if (answer_visible == 1.0){
             correct = false
             answer_visible = 0.0
@@ -125,27 +126,27 @@ struct IntervalQuizView: View {
         var delay: Double = 0.0
         if (n_notes == 1) {
             if (notes[0] == 0) {
-                notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-                player.playNotes(notes: notes, duration: params.delay*0.5)
-                delay = params.delay * 0.5
+                notes[0] = Int.random(in: seqParams.lower_bound..<seqParams.upper_bound)
+                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                player.playNotes(notes: notes, duration: seqParams.delay*0.5)
+                delay = seqParams.delay * 0.5
             }
             else {
                 notes[0] = notes[1]
-                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-                player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
+                notes[1] = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+                player.playNotes(notes: [notes[1]], duration: seqParams.delay*0.5)
             }
         } else if chord{
-            notes = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-            player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
+            notes = draw_random_chord(n_notes: n_notes, active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
+            player.playNotes(notes: notes, duration: seqParams.delay * 0.5, chord: true)
         } else {
-            notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
+            notes[0] = Int.random(in: seqParams.lower_bound..<seqParams.upper_bound)
             for (i, _) in notes[1...].enumerated(){
-                notes[i+1] = draw_new_note(prev_note: notes[i], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+                notes[i+1] = draw_new_note(prev_note: notes[i], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
             }
-            let duration = params.delay_sequence
+            let duration = seqParams.delay_sequence
             player.playNotes(notes: notes, duration: duration, chord: false)
-            delay = params.delay_sequence * Double(n_notes-1) * 0.5
+            delay = seqParams.delay_sequence * Double(n_notes-1) * 0.5
         }
         return delay
     }
@@ -167,15 +168,15 @@ struct IntervalQuizView: View {
         guess = [Int](repeating: 0, count: notes.count)
     }
     
-    func update_function(newParams: IntervalParameters){
-        dftDelay = newParams.delay
-        dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
+    func update_function(newIntParams: IntervalParameters, newSeqParams: SequenceParameters){
+        dftDelay = newSeqParams.delay
+        dftFilterStr = interval_filter_to_str(intervals: newIntParams.active_intervals)
     }
 }
 
 struct AnswerButtonsView: View {
     public var loopFunction: (() -> Void)
-    var params: IntervalParameters
+    var activeIntervals: Set<Int>
     var running: Bool
     var notes: [Int]
     @Binding var guess_str: Text
@@ -185,7 +186,7 @@ struct AnswerButtonsView: View {
     @State private var timer: Timer?
     
     var body: some View {
-        let activeIntAbs = params.active_intervals.map{$0 > 0 ? $0 : -$0}
+        let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
         HStack{
             ForEach(0..<4){ i in
                 VStack{

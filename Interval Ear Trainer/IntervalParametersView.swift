@@ -16,7 +16,8 @@ let PRESET_MAPPING: [String : Set<Int>] = [
               ]
 
 struct IntervalParametersView: View {
-    @Binding var params : IntervalParameters
+    @Binding var intParams : IntervalParameters
+    @Binding var seqParams : SequenceParameters
     @State private var preset = 0
     
     let player = MidiPlayer()
@@ -30,11 +31,11 @@ struct IntervalParametersView: View {
                     Section(header: Text("general")) {
                         VStack{
                             HStack{Text("Delay (seconds)");Spacer()}
-                            HStack{ParamSlider(value: $params.delay, valueRange: 0.2...5.0);Text("\(params.delay, specifier:"%0.1f")")}
+                            HStack{ParamSlider(value: $seqParams.delay, valueRange: 0.2...5.0);Text("\(seqParams.delay, specifier:"%0.1f")")}
                         }
                         VStack{
                             HStack{Text("Probability of large intervals (>octave)");Spacer()}
-                            HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
+                            HStack{ParamSlider(value: $intParams.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(intParams.largeIntevalsProba*100, specifier:"%0.f")")}
                         }
                     }
                     Section(header: Text("filters")) {
@@ -43,7 +44,7 @@ struct IntervalParametersView: View {
                                 Text(preset_values[$0])
                             }
                                 }.onChange(of: preset) {
-                                        params.active_intervals = PRESET_MAPPING[preset_values[preset]]!
+                                    intParams.active_intervals = PRESET_MAPPING[preset_values[preset]]!
                             }
                         Grid{
                             GridRow {
@@ -68,14 +69,14 @@ struct IntervalParametersView: View {
                                     Text(interval_name(interval_int: 2*interval_int-1, oriented: false)).bold().gridColumnAlignment(.trailing).onTapGesture {
                                         toggle_active_intervals(intervals: [2*interval_int-1, -2*interval_int+1])
                                     }
-                                    IntervalCheckBoxView(active: $params.active_intervals , interval_int: 2*interval_int-1)
-                                    IntervalCheckBoxView(active: $params.active_intervals ,interval_int: -2*interval_int+1)
+                                    IntervalCheckBoxView(active: $intParams.active_intervals , interval_int: 2*interval_int-1)
+                                    IntervalCheckBoxView(active: $intParams.active_intervals ,interval_int: -2*interval_int+1)
                                     Spacer()
                                     Text(interval_name(interval_int: 2*interval_int, oriented: false)).bold().gridColumnAlignment(.trailing).onTapGesture {
                                         toggle_active_intervals(intervals: [2*interval_int, -2*interval_int])
                                     }
-                                    IntervalCheckBoxView(active: $params.active_intervals , interval_int: 2*interval_int)
-                                    IntervalCheckBoxView(active: $params.active_intervals ,interval_int: -2*interval_int)
+                                    IntervalCheckBoxView(active: $intParams.active_intervals , interval_int: 2*interval_int)
+                                    IntervalCheckBoxView(active: $intParams.active_intervals ,interval_int: -2*interval_int)
                                 }
                                 if (interval_int < 6) {Divider()}
                             }
@@ -83,24 +84,24 @@ struct IntervalParametersView: View {
                     }
                     Section(header: Text("Misc")) {
                         HStack{
-                            NoteStepperView(value: $params.lower_bound, caption: "Lowest note", other_bond: params.upper_bound)
-                            Text(midi_note_to_name(note_int: params.lower_bound)).bold()
+                            NoteStepperView(value: $seqParams.lower_bound, caption: "Lowest note", other_bond: seqParams.upper_bound)
+                            Text(midi_note_to_name(note_int: seqParams.lower_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.lower_bound], duration: 1)
+                                player.playNotes(notes: [seqParams.lower_bound], duration: 1)
                             }
                         }
                         HStack{
-                            NoteStepperView(value: $params.upper_bound, caption: "Highest note", other_bond: params.lower_bound)
-                            Text(midi_note_to_name(note_int: params.upper_bound)).bold()
+                            NoteStepperView(value: $seqParams.upper_bound, caption: "Highest note", other_bond: seqParams.lower_bound)
+                            Text(midi_note_to_name(note_int: seqParams.upper_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.upper_bound], duration: 1)
+                                player.playNotes(notes: [seqParams.upper_bound], duration: 1)
                             }
                         }
                         VStack{
                             HStack{Text("Sequence speed (seconds)");Spacer()}
-                            HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.2...1.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
+                            HStack{ParamSlider(value: $seqParams.delay_sequence, valueRange: 0.2...1.0);Text("\(seqParams.delay_sequence, specifier:"%0.1f")")}
                         }
                     }
                 }.navigationTitle("Parameters").navigationBarTitleDisplayMode(.inline)
@@ -110,12 +111,12 @@ struct IntervalParametersView: View {
     
     func toggle_active_intervals(intervals:[Int]){
         for i in intervals{
-            if (params.active_intervals.contains(i))
+            if (intParams.active_intervals.contains(i))
             {
-                params.active_intervals.remove(at: params.active_intervals.firstIndex(of: i)!)
+                intParams.active_intervals.remove(at: intParams.active_intervals.firstIndex(of: i)!)
             } else
             {
-                params.active_intervals.insert(i)
+                intParams.active_intervals.insert(i)
             }
         }
     }
