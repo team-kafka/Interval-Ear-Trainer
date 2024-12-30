@@ -7,24 +7,27 @@
 
 import Foundation
 
-struct IntervalParameters {
-    var active_intervals: Set<Int> = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    var largeIntevalsProba: Double = 0.0
+ enum ParamType {
+    case interval
+    case triad
+    case scale_degree
 }
 
-struct SequenceParameters {
+struct Parameters {
+    var type: ParamType = ParamType.interval
+    
+    // General
     var upper_bound: Int = 107
     var lower_bound: Int = 64
     var delay: Double = 2.8
     var delay_sequence: Double = 0.6
-}
-
-struct TriadParameters {
-    var upper_bound: Int = 107
-    var lower_bound: Int = 64
-    var active_qualities: Set<String> = Set<String>(TRIADS.keys)
+    
+    // Interval related
+    var active_intervals: Set<Int> = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    var largeIntevalsProba: Double = 0.0
+    
+    // Triad related
+    var active_qualities:  Set<String> = Set<String>(TRIADS.keys)
     var active_inversions: Set<String> = Set<String>(TRIAD_INVERSIONS.keys)
-    var active_voicings: Set<String> = Set<String>(TRIAD_VOICINGS.keys)
-    var delay: Double = 2.8
-    var delay_arpeggio: Double = 0.6
+    var active_voicings:   Set<String> = Set<String>(TRIAD_VOICINGS.keys)
 }

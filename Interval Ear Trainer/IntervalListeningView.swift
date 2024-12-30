@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct IntervalListeningView: View {
-    @State var intParams: IntervalParameters
-    @State var seqParams: SequenceParameters
+    @State var params: Parameters
     @State private var playing:Bool = false
     @State private var spakerImg:Image = Image(systemName:"speaker.wave.2.fill")
     @State private var timer: Timer?
@@ -27,11 +26,11 @@ struct IntervalListeningView: View {
                     stop()
                 }
             }
-            NavigationLink(destination: IntervalParametersView(intParams: $intParams, seqParams: $seqParams).navigationBarBackButtonHidden(true)){
+            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
-            Text(interval_filter_to_str(intervals:intParams.active_intervals)).lineLimit(1)
+            Text(interval_filter_to_str(intervals:params.active_intervals)).lineLimit(1)
             Image(systemName: "gearshape.fill")
-        }.onAppear{ update_function(newIntParams: intParams, newSeqParams: seqParams) }
+        }.onAppear{ update_function(newParams: params) }
     }
     
     func start() {
@@ -49,17 +48,17 @@ struct IntervalListeningView: View {
 
     func loopFunction() {
         var notes: [Int] = [0, 0]
-        notes[0] = Int.random(in: seqParams.lower_bound..<seqParams.upper_bound)
-        (notes[1], _) = draw_new_note(prev_note: notes[0], active_intervals: intParams.active_intervals, upper_bound: seqParams.upper_bound, lower_bound: seqParams.lower_bound, largeIntevalsProba: intParams.largeIntevalsProba)
-        player.playNotes(notes: notes, duration: seqParams.delay_sequence, chord: false)
-        timer = Timer.scheduledTimer(withTimeInterval:seqParams.delay, repeats: false) { t in
+        notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
+        (notes[1], _) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+        player.playNotes(notes: notes, duration: params.delay_sequence, chord: false)
+        timer = Timer.scheduledTimer(withTimeInterval:params.delay, repeats: false) { t in
             loopFunction()
         }
     }
     
-    func update_function(newIntParams: IntervalParameters, newSeqParams: SequenceParameters){
-        dftDelay = newSeqParams.delay
-        dftFilterStr = interval_filter_to_str(intervals: newIntParams.active_intervals)
+    func update_function(newParams: Parameters){
+        dftDelay = newParams.delay
+        dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
     }
 }
 

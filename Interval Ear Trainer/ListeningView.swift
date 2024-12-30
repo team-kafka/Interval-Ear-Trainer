@@ -7,8 +7,9 @@
 
 import SwiftUI
 
-struct TriadListeningView: View {
-    @State var params: TriadParameters
+struct ListeningView: View {
+    @State var params: Parameters
+    var sequenceGenerator: SequenceGenerator
     @State private var playing: Bool = false
     @State var chord: Bool = true
     @State private var spakerImg: Image = Image(systemName:"speaker.wave.2.fill")
@@ -29,9 +30,9 @@ struct TriadListeningView: View {
                 }
             }
             ChordArpSwitchView(chord: $chord, active: true)
-            NavigationLink(destination: TriadParametersView(params: $params).navigationBarBackButtonHidden(true)){
+            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
-            Text(triad_qualities_to_str(active_qualities:params.active_qualities)).lineLimit(1)
+            Text(sequenceGenerator.generateLabelString(params: params)).lineLimit(1)
             Image(systemName: "gearshape.fill")
         }.onAppear{update_function(newParams: params)}
     }
@@ -50,22 +51,26 @@ struct TriadListeningView: View {
     }
 
     func loopFunction() {
-        let res = draw_random_triad(active_qualities: params.active_qualities, active_inversions: params.active_inversions, active_voicings: params.active_voicings, upper_bound: params.upper_bound, lower_bound: params.lower_bound)
-        var delay = 0.0
-        if chord {
-            player.playNotes(notes: res.0, duration: params.delay * 0.5 , chord: true)
-        } else {
-            player.playNotes(notes: res.0, duration: params.delay_arpeggio, chord: false)
-            delay = params.delay_arpeggio * 2.0 * 0.5 
-        }
-        timer = Timer.scheduledTimer(withTimeInterval:params.delay + delay, repeats: false) { t in
+        var delay = params.delay * 0.5
+        delay += play_sequence()
+        timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
             loopFunction()
         }
     }
     
-    func update_function(newParams: TriadParameters){
+    func play_sequence() -> Double {
+        var delay: Double
+        var duration: Double
+        var notes: [Int] = [0, 0]
+        
+        (notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:2, chord:chord, prev_note:0)
+        player.playNotes(notes: notes, duration: duration, chord: chord)
+
+        return delay
+    }
+        
+    func update_function(newParams: Parameters){
         dftDelay = newParams.delay
-        dftFilterStr = triad_filters_to_str(active_qualities: newParams.active_qualities, active_inversions: newParams.active_inversions, active_voicings: newParams.active_voicings)
+        dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
     }
 }
-

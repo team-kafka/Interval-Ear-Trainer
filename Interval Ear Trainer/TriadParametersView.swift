@@ -1,5 +1,5 @@
 //
-//  TriadParametersView.swift
+//  ParametersView.swift
 //  Interval Ear Trainer
 //
 //  Created by Nicolas Carre on 2024/12/25.
@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct TriadParametersView: View {
-    @Binding var params : TriadParameters
-    
+    @Binding var params : Parameters
     
     let player = MidiPlayer()
     
@@ -75,7 +74,7 @@ struct TriadParametersView: View {
                         }
                         VStack{
                             HStack{Text("Arpeggio speed (seconds)");Spacer()}
-                            HStack{ParamSlider(value: $params.delay_arpeggio, valueRange: 0.2...1.0);Text("\(params.delay_arpeggio, specifier:"%0.1f")")}
+                            HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.2...1.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
                         }
                     }
 

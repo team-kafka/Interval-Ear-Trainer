@@ -31,47 +31,49 @@ struct MainMenu: View {
     var body: some View {
         NavigationStack{
             List{
-                let intParamsIP = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
-                let seqParamsIP = SequenceParameters(delay: dftDelayIP)
                 Section(header: Text("Practice")) {
-                    NavigationLink(destination: IntervalPracticeView(intParams: intParamsIP, seqParams: seqParamsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP).navigationBarBackButtonHidden(true)){
-                        Text("Interval Recognition").font(.headline)
-                    }
+                    let paramsIP = Parameters(type:.interval, delay: dftDelayIP, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
+                    NavigationLink(destination: PracticeView(params: paramsIP, sequenceGenerator: IntervalGenerator(),  dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP ).navigationBarBackButtonHidden(true)){
+                            Text("Interval Recognition").font(.headline)
+                        }
                     let filtersTP = triad_filters_from_str(filter_str: dftFilterStrTP)
-                    let dftParamsTP = TriadParameters(active_qualities: filtersTP.0, active_inversions: filtersTP.1, active_voicings: filtersTP.2, delay: dftDelayTP)
+                    let paramsTP = Parameters(type:.triad, delay: dftDelayTP, active_qualities: filtersTP.0, active_inversions: filtersTP.1, active_voicings: filtersTP.2)
                     NavigationLink(destination:
-                                    TriadPracticeView(params: dftParamsTP, dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: paramsTP, sequenceGenerator: TriadGenerator(), notes:[0,0,0],
+                                                 n_notes:3,
+                                                 fixed_n_notes:true,
+                                                 dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
-                let intParamsIQ = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
-                let seqParamsIQ = SequenceParameters(delay: dftDelayIQ)
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: IntervalQuizView(intParams: intParamsIQ, seqParams: seqParamsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
+                    let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
+                    NavigationLink(destination: QuizView(params: paramsIQ,
+                                                         sequenceGenerator: IntervalGenerator(),
+                                                         dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }
                     let filtersTQ = triad_filters_from_str(filter_str: dftFilterStrTQ)
-                    let dftParamsTQ = TriadParameters(active_qualities: filtersTQ.0, active_inversions: filtersTQ.1, active_voicings: filtersTQ.2, delay: dftDelayTQ)
-                    NavigationLink(destination: TriadQuizView(params: dftParamsTQ, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ).navigationBarBackButtonHidden(true)){
+                    let paramsTQ = Parameters(type: .triad, delay: dftDelayTQ, active_qualities: filtersTQ.0, active_inversions: filtersTQ.1, active_voicings: filtersTQ.2)
+                    NavigationLink(destination: QuizView(params: paramsTQ, sequenceGenerator: TriadGenerator(), n_notes:3,
+                                                         fixed_n_notes:true, chord: true, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
                     }
                 }
                 Section(header: Text("Passive Listening")) {
-                    let intParamsIL1 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
-                    let seqParamsIL1 = SequenceParameters(delay: dftDelayIL1)
-                    IntervalListeningView(intParams:intParamsIL1, seqParams: seqParamsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
+                    let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
+                    ListeningView(params:paramsIL1, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
                     
-                    let intParamsIL2 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
-                    let seqParamsIL2 = SequenceParameters(delay: dftDelayIL2)
-                    IntervalListeningView(intParams:intParamsIL2, seqParams: seqParamsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
+                    let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
+                    ListeningView(params:paramsIL2, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
                     
-                    let intParamsIL3 = IntervalParameters(active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
-                    let seqParamsIL3 = SequenceParameters(delay: dftDelayIL3)
-                    IntervalListeningView(intParams:intParamsIL3, seqParams: seqParamsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
+                    ListeningView(params: paramsIL3, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
                     
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
-                    let dftParamsTL = TriadParameters(active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2, delay: dftDelayTQ)
-                    TriadListeningView(params: dftParamsTL, dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
+                    let dftParamsTL = Parameters(type: .triad,
+                        delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
+                    ListeningView(params: dftParamsTL, sequenceGenerator: TriadGenerator(), dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
                 }
             }
         }

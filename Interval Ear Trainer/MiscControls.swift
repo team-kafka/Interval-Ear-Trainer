@@ -84,10 +84,13 @@ struct ChordArpSwitchView: View {
 struct NumberOfNotesView: View {
     @Binding var n_notes: Int
     @Binding var notes: [Int]
+    var active: Bool = true
+    var visible: Bool = true
 
     var body: some View {
+        let opacity:Double = (visible ? 1 : 0) * (active ? 1 : 0.5)
         Image(systemName: String(format:"%d.square", n_notes))
-            .foregroundColor(Color.secondary)
+            .foregroundColor(Color.secondary).opacity(opacity)
             .onTapGesture {
                 n_notes = n_notes + 1 > 4 ? 1 : n_notes + 1
                 notes = [Int](repeating: 0, count: max(2, n_notes))

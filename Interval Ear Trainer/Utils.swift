@@ -249,11 +249,15 @@ func triad_filters_to_str(active_qualities: Set<String>, active_inversions: Set<
 func triad_filters_from_str(filter_str: String) -> (Set<String>, Set<String>, Set<String>)
 {
     if filter_str.isEmpty { return (Set<String>(), Set<String>(), Set<String>()) }
-    
+ 
     let split_str = filter_str.split(separator: "|")
+    
+    if split_str.count != 3 { return (Set<String>(), Set<String>(), Set<String>()) }
+    
     let qualities  = Set(split_str[0].split(separator: "/").map{String($0)})
     let inversions = Set(split_str[1].split(separator: "/").map{String($0)})
     let voicings   = Set(split_str[2].split(separator: "/").map{String($0)})
     
     return (qualities, inversions, voicings)
+    
 }

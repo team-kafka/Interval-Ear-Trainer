@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TriadPracticeView: View {
-    @State var params: TriadParameters
+    @State var params: Parameters
     @State private var button_lbl = Image(systemName: "play.circle")
     @State private var running = false
     @State private var chord = true
@@ -35,7 +35,7 @@ struct TriadPracticeView: View {
             VStack {
                 HStack{
                  Spacer()
-                NavigationLink(destination: TriadParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+                NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
                 Image(systemName: "gearshape.fill")
                  }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
                 }
@@ -58,7 +58,7 @@ struct TriadPracticeView: View {
                 GridRow{
                     
                     VStack{
-                        ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_arpeggio)
+                        ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_sequence)
                         Text(" ").opacity(0.0)
                     }
                     
@@ -146,8 +146,8 @@ struct TriadPracticeView: View {
         if chord {
             player.playNotes(notes: notes, duration: params.delay * 0.5 , chord: true)
         } else {
-            player.playNotes(notes: notes, duration: params.delay_arpeggio, chord: false)
-            delay = params.delay_arpeggio * 2.0 * 0.5 // x  n_notes - 1 (triad) and x 0.5 (tempo = 120)
+            player.playNotes(notes: notes, duration: params.delay_sequence, chord: false)
+            delay = params.delay_sequence * 2.0 * 0.5 // x  n_notes - 1 (triad) and x 0.5 (tempo = 120)
         }
         return delay
     }
@@ -166,7 +166,7 @@ struct TriadPracticeView: View {
         notes = notes.map{$0 * 0}
     }
     
-    func update_function(newParams: TriadParameters){
+    func update_function(newParams: Parameters){
         dftDelay = newParams.delay
         dftFilterStr = triad_filters_to_str(active_qualities: newParams.active_qualities, active_inversions: newParams.active_inversions, active_voicings: newParams.active_voicings)
     }
