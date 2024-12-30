@@ -9,30 +9,57 @@ import SwiftUI
 
 struct QuizView: View { // find a way to reuse commmon code with practice view
     @State var params: Parameters
-    var sequenceGenerator: SequenceGenerator // move to some init function
-    @State private var button_lbl = Image(systemName: "play.circle")
-    @State private var running = false
-    @State private var answer: AnyView = AnyView(Text(" "))
-    @State private var answer_str = String(" ")
+    @State private var button_lbl: Image
+    @State private var running: Bool
     
-    @State private var timer: Timer?
-    @State var answer_visible: Double = 1.0
-    
-    @State private var notes: [Int] = [0,0] // move to some init function
-    @State var n_notes:Int = 2
-    @State var fixed_n_notes = false
-    
-    @State var chord: Bool = false
-    @State var use_timer: Bool = true
+    @State private var answer_str: String
+    @State var correct: Bool
+    @State private var guess_str: String
+    @State private var guess: [Int]
+    @State var answer_visible: Double
 
-    @State var correct: Bool = false
-    @State private var guess_str = " "
-    @State private var guess: [Int] = [0]
+    @State private var timer: Timer?
     
+    @State private var notes: [Int]
+    @State var n_notes:Int
+    @State var fixed_n_notes: Bool
+    
+    @State var chord: Bool
+    @State var use_timer: Bool
+
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
 
-    @State var player = MidiPlayer()
+    @State var player: MidiPlayer
+    var sequenceGenerator: SequenceGenerator
+
+    
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord: Bool=false){
+        _params = .init(initialValue: params)
+        if (params.type == .interval) {
+            self.sequenceGenerator = IntervalGenerator()
+        } else if (params.type == .triad){
+            self.sequenceGenerator = TriadGenerator()
+        } else {
+            self.sequenceGenerator = TriadGenerator()
+        }
+        _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
+        _running = .init(initialValue: false)
+        _answer_str = .init(initialValue: " ")
+        _answer_visible = .init(initialValue: 1.0)
+        _n_notes = .init(initialValue: n_notes)
+        _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
+        _fixed_n_notes = .init(initialValue: fixed_n_notes)
+        _chord = .init(initialValue: chord)
+        _use_timer = .init(initialValue: true)
+        _correct = .init(initialValue: false)
+        _guess_str = .init(initialValue: " ")
+        _guess = .init(initialValue: [0])
+        _player = .init(initialValue: MidiPlayer())
+        _timer = .init(initialValue: nil)
+        _dftDelay = .init(projectedValue: dftDelay)
+        _dftFilterStr = .init(projectedValue: dftFilterStr)
+    }
     
     var body: some View {
         
@@ -63,7 +90,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     Spacer()
                 }
                 Spacer()
-                answer.opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
+                answerView(answer_str: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
                 Text(guess_str).foregroundColor(Color(.systemGray)).font(.system(size: 40))
                 Spacer()
                 if (params.type == .interval) {
@@ -113,7 +140,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         button_lbl = Image(systemName: "play.circle")
         running = false
         notes = notes.map{$0 * 0}
-        answer = AnyView(VStack{Text(" ")})
+        answer_str = " "
         guess_str = " "
         answer_visible = 1.0
     }
@@ -155,13 +182,11 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     
     func show_answer(){
         correct = answer_str.contains(guess_str) && guess_str != " "
-        answer = answerView(answer_str: answer_str)
         answer_visible = 1.0
     }
 
     func reset_state(){
         stop()
-        //answer = sequenceGenerator.generateAnswerView(answerStr: " ")
         answer_visible = 1.0
         guess_str = " "
         guess = [Int](repeating: 0, count: notes.count)

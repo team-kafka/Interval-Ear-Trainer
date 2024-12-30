@@ -33,30 +33,26 @@ struct MainMenu: View {
             List{
                 Section(header: Text("Practice")) {
                     let paramsIP = Parameters(type:.interval, delay: dftDelayIP, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
-                    NavigationLink(destination: PracticeView(params: paramsIP, sequenceGenerator: IntervalGenerator(),  dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: PracticeView(params: paramsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP ).navigationBarBackButtonHidden(true)){
                             Text("Interval Recognition").font(.headline)
                         }
                     let filtersTP = triad_filters_from_str(filter_str: dftFilterStrTP)
                     let paramsTP = Parameters(type:.triad, delay: dftDelayTP, active_qualities: filtersTP.0, active_inversions: filtersTP.1, active_voicings: filtersTP.2)
                     NavigationLink(destination:
-                                    PracticeView(params: paramsTP, sequenceGenerator: TriadGenerator(), notes:[0,0,0],
-                                                 n_notes:3,
-                                                 fixed_n_notes:true,
-                                                 dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: paramsTP, dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP, n_notes:3,
+                                                 fixed_n_notes:true, chord:true).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
                 Section(header: Text("Quiz")) {
                     let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
-                    NavigationLink(destination: QuizView(params: paramsIQ,
-                                                         sequenceGenerator: IntervalGenerator(),
-                                                         dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: paramsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Interval Recognition").font(.headline)
                     }
                     let filtersTQ = triad_filters_from_str(filter_str: dftFilterStrTQ)
                     let paramsTQ = Parameters(type: .triad, delay: dftDelayTQ, active_qualities: filtersTQ.0, active_inversions: filtersTQ.1, active_voicings: filtersTQ.2)
-                    NavigationLink(destination: QuizView(params: paramsTQ, sequenceGenerator: TriadGenerator(), n_notes:3,
-                                                         fixed_n_notes:true, chord: true, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: paramsTQ, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ, n_notes:3,
+                                                         fixed_n_notes:true, chord: true).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
                     }
                 }

@@ -9,27 +9,54 @@ import SwiftUI
 
 struct PracticeView: View {
     @State var params: Parameters
-    var sequenceGenerator: SequenceGenerator
-    @State private var button_lbl = Image(systemName: "play.circle")
-    @State private var running = false
-    @State private var use_timer = true
-    @State private var answer: AnyView = AnyView(VStack{Text(" ")})
-    @State private var answer_str = String(" ")
     
-    @State var notes: [Int] = [0, 0]
-    @State var n_notes:Int = 2
-    @State var fixed_n_notes = false
-    @State private var root_note: Int = 0
+    @State private var button_lbl: Image
+    @State private var running: Bool
+    @State private var use_timer: Bool
+    @State private var answer_str: String
+    
+    @State var notes: [Int]
+    @State var n_notes:Int
+    @State var fixed_n_notes: Bool
+    @State private var root_note: Int
     
     @State private var timer: Timer?
-    @State var answer_visible: Double = 1.0
+    @State var answer_visible: Double
     
     @State var chord: Bool = false
-    @State var player = MidiPlayer()
     
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
 
+    @State var player = MidiPlayer()
+    var sequenceGenerator: SequenceGenerator
+
+    
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord: Bool=false){
+        _params = .init(initialValue: params)
+        if (params.type == .interval) {
+            self.sequenceGenerator = IntervalGenerator()
+        } else if (params.type == .triad){
+            self.sequenceGenerator = TriadGenerator()
+        } else {
+            self.sequenceGenerator = TriadGenerator()
+        }
+        _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
+        _running = .init(initialValue: false)
+        _answer_str = .init(initialValue: " ")
+        _answer_visible = .init(initialValue: 1.0)
+        _n_notes = .init(initialValue: n_notes)
+        _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
+        _fixed_n_notes = .init(initialValue: fixed_n_notes)
+        _root_note = .init(initialValue: 0)
+        _chord = .init(initialValue: chord)
+        _use_timer = .init(initialValue: true)
+        _player = .init(initialValue: MidiPlayer())
+        _timer = .init(initialValue: nil)
+        _dftDelay = .init(projectedValue: dftDelay)
+        _dftFilterStr = .init(projectedValue: dftFilterStr)
+    }
+    
     var body: some View {
         
         NavigationStack{
@@ -74,7 +101,7 @@ struct PracticeView: View {
                     }
                 }
                 Spacer()
-                answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
+                answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
                 Spacer()
             }
         }
@@ -165,13 +192,11 @@ struct PracticeView: View {
     }
     
     func show_answer(){
-        answer = answerView(answer_str: answer_str)
         answer_visible = 1.0
     }
         
     func reset_state(){
         stop()
-        //answer = sequenceGenerator.generateAnswerView(answerStr: " ")
         answer_visible = 1.0
         notes = notes.map{$0 * 0}
     }
