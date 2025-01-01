@@ -30,4 +30,9 @@ struct Parameters {
     var active_qualities:  Set<String> = Set<String>(TRIADS.keys)
     var active_inversions: Set<String> = Set<String>(TRIAD_INVERSIONS.keys)
     var active_voicings:   Set<String> = Set<String>(TRIAD_VOICINGS.keys)
+    
+    // Scale degree related
+    var scale: String = SCALE_KEYS.first!
+    var active_scale_degrees: Set<Int> = Set<Int>(SCALE_DEGREES.values)
+    var key: String = "A"
 }

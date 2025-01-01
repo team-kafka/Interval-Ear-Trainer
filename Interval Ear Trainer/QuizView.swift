@@ -40,8 +40,10 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
             self.sequenceGenerator = IntervalGenerator()
         } else if (params.type == .triad){
             self.sequenceGenerator = TriadGenerator()
+        } else  if (params.type == .scale_degree){
+            self.sequenceGenerator = ScaleDegreeGenerator()
         } else {
-            self.sequenceGenerator = TriadGenerator()
+            self.sequenceGenerator = ScaleDegreeGenerator()
         }
         _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
         _running = .init(initialValue: false)
@@ -89,6 +91,39 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     }.foregroundColor(Color(.systemGray))
                     Spacer()
                 }
+                if (params.type == .scale_degree) {
+                    Grid{
+                        GridRow{
+                            Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
+                                params.key = NOTE_KEYS.randomElement()!
+                            }.scaleEffect(1.5)
+                            Menu{
+                                Picker("key", selection: $params.key) {
+                                    ForEach(NOTE_KEYS, id: \.self) {
+                                        Text($0).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                                    }
+                                }.onChange(of: params.key) {reset_state()}
+                            } label: {
+                                Text(params.key).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                            }.gridColumnAlignment(.leading)
+                        }
+                        GridRow{
+                            Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
+                                player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence)
+                            }.scaleEffect(1.5)
+                            Menu{
+                                Picker("Scale", selection: $params.scale) {
+                                    ForEach(SCALE_KEYS, id: \.self) {
+                                        Text($0).font(.system(size: 30)).gridColumnAlignment(.leading)
+                                    }
+                                }.accentColor(Color(.systemGray)).onChange(of: params.scale) {reset_state()}
+                            } label: {
+                                Text(params.scale).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                            }.gridColumnAlignment(.leading)
+                            //Spacer()
+                        }
+                    }
+                }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
                 Text(guess_str).foregroundColor(Color(.systemGray)).font(.system(size: 40))
@@ -97,8 +132,10 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     IntervalAnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: params.active_intervals, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 } else if (params.type == .triad) {
                     TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer)
+                } else if (params.type == .scale_degree) {
+                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 }
-                Spacer()
+                //Spacer()
             }
         }
         .onAppear {
@@ -151,11 +188,10 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
             correct = false
             answer_visible = 0.0
             guess_str = " "
-            guess = [0]
+            guess = []
             delay += play_sequence()
         } else{
             show_answer()
-            notes[0] = notes[1]
         }
         if (use_timer){
             timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
@@ -171,17 +207,13 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         
         (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:n_notes, chord:chord, prev_note:notes.last ?? 0)
         player.playNotes(notes: new_notes, duration: duration, chord: chord)
-        if ((n_notes == 1) && (new_notes.count == 1)) {
-            notes[0] = notes[1]
-            notes[1] = new_notes[0]
-        } else {
-            notes = new_notes
-        }
+        notes = new_notes
+        
         return delay
     }
     
     func show_answer(){
-        correct = answer_str.contains(guess_str) && guess_str != " "
+        correct = answer_str.hasSuffix(guess_str) && guess_str != " "
         answer_visible = 1.0
     }
 
@@ -195,177 +227,6 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     func update_function(newParams: Parameters){
         dftDelay = newParams.delay
         dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
-    }
-}
-
-
-struct IntervalQuizView: View {
-    @State var params: Parameters
-    @State private var run_btn = Image(systemName: "play.circle")
-    @State private var running = false
-    @State private var answer = Text(" ")
-    @State private var answer_str = String(" ")
-    @State private var notes: [Int] = [0,0]
-    @State private var timer: Timer?
-    @State var answer_visible: Double = 1.0
-    @State var n_notes:Int = 2
-    @State var chord: Bool = false
-    @State var use_timer: Bool = true
-
-    @State var correct: Bool = false
-    @State private var guess_str = " "
-    @State private var guess: [Int] = [0]
-    
-    @Binding var dftDelay: Double
-    @Binding var dftFilterStr: String
-
-    @State var player = MidiPlayer()
-    
-    var body: some View {
-        
-        NavigationStack{
-            VStack {
-                HStack{
-                    Spacer()
-                    NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
-                        Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray)).scaleEffect(1.5).padding([.trailing])
-                }
-                Spacer()
-                HStack{
-                    NumberOfNotesView(n_notes: $n_notes, notes: $notes).padding().onChange(of: n_notes){
-                        reset_state()
-                        if (n_notes == 1) {chord = false}
-                    }
-                    TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
-                    ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
-                }.scaleEffect(2.0)
-                Spacer()
-                Spacer()
-                HStack {
-                    Spacer()
-                    run_btn.resizable().scaledToFit().onTapGesture {
-                        toggle_start_stop()
-                    }.foregroundColor(Color(.systemGray))
-                    Spacer()
-                }
-                Spacer()
-                answer.opacity(answer_visible).font(.system(size: 45)).foregroundStyle(correct ? Color.green : Color.red)
-                Text(guess_str).foregroundColor(Color(.systemGray)).font(.system(size: 45))
-                Spacer()
-                IntervalAnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: params.active_intervals, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
-                Spacer()
-            }
-        }
-        .onAppear {
-            UIApplication.shared.isIdleTimerDisabled = true
-            update_function(newParams: params)
-        }
-        .onDisappear {
-            UIApplication.shared.isIdleTimerDisabled = false
-            stop()
-        }
-        
-    }
-    
-    func toggle_start_stop() {
-        running.toggle()
-        if running {
-            start()
-        }
-        else{
-            stop()
-        }
-    }
-    
-    func start() {
-        run_btn = Image(systemName: "pause.circle")
-        running = true
-        timer?.invalidate()
-        loopFunction()
-    }
-    
-    func stop(){
-        timer?.invalidate()
-        run_btn = Image(systemName: "play.circle")
-        running = false
-        notes = notes.map{$0 * 0}
-        answer = Text(" ")
-        guess_str = " "
-        answer_visible = 1.0
-    }
-
-    func loopFunction() {
-        var delay = params.delay * 0.5
-        if (answer_visible == 1.0){
-            correct = false
-            answer_visible = 0.0
-            guess_str = " "
-            guess = [0]
-            delay += play_sequence()
-        } else{
-            show_answer()
-            notes[0] = notes[1]
-        }
-        if (use_timer){
-            timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
-                loopFunction()
-            }
-        }
-    }
-    
-    func play_sequence() -> Double {
-        var delay: Double = 0.0
-        if (n_notes == 1) {
-            if (notes[0] == 0) {
-                notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-                (notes[1], answer_str) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-                player.playNotes(notes: notes, duration: params.delay*0.5)
-                delay = params.delay * 0.5
-            }
-            else {
-                notes[0] = notes[1]
-                (notes[1], answer_str) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-                player.playNotes(notes: [notes[1]], duration: params.delay*0.5)
-            }
-        } else if chord{
-            (notes, answer_str) = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-            player.playNotes(notes: notes, duration: params.delay * 0.5, chord: true)
-        } else {
-            notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-            var answers = [String]()
-            for (i, _) in notes[1...].enumerated(){
-                var answer: String
-                (notes[i+1], answer) = draw_new_note(prev_note: notes[i], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-                answers.append(answer)
-            }
-            answer_str = answers.joined(separator: " ")
-            let duration = params.delay_sequence
-            player.playNotes(notes: notes, duration: duration, chord: false)
-            delay = params.delay_sequence * Double(n_notes-1) * 0.5
-        }
-        return delay
-    }
-    
-    func show_answer(){
-        let answerInt = answer_from_notes(notes: notes, chord: chord, oriented: false)
-
-        correct = (answerInt[...] == guess[1...])
-        answer = Text(answer_str)
-        answer_visible = 1.0
-    }
-
-    func reset_state(){
-        stop()
-        answer = Text(" ")
-        answer_visible = 1.0
-        guess_str = " "
-        guess = [Int](repeating: 0, count: notes.count)
-    }
-    
-    func update_function(newParams: Parameters){
-        dftDelay = newParams.delay
-        dftFilterStr = interval_filter_to_str(intervals: newParams.active_intervals)
     }
 }
 
@@ -450,6 +311,63 @@ struct TriadAnswerButtonsView: View {
                             Text("Maj").bold().font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.gray, lineWidth: 4)).opacity(0.0)
+                        }
+                    }
+                }.fixedSize(horizontal: false, vertical: true)
+            }
+        }.padding()
+    }
+    
+    func set_timer() {
+        timer = Timer.scheduledTimer(withTimeInterval:0.2, repeats: false) { t in
+            loopFunction()
+            timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
+                loopFunction()
+            }
+        }
+    }
+}
+
+
+struct ScaleDegreeAnswerButtonsView: View {
+    public var loopFunction: (() -> Void)
+    var activeDegrees: Set<Int>
+    var running: Bool
+    var notes: [Int]
+    @Binding var guess_str: String
+    @Binding var guess: [Int]
+    var use_timer: Bool
+    
+    @State private var timer: Timer?
+    
+    var body: some View {
+        HStack{
+            ForEach(0..<4){ i in
+                VStack{
+                    ForEach(0..<2){ j in
+                        let idx = j*4+i
+                        if (idx < SCALE_DEGREES.values.count) {
+                            let thisDegree = SCALE_DEGREES.values.sorted()[idx]
+                            let active = activeDegrees.contains(thisDegree) && running
+                            Text(scale_degree_name(degree_int: thisDegree)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)
+                            .onTapGesture{
+                                    if (active) {
+                                        if (guess.count < notes.count){
+                                            guess.append(thisDegree)
+                                        }
+                                        guess_str = answer_str(guess: guess)
+                                        if ((guess.count == notes.count) && !use_timer){
+                                            set_timer()
+                                        }
+                                    }
+                            }
+                        }
+                        else{
+                            Text("0").bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.gray, lineWidth: 4)).opacity(0)
                         }
                     }
                 }.fixedSize(horizontal: false, vertical: true)

@@ -28,6 +28,15 @@ struct MainMenu: View {
     @AppStorage("dftFilterStrTP") var dftFilterStrTP: String = "Major/Minor/Diminished/Augmented/Lydian|Root position/1st inversion/2nd inversion|Close/Open"
     @AppStorage("dftFilterStrTS") var dftFilterStrTS: String = "Major/Minor/Diminished/Augmented/Lydian|Root position/1st inversion/2nd inversion|Close/Open"
 
+    @AppStorage("dftDelaySP") var dftDelaySP: Double = 3.0
+    @AppStorage("dftFilterStrSP") var dftFilterStrSP: String = "1 2 3 4 5 6 7"
+
+    @AppStorage("dftDelaySL") var dftDelaySL: Double = 3.0
+    @AppStorage("dftFilterStrSL") var dftFilterStrSL: String = "1 2 3 4 5 6 7"
+
+    @AppStorage("dftDelaySQ") var dftDelaySQ: Double = 3.0
+    @AppStorage("dftFilterStrSQ") var dftFilterStrSQ: String = "1 2 3 4 5 6 7"
+
     var body: some View {
         NavigationStack{
             List{
@@ -43,6 +52,12 @@ struct MainMenu: View {
                                                  fixed_n_notes:true, chord:true).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
                     }
+                        let paramsSP = Parameters(type:.scale_degree, delay: dftDelaySP, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSP))
+                        NavigationLink(destination:
+                                        PracticeView(params: paramsSP, dftDelay: $dftDelaySP, dftFilterStr: $dftFilterStrSP, n_notes:1).navigationBarBackButtonHidden(true)){
+                            Text("Scale Degree Recognition").font(.headline)
+
+                    }
                 }.navigationTitle(Text("Interval Ear Trainer"))
                 Section(header: Text("Quiz")) {
                     let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
@@ -54,6 +69,10 @@ struct MainMenu: View {
                     NavigationLink(destination: QuizView(params: paramsTQ, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ, n_notes:3,
                                                          fixed_n_notes:true, chord: true).navigationBarBackButtonHidden(true)){
                         Text("Triad Recognition").font(.headline)
+                    }
+                    let paramsSQ = Parameters(type: .scale_degree, delay: dftDelaySQ, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSQ))
+                    NavigationLink(destination: QuizView(params: paramsSQ, dftDelay: $dftDelaySQ, dftFilterStr: $dftFilterStrSQ, n_notes:1).navigationBarBackButtonHidden(true)){
+                        Text("Scale Degree Recognition").font(.headline)
                     }
                 }
                 Section(header: Text("Passive Listening")) {
@@ -70,7 +89,11 @@ struct MainMenu: View {
                     let dftParamsTL = Parameters(type: .triad,
                         delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
                     ListeningView(params: dftParamsTL, sequenceGenerator: TriadGenerator(), dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
-                }
+               
+                let dftParamsSL = Parameters(type: .scale_degree,
+                    delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
+                ListeningView(params: dftParamsSL, sequenceGenerator: ScaleDegreeGenerator(), dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
+            }
             }
         }
     }  

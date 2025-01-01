@@ -39,7 +39,9 @@ class IntervalGenerator : SequenceGenerator{
                 delay = params.delay_sequence
             }
             else {
-                (notes[0], answer_str) = draw_new_note(prev_note: prev_note, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+                notes.append(0)
+                notes[0] = prev_note
+                (notes[1], answer_str) = draw_new_note(prev_note: prev_note, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 duration = params.delay_sequence
                 delay = 0.0
             }
@@ -95,5 +97,29 @@ class TriadGenerator : SequenceGenerator{
     
     override func generateLabelString(params: Parameters) -> String{
         return triad_qualities_to_str(active_qualities: params.active_qualities)
+    }
+}
+
+class ScaleDegreeGenerator : SequenceGenerator{
+    
+    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, String, Int) {
+        var notes = [Int]()
+        var answers = [String]()
+
+        (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba)
+
+        let answer_str = answers.joined(separator: " ")
+        let duration = params.delay_sequence
+        let delay = params.delay_sequence * Double(n_notes-1) * 0.5
+        
+        return (notes, duration, delay, answer_str, 0)
+    }
+    
+    override func generateFilterString(params: Parameters) -> String{
+        return scale_degree_filter_to_str(intervals: params.active_scale_degrees)
+    }
+    
+    override func generateLabelString(params: Parameters) -> String{
+        return params.scale
     }
 }

@@ -32,9 +32,11 @@ struct ParametersView: View {
                             HStack{Text("Delay (seconds)");Spacer()}
                             HStack{ParamSlider(value: $params.delay, valueRange: 0.2...5.0);Text("\(params.delay, specifier:"%0.1f")")}
                         }
-                        VStack{
-                            HStack{Text("Probability of large intervals (>octave)");Spacer()}
-                            HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
+                        if ((params.type == .interval) || (params.type == .scale_degree)) {
+                            VStack{
+                                HStack{Text("Probability of large intervals (>octave)");Spacer()}
+                                HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
+                            }
                         }
                     }
                     if (params.type == .interval) {
@@ -114,6 +116,24 @@ struct ParametersView: View {
                                         ChordCheckBoxView(active: $params.active_voicings, key: key).gridColumnAlignment(.trailing)
                                     }
                                     if (TRIAD_VOICING_KEYS.firstIndex(of: key) != TRIAD_VOICING_KEYS.count-1 ) {Divider()}
+                                }
+                            }
+                        }
+                    }
+                    if (params.type == .scale_degree) {
+                        Section(header: Text("Scale degrees")) {
+                            Grid{
+                                ForEach(0..<4){ degree_int in
+                                    GridRow{
+                                        Text(scale_degree_name(degree_int: 2*degree_int)).bold().gridColumnAlignment(.trailing)
+                                        IntervalCheckBoxView(active: $params.active_scale_degrees, interval_int: 2*degree_int)
+                                        Spacer()
+                                        if (2*degree_int+1 < 7){
+                                            Text(scale_degree_name(degree_int: 2*degree_int+1)).bold().gridColumnAlignment(.trailing)
+                                            IntervalCheckBoxView(active: $params.active_scale_degrees , interval_int: 2*degree_int+1)
+                                        }
+                                    }
+                                    if (degree_int < 3) {Divider()}
                                 }
                             }
                         }

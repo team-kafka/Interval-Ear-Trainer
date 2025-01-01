@@ -80,6 +80,7 @@ func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, 
     return (rv, answers.joined(separator: "  "))
 }
 
+let NOTE_KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 let MIDI_NOTE_MAPPING: [Int: String] = [
     0:"C",
     1:"C#",
@@ -140,7 +141,7 @@ func str_to_interval_filter(filter_str: String) -> Set<Int>
     }
     return Set<Int>(rv)
 }
-// ##########  to disappear ##########################
+
 func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
 {
     var answers = [String]()
@@ -155,22 +156,6 @@ func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
     }
     return answers.joined(separator: "  ")
 }
-
-func answer_from_notes(notes: [Int], chord: Bool, oriented: Bool) -> [Int]
-{
-    var answers = [Int]()
-    if chord{
-        for i in notes[1...] {
-            answers.append(oriented ? i-notes[0] : abs(i-notes[0]))
-        }
-    } else{
-        for (e1, e2) in zip(notes, notes[1...]) {
-            answers.append(oriented ? e2-e1 : abs(e2-e1))
-        }
-    }
-    return answers
-}
-// ##########  end of: to disappear ##########################
 
 //-------------------------
 // Triads
@@ -259,5 +244,97 @@ func triad_filters_from_str(filter_str: String) -> (Set<String>, Set<String>, Se
     let voicings   = Set(split_str[2].split(separator: "/").map{String($0)})
     
     return (qualities, inversions, voicings)
+}
+
+//-------------------------
+// Scale degrees
+//-------------------------
+
+let SCALE_KEYS = ["Major", "Harmonic Minor", "Relative Minor", "Melodic Minor", "Dorian"]
+let SCALES: [String: [Int]] = [
+    "Major":          [0, 2, 4, 5, 7, 9, 11],
+    "Harmonic Minor": [0, 2, 3, 5, 7, 8, 11],
+    "Relative Minor": [0, 2, 3, 5, 7, 8, 10],
+    "Melodic Minor":  [0, 2, 3, 5, 7, 9, 11],
+    "Dorian":         [0, 2, 3, 5, 7, 8, 10]
+]
+
+//let SCALE_DEGREE_KEYS = ["1", "2", "3", "4", "5", "6", "7"]
+let SCALE_DEGREES = [
+    "1" : 0,
+    "2" : 1,
+    "3" : 2,
+    "4" : 3,
+    "5" : 4,
+    "6" : 5,
+    "7" : 6
+]
+
+
+func scale_degree_name(degree_int: Int) -> String
+{
+    let quality = SCALE_DEGREES.filter{$1 == degree_int}.map{$0.0}[0]
+    return quality
+}
+
+func answer_str(guess: [Int]) -> String
+{
+    let ans_array = guess.map{scale_degree_name(degree_int: $0)}
+    return ans_array.joined(separator: " ")
+}
+
+func middle_note(key: String, upper_bound:Int, lower_bound:Int) -> Int{
+    let mid_note = Int((upper_bound + lower_bound) / 2)
+    let pitch_int = MIDI_NOTE_MAPPING.filter{$1 == key}.map{$0.0}[0]
     
+    return Int(floor(Double(mid_note - pitch_int) / 12)) * 12 + pitch_int
+}
+
+func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double) -> ([Int], [String])
+{
+    var notes = [Int]()
+    var answers = [String]()
+    
+    for _ in 0..<n_notes
+    {
+        let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
+        let this_degree = active_degrees.randomElement() ?? 0
+        let degree_str = SCALE_DEGREES.filter{$1 == this_degree}.map{$0.0}[0]
+        let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
+        let new_note = mid_note + SCALES[scale]![this_degree] + octave
+        notes.append(new_note)
+        answers.append(degree_str)
+    }
+    return (notes, answers)
+}
+
+func scale_degree_filter_to_str(intervals:Set<Int>) -> String
+{
+    if intervals.isEmpty { return "" }
+    
+    let degrees_str = SCALE_DEGREES.filter{intervals.contains($1)}.keys//.map(String($0))
+    return degrees_str.joined(separator: " ")
+}
+
+func str_to_scale_degree_filter(filter_str: String) -> Set<Int>
+{
+    if (filter_str == "") {
+        return Set<Int>()
+    }
+    var rv = Set<Int>()
+    let degrees_str = filter_str.split(separator: " ")
+    for d in degrees_str {
+        if (SCALE_DEGREES.keys.contains(String(d))) {
+            rv.insert(SCALE_DEGREES[String(d)]!)
+        }
+    }
+    return rv
+}
+
+func scale_notes(scale:String, key:String, upper_bound:Int, lower_bound:Int) -> [Int]
+{
+    let mid_note: Int = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
+    var notes = SCALES[scale] ?? []
+    notes.append(12)
+    return notes.map{mid_note + $0}
 }

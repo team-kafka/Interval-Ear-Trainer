@@ -39,7 +39,7 @@ struct PracticeView: View {
         } else if (params.type == .triad){
             self.sequenceGenerator = TriadGenerator()
         } else {
-            self.sequenceGenerator = TriadGenerator()
+            self.sequenceGenerator = ScaleDegreeGenerator()
         }
         _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
         _running = .init(initialValue: false)
@@ -67,7 +67,7 @@ struct PracticeView: View {
                         Image(systemName: "gearshape.fill")
                     }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
                 }
-                    HStack{
+                HStack{
                         NumberOfNotesView(n_notes: $n_notes, notes: $notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
                             reset_state()
                             if (n_notes == 1) {chord = false}
@@ -75,6 +75,7 @@ struct PracticeView: View {
                         TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
                         ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
                     }.scaleEffect(2.0)
+
 
                 
                 HStack {
@@ -100,6 +101,40 @@ struct PracticeView: View {
                         }
                     }
                 }
+                if (params.type == .scale_degree) {
+                    Grid{
+                        GridRow{
+                            Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
+                                params.key = NOTE_KEYS.randomElement()!
+                            }.scaleEffect(1.5)
+                            Menu{
+                                Picker("key", selection: $params.key) {
+                                    ForEach(NOTE_KEYS, id: \.self) {
+                                        Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                                    }
+                                }.onChange(of: params.key) {reset_state()}
+                            } label: {
+                                Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                            }.gridColumnAlignment(.leading)
+                            //Spacer()
+                        }
+                        GridRow{
+                            Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
+                                player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence)
+                            }.scaleEffect(1.5)
+                            Menu{
+                                Picker("Scale", selection: $params.scale) {
+                                    ForEach(SCALE_KEYS, id: \.self) {
+                                        Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
+                                    }
+                                }.accentColor(Color(.systemGray)).onChange(of: params.scale) {reset_state()}
+                            } label: {
+                                Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                            }.gridColumnAlignment(.leading)
+                            //Spacer()
+                        }
+                    }
+                }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
                 Spacer()
@@ -113,7 +148,6 @@ struct PracticeView: View {
             UIApplication.shared.isIdleTimerDisabled = false
             stop()
         }
-        
     }
     
     func answerView(answer_str: String) -> AnyView {
@@ -168,7 +202,6 @@ struct PracticeView: View {
             show_answer()
         }
         if (use_timer){
-            print(delay)
             timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
                 loopFunction()
             }
@@ -182,12 +215,8 @@ struct PracticeView: View {
         
         (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:n_notes, chord:chord, prev_note:notes.last ?? 0)
         player.playNotes(notes: new_notes, duration: duration, chord: chord)
-        if ((n_notes == 1) && (new_notes.count == 1)) {
-            notes[0] = notes[1]
-            notes[1] = new_notes[0]
-        } else {
-            notes = new_notes
-        }
+        notes = new_notes
+        
         return delay
     }
     
