@@ -54,7 +54,7 @@ class MidiPlayer {
                                                 note: UInt8(note),
                                                 velocity: 64,
                                                 releaseVelocity: 0,
-                                                duration: Float(duration))
+                                                duration: Float(duration*0.95))
                 
                 guard MusicTrackNewMIDINoteEvent(track!, MusicTimeStamp(position), &musicNote) == OSStatus(noErr) else {
                     fatalError("Cannot add Note")
