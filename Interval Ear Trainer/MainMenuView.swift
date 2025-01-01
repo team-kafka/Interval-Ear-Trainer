@@ -90,9 +90,9 @@ struct MainMenu: View {
                         delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
                     ListeningView(params: dftParamsTL, sequenceGenerator: TriadGenerator(), dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
                
-//                let dftParamsSL = Parameters(type: .scale_degree,
-//                    delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
-//                ListeningView(params: dftParamsSL, sequenceGenerator: ScaleDegreeGenerator(), dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
+                let dftParamsSL = Parameters(type: .scale_degree,
+                    delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
+                    ListeningView(params: dftParamsSL, sequenceGenerator: ScaleDegreeGenerator(), n_notes:1, chord:false, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
             }
             }
         }

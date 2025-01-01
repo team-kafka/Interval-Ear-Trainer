@@ -29,13 +29,13 @@ struct ParametersView: View {
                 List{
                     Section(header: Text("general")) {
                         if (params.type == .scale_degree){
-                            Picker("Key", selection: $params.key) {
-                                ForEach(NOTE_KEYS, id: \.self) {
+                            Picker("Scale", selection: $params.scale) {
+                                ForEach(SCALE_KEYS, id: \.self) {
                                     Text($0)
                                 }
                             }
-                            Picker("Scale", selection: $params.scale) {
-                                ForEach(SCALE_KEYS, id: \.self) {
+                            Picker("Key", selection: $params.key) {
+                                ForEach(NOTE_KEYS, id: \.self) {
                                     Text($0)
                                 }
                             }

@@ -270,6 +270,13 @@ let SCALE_DEGREES = [
     "7" : 6
 ]
 
+let SCALE_SHORT_NAMES: [String: String] = [
+    "Major":          "Maj",
+    "Harmonic Minor": "Harm Min",
+    "Relative Minor": "Rel Min",
+    "Melodic Minor":  "Mel Min",
+    "Dorian":         "Dor"
+]
 
 func scale_degree_name(degree_int: Int) -> String
 {

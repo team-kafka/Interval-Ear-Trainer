@@ -11,6 +11,7 @@ struct ListeningView: View {
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
     @State private var playing: Bool = false
+    @State var n_notes: Int = 2
     @State var chord: Bool = true
     @State private var spakerImg: Image = Image(systemName:"speaker.wave.2.fill")
     @State private var timer: Timer?
@@ -29,7 +30,13 @@ struct ListeningView: View {
                     stop()
                 }
             }
-            ChordArpSwitchView(chord: $chord, active: true)
+            if (params.type == .scale_degree) {
+                Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
+                    params.key = NOTE_KEYS.randomElement()!
+                }
+            } else{
+                ChordArpSwitchView(chord: $chord)
+            }
             NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true)){
             }.opacity(0)
             Text(sequenceGenerator.generateLabelString(params: params)).lineLimit(1)
@@ -41,7 +48,15 @@ struct ListeningView: View {
         spakerImg = Image(systemName:"speaker.slash.fill")
         playing = true
         timer?.invalidate()
-        loopFunction()
+        if (params.type == .scale_degree) {
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+                loopFunction()
+            }
+        } else {
+            loopFunction()
+        }
+        
     }
     
     func stop(){
@@ -63,7 +78,7 @@ struct ListeningView: View {
         var duration: Double
         var notes: [Int] = [0, 0]
         
-        (notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:2, chord:chord, prev_note:0)
+        (notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:n_notes, chord:chord, prev_note:0)
         player.playNotes(notes: notes, duration: duration, chord: chord)
 
         return delay
