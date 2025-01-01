@@ -43,36 +43,36 @@ struct MainMenu: View {
                 Section(header: Text("Practice")) {
                     let paramsIP = Parameters(type:.interval, delay: dftDelayIP, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
                     NavigationLink(destination: PracticeView(params: paramsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP ).navigationBarBackButtonHidden(true)){
-                            Text("Interval Recognition").font(.headline)
+                            Text("Intervals").font(.headline)
                         }
                     let filtersTP = triad_filters_from_str(filter_str: dftFilterStrTP)
                     let paramsTP = Parameters(type:.triad, delay: dftDelayTP, active_qualities: filtersTP.0, active_inversions: filtersTP.1, active_voicings: filtersTP.2)
                     NavigationLink(destination:
                                     PracticeView(params: paramsTP, dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP, n_notes:3,
                                                  fixed_n_notes:true, chord:true).navigationBarBackButtonHidden(true)){
-                        Text("Triad Recognition").font(.headline)
+                        Text("Triads").font(.headline)
                     }
                         let paramsSP = Parameters(type:.scale_degree, delay: dftDelaySP, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSP))
                         NavigationLink(destination:
                                         PracticeView(params: paramsSP, dftDelay: $dftDelaySP, dftFilterStr: $dftFilterStrSP, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
-                            Text("Scale Degree Recognition").font(.headline)
+                            Text("Scale Degrees").font(.headline)
 
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
                 Section(header: Text("Quiz")) {
                     let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
                     NavigationLink(destination: QuizView(params: paramsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
-                        Text("Interval Recognition").font(.headline)
+                        Text("Intervals").font(.headline)
                     }
                     let filtersTQ = triad_filters_from_str(filter_str: dftFilterStrTQ)
                     let paramsTQ = Parameters(type: .triad, delay: dftDelayTQ, active_qualities: filtersTQ.0, active_inversions: filtersTQ.1, active_voicings: filtersTQ.2)
                     NavigationLink(destination: QuizView(params: paramsTQ, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ, n_notes:3,
                                                          fixed_n_notes:true, chord: true).navigationBarBackButtonHidden(true)){
-                        Text("Triad Recognition").font(.headline)
+                        Text("Triads").font(.headline)
                     }
                     let paramsSQ = Parameters(type: .scale_degree, delay: dftDelaySQ, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSQ))
                     NavigationLink(destination: QuizView(params: paramsSQ, dftDelay: $dftDelaySQ, dftFilterStr: $dftFilterStrSQ, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
-                        Text("Scale Degree Recognition").font(.headline)
+                        Text("Scale Degrees").font(.headline)
                     }
                 }
                 Section(header: Text("Passive Listening")) {

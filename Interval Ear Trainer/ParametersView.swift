@@ -28,6 +28,18 @@ struct ParametersView: View {
             VStack{
                 List{
                     Section(header: Text("general")) {
+                        if (params.type == .scale_degree){
+                            Picker("Key", selection: $params.key) {
+                                ForEach(NOTE_KEYS, id: \.self) {
+                                    Text($0)
+                                }
+                            }
+                            Picker("Scale", selection: $params.scale) {
+                                ForEach(SCALE_KEYS, id: \.self) {
+                                    Text($0)
+                                }
+                            }
+                        }
                         VStack{
                             HStack{Text("Delay (seconds)");Spacer()}
                             HStack{ParamSlider(value: $params.delay, valueRange: 0.2...5.0);Text("\(params.delay, specifier:"%0.1f")")}
@@ -38,6 +50,7 @@ struct ParametersView: View {
                                 HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
                             }
                         }
+
                     }
                     if (params.type == .interval) {
                         Section(header: Text("filters")) {

@@ -80,7 +80,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     Spacer()
                 }
                 if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, player: $player, reset_state: self.reset_state)
+                    ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)

@@ -170,11 +170,13 @@ struct NoteStepperView: View {
 struct ScaleChooserView: View {
     @Binding var params: Parameters
     @Binding var player: MidiPlayer
+    @Binding var timer: Timer?
     var reset_state: () -> Void
 
-init(params: Binding<Parameters>, player: Binding<MidiPlayer>, reset_state: @escaping () -> Void) {
+init(params: Binding<Parameters>, player: Binding<MidiPlayer>, timer: Binding<Timer?>, reset_state: @escaping () -> Void) {
     _params = .init(projectedValue: params)
     _player = .init(projectedValue: player)
+    _timer = .init(projectedValue: timer)
     self.reset_state = reset_state
 }
 
@@ -197,7 +199,7 @@ var body: some View {
         }
         GridRow{
             Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+                play_scale(params:params, player:player)
             }.scaleEffect(1.5)
             Menu{
                 Picker("Scale", selection: $params.scale) {
@@ -211,6 +213,9 @@ var body: some View {
         }
     }
 }
+    func play_scale(params:Parameters, player:MidiPlayer){
+        player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+    }
 }
 
 struct QuickParamButtonsView: View {

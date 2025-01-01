@@ -87,7 +87,7 @@ struct PracticeView: View {
                     }
                 }
                 if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, player: $player, reset_state: self.reset_state)
+                    ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
