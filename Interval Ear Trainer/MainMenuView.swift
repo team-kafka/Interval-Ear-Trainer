@@ -75,7 +75,7 @@ struct MainMenu: View {
                         Text("Scale Degrees").font(.headline)
                     }
                 }
-                Section(header: Text("Passive Listening")) {
+                Section(header: Text("Listening: Intervals")) {
                     let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
                     ListeningView(params:paramsIL1, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
                     
@@ -84,12 +84,14 @@ struct MainMenu: View {
                     
                     let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
                     ListeningView(params: paramsIL3, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
-                    
+                }
+                Section(header: Text("Listening: Triads")) {
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
                     let dftParamsTL = Parameters(type: .triad,
-                        delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
+                                                 delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
                     ListeningView(params: dftParamsTL, sequenceGenerator: TriadGenerator(), dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
-               
+                }
+                Section(header: Text("Listening: Scale Degrees")) {
                 let dftParamsSL = Parameters(type: .scale_degree,
                     delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
                     ListeningView(params: dftParamsSL, sequenceGenerator: ScaleDegreeGenerator(), n_notes:1, chord:false, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
