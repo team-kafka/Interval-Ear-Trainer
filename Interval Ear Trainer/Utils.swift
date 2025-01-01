@@ -25,7 +25,7 @@ let INTERVAL_NAME_TO_INT: [String :Int] = [
 func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> String
 {
     if (interval_int==0){
-        return "0"
+        return "1"
     }
     
     let direction = oriented ? (interval_int > 0 ? "↑" : "↓") : ""
@@ -277,9 +277,9 @@ func scale_degree_name(degree_int: Int) -> String
     return quality
 }
 
-func answer_str(guess: [Int]) -> String
+func scale_degree_answer_str(degrees: [Int], scale:String) -> String
 {
-    let ans_array = guess.map{scale_degree_name(degree_int: $0)}
+    let ans_array = degrees.map{interval_name(interval_int:SCALES[scale]![$0], oriented:false)}
     return ans_array.joined(separator: " ")
 }
 
@@ -299,11 +299,11 @@ func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int
     {
         let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
         let this_degree = active_degrees.randomElement() ?? 0
-        let degree_str = SCALE_DEGREES.filter{$1 == this_degree}.map{$0.0}[0]
         let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
-        let new_note = mid_note + SCALES[scale]![this_degree] + octave
+        let raw_int = SCALES[scale]![this_degree]
+        let new_note = mid_note + raw_int + octave
         notes.append(new_note)
-        answers.append(degree_str)
+        answers.append(interval_name(interval_int:raw_int, oriented:false))
     }
     return (notes, answers)
 }

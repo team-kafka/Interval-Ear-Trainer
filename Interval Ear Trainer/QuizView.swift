@@ -9,10 +9,17 @@ import SwiftUI
 
 struct QuizView: View { // find a way to reuse commmon code with practice view
     @State var params: Parameters
+    
     @State private var button_lbl: Image
     @State private var running: Bool
-    
+    @State var use_timer: Bool
     @State private var answer_str: String
+    
+    @State private var notes: [Int]
+    @State var n_notes:Int
+    @State var fixed_n_notes: Bool
+    @State var chord_active: Bool
+    
     @State var correct: Bool
     @State private var guess_str: String
     @State private var guess: [Int]
@@ -20,12 +27,8 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
 
     @State private var timer: Timer?
     
-    @State private var notes: [Int]
-    @State var n_notes:Int
-    @State var fixed_n_notes: Bool
-    
     @State var chord: Bool
-    @State var use_timer: Bool
+    
 
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
@@ -34,7 +37,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     var sequenceGenerator: SequenceGenerator
 
     
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord: Bool=false){
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -52,6 +55,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         _n_notes = .init(initialValue: n_notes)
         _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
+        _chord_active = .init(initialValue: chord_active)
         _chord = .init(initialValue: chord)
         _use_timer = .init(initialValue: true)
         _correct = .init(initialValue: false)
@@ -67,23 +71,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         
         NavigationStack{
             VStack {
-                HStack{
-                    Spacer()
-                    NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
-                        Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray)).scaleEffect(1.5).padding([.trailing])
-                }
-                Spacer()
-                HStack{
-                    NumberOfNotesView(n_notes: $n_notes, notes: $notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
-                        reset_state()
-                        if (n_notes == 1) {chord = false}
-                    }
-                    TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
-                    ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
-                }.scaleEffect(2.0)
-                Spacer()
-                Spacer()
+                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $n_notes, chord: $chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
                 HStack {
                     Spacer()
                     button_lbl.resizable().scaledToFit().onTapGesture {
@@ -92,37 +80,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     Spacer()
                 }
                 if (params.type == .scale_degree) {
-                    Grid{
-                        GridRow{
-                            Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
-                                params.key = NOTE_KEYS.randomElement()!
-                            }.scaleEffect(1.5)
-                            Menu{
-                                Picker("key", selection: $params.key) {
-                                    ForEach(NOTE_KEYS, id: \.self) {
-                                        Text($0).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                                    }
-                                }.onChange(of: params.key) {reset_state()}
-                            } label: {
-                                Text(params.key).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                            }.gridColumnAlignment(.leading)
-                        }
-                        GridRow{
-                            Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                                player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence)
-                            }.scaleEffect(1.5)
-                            Menu{
-                                Picker("Scale", selection: $params.scale) {
-                                    ForEach(SCALE_KEYS, id: \.self) {
-                                        Text($0).font(.system(size: 30)).gridColumnAlignment(.leading)
-                                    }
-                                }.accentColor(Color(.systemGray)).onChange(of: params.scale) {reset_state()}
-                            } label: {
-                                Text(params.scale).font(.system(size: 30)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                            }.gridColumnAlignment(.leading)
-                            //Spacer()
-                        }
-                    }
+                    ScaleChooserView(params: $params, player: $player, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
@@ -133,9 +91,8 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                 } else if (params.type == .triad) {
                     TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer)
                 } else if (params.type == .scale_degree) {
-                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
+                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 }
-                //Spacer()
             }
         }
         .onAppear {
@@ -227,160 +184,5 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     func update_function(newParams: Parameters){
         dftDelay = newParams.delay
         dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
-    }
-}
-
-struct IntervalAnswerButtonsView: View {
-    public var loopFunction: (() -> Void)
-    var activeIntervals: Set<Int>
-    var running: Bool
-    var notes: [Int]
-    @Binding var guess_str: String
-    @Binding var guess: [Int]
-    var use_timer: Bool
-    
-    @State private var timer: Timer?
-    
-    var body: some View {
-        let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
-        HStack{
-            ForEach(0..<4){ i in
-                VStack{
-                    ForEach(0..<3){ j in
-                        let thisInt = j*4+i+1
-                        let active = (activeIntAbs.contains(thisInt) && running)
-                        Text(interval_name(interval_int: thisInt, oriented: false)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
-                                    if (active) {
-                                        if (guess.count < notes.count){
-                                            guess.append(thisInt)
-                                        }
-                                        guess_str = answer_string(notes: guess, chord: true, oriented: false)
-                                        if ((guess.count == notes.count) && !use_timer){
-                                            set_timer()
-                                        }
-                                    }
-                                }
-                    
-                    }
-                }.fixedSize(horizontal: false, vertical: true)
-            }
-        }.padding()
-    }
-    
-    func set_timer() {
-        timer = Timer.scheduledTimer(withTimeInterval:0.2, repeats: false) { t in
-            loopFunction()
-            timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
-                loopFunction()
-            }
-        }
-    }
-}
-
-struct TriadAnswerButtonsView: View {
-    public var loopFunction: (() -> Void)
-    var params: Parameters
-    var running: Bool
-    @Binding var guess_str: String
-    var use_timer: Bool
-    
-    @State private var timer: Timer?
-    
-    var body: some View {
-        let activeTriads = params.active_qualities
-        HStack{
-            ForEach(0..<2){ i in
-                VStack{
-                    ForEach(0..<3){ j in
-                        if (i*3+j < TRIAD_KEYS.count){
-                            let thisTriad = TRIAD_KEYS[i*3+j]
-                            let active = activeTriads.contains(thisTriad) && running
-                            Text(thisTriad.prefix(3)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
-                                        if active {
-                                            guess_str = thisTriad
-                                            if !use_timer {
-                                                set_timer()
-                                            }
-                                        }
-                                    }
-                        } else {
-                            Text("Maj").bold().font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                                RoundedRectangle(cornerRadius: 10)
-                                    .stroke(.gray, lineWidth: 4)).opacity(0.0)
-                        }
-                    }
-                }.fixedSize(horizontal: false, vertical: true)
-            }
-        }.padding()
-    }
-    
-    func set_timer() {
-        timer = Timer.scheduledTimer(withTimeInterval:0.2, repeats: false) { t in
-            loopFunction()
-            timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
-                loopFunction()
-            }
-        }
-    }
-}
-
-
-struct ScaleDegreeAnswerButtonsView: View {
-    public var loopFunction: (() -> Void)
-    var activeDegrees: Set<Int>
-    var running: Bool
-    var notes: [Int]
-    @Binding var guess_str: String
-    @Binding var guess: [Int]
-    var use_timer: Bool
-    
-    @State private var timer: Timer?
-    
-    var body: some View {
-        HStack{
-            ForEach(0..<4){ i in
-                VStack{
-                    ForEach(0..<2){ j in
-                        let idx = j*4+i
-                        if (idx < SCALE_DEGREES.values.count) {
-                            let thisDegree = SCALE_DEGREES.values.sorted()[idx]
-                            let active = activeDegrees.contains(thisDegree) && running
-                            Text(scale_degree_name(degree_int: thisDegree)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)
-                            .onTapGesture{
-                                    if (active) {
-                                        if (guess.count < notes.count){
-                                            guess.append(thisDegree)
-                                        }
-                                        guess_str = answer_str(guess: guess)
-                                        if ((guess.count == notes.count) && !use_timer){
-                                            set_timer()
-                                        }
-                                    }
-                            }
-                        }
-                        else{
-                            Text("0").bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.gray, lineWidth: 4)).opacity(0)
-                        }
-                    }
-                }.fixedSize(horizontal: false, vertical: true)
-            }
-        }.padding()
-    }
-    
-    func set_timer() {
-        timer = Timer.scheduledTimer(withTimeInterval:0.2, repeats: false) { t in
-            loopFunction()
-            timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
-                loopFunction()
-            }
-        }
     }
 }

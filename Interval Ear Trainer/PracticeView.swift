@@ -18,21 +18,21 @@ struct PracticeView: View {
     @State var notes: [Int]
     @State var n_notes:Int
     @State var fixed_n_notes: Bool
+    @State var chord_active: Bool
     @State private var root_note: Int
     
-    @State private var timer: Timer?
     @State var answer_visible: Double
-    
     @State var chord: Bool = false
     
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
 
+    @State private var timer: Timer?
     @State var player = MidiPlayer()
     var sequenceGenerator: SequenceGenerator
 
     
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord: Bool=false){
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -48,6 +48,7 @@ struct PracticeView: View {
         _n_notes = .init(initialValue: n_notes)
         _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
+        _chord_active = .init(initialValue: chord_active)
         _root_note = .init(initialValue: 0)
         _chord = .init(initialValue: chord)
         _use_timer = .init(initialValue: true)
@@ -61,23 +62,7 @@ struct PracticeView: View {
         
         NavigationStack{
             VStack {
-                HStack{
-                    Spacer()
-                    NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
-                        Image(systemName: "gearshape.fill")
-                    }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
-                }
-                HStack{
-                        NumberOfNotesView(n_notes: $n_notes, notes: $notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
-                            reset_state()
-                            if (n_notes == 1) {chord = false}
-                        }
-                        TimerView(active: $use_timer).padding().onChange(of: use_timer){reset_state()}
-                        ChordArpSwitchView(chord: $chord, active: (n_notes>1)).padding().onChange(of: chord){reset_state()}
-                    }.scaleEffect(2.0)
-
-
-                
+                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $n_notes, chord: $chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
                 HStack {
                     Spacer()
                     button_lbl.resizable().scaledToFit().onTapGesture {
@@ -102,38 +87,7 @@ struct PracticeView: View {
                     }
                 }
                 if (params.type == .scale_degree) {
-                    Grid{
-                        GridRow{
-                            Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
-                                params.key = NOTE_KEYS.randomElement()!
-                            }.scaleEffect(1.5)
-                            Menu{
-                                Picker("key", selection: $params.key) {
-                                    ForEach(NOTE_KEYS, id: \.self) {
-                                        Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                                    }
-                                }.onChange(of: params.key) {reset_state()}
-                            } label: {
-                                Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                            }.gridColumnAlignment(.leading)
-                            //Spacer()
-                        }
-                        GridRow{
-                            Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                                player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence)
-                            }.scaleEffect(1.5)
-                            Menu{
-                                Picker("Scale", selection: $params.scale) {
-                                    ForEach(SCALE_KEYS, id: \.self) {
-                                        Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
-                                    }
-                                }.accentColor(Color(.systemGray)).onChange(of: params.scale) {reset_state()}
-                            } label: {
-                                Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-                            }.gridColumnAlignment(.leading)
-                            //Spacer()
-                        }
-                    }
+                    ScaleChooserView(params: $params, player: $player, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
@@ -237,4 +191,3 @@ struct PracticeView: View {
 }
 
 
-        

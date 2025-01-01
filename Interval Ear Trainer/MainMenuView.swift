@@ -54,7 +54,7 @@ struct MainMenu: View {
                     }
                         let paramsSP = Parameters(type:.scale_degree, delay: dftDelaySP, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSP))
                         NavigationLink(destination:
-                                        PracticeView(params: paramsSP, dftDelay: $dftDelaySP, dftFilterStr: $dftFilterStrSP, n_notes:1).navigationBarBackButtonHidden(true)){
+                                        PracticeView(params: paramsSP, dftDelay: $dftDelaySP, dftFilterStr: $dftFilterStrSP, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
                             Text("Scale Degree Recognition").font(.headline)
 
                     }
@@ -71,7 +71,7 @@ struct MainMenu: View {
                         Text("Triad Recognition").font(.headline)
                     }
                     let paramsSQ = Parameters(type: .scale_degree, delay: dftDelaySQ, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSQ))
-                    NavigationLink(destination: QuizView(params: paramsSQ, dftDelay: $dftDelaySQ, dftFilterStr: $dftFilterStrSQ, n_notes:1).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: paramsSQ, dftDelay: $dftDelaySQ, dftFilterStr: $dftFilterStrSQ, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
                         Text("Scale Degree Recognition").font(.headline)
                     }
                 }
