@@ -36,14 +36,16 @@ struct PracticeView: View {
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
+            _answer_str = .init(initialValue: " ")
         } else if (params.type == .triad){
             self.sequenceGenerator = TriadGenerator()
+            _answer_str = .init(initialValue: " / / ")
         } else {
             self.sequenceGenerator = ScaleDegreeGenerator()
+            _answer_str = .init(initialValue: " ")
         }
         _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
         _running = .init(initialValue: false)
-        _answer_str = .init(initialValue: " ")
         _answer_visible = .init(initialValue: 1.0)
         _n_notes = .init(initialValue: n_notes)
         _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
@@ -165,6 +167,7 @@ struct PracticeView: View {
         
     func reset_state(){
         stop()
+        answer_str = params.type == .triad ? " / / " : " "
         answer_visible = 1.0
         notes = notes.map{$0 * 0}
     }
