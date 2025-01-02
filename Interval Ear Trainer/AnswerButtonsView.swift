@@ -68,11 +68,12 @@ struct TriadAnswerButtonsView: View {
     var body: some View {
         let activeTriads = params.active_qualities
         HStack{
-            ForEach(0..<2){ i in
+            ForEach(0..<3){ i in
                 VStack{
-                    ForEach(0..<3){ j in
-                        if (i*3+j < TRIAD_KEYS.count){
-                            let thisTriad = TRIAD_KEYS[i*3+j]
+                    ForEach(0..<2){ j in
+                        let idx = i*2+j
+                        if (idx < TRIAD_KEYS.count){
+                            let thisTriad = TRIAD_KEYS[idx]
                             let active = activeTriads.contains(thisTriad) && running
                             Text(thisTriad.prefix(3)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                                 RoundedRectangle(cornerRadius: 10)

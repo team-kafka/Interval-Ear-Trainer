@@ -248,6 +248,7 @@ var body: some View {
         Image(systemName: "gearshape.fill")
     }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
     }
+    Spacer()
     HStack{
         NumberOfNotesView(n_notes: $n_notes, notes: $notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
             reset_state()
@@ -257,4 +258,49 @@ var body: some View {
     ChordArpSwitchView(chord: $chord, active: (chord_active && (n_notes>1)), visible: chord_active).padding().onChange(of: chord){reset_state()}
     }.scaleEffect(2.0)
 }
+}
+
+struct NoteButtonsView: View {
+    var params: Parameters
+    @Binding var player: MidiPlayer
+    var notes: [Int]
+    var root_note: Int
+    var running: Bool
+    var chord: Bool
+    var answer_visible: Double
+    var fixed_n_notes: Bool
+    var reset_state: () -> Void
+    var stop: () -> Void
+    
+    init(params: Parameters, player: Binding<MidiPlayer>, notes: [Int], root_note: Int, chord: Bool, running: Bool, answer_visible: Double, fixed_n_notes: Bool, chord_active: Bool, reset_state: @escaping () -> Void, stop: @escaping () -> Void) {
+        self.params =  params
+        _player = .init(projectedValue: player)
+        self.notes = notes
+        self.root_note = root_note
+        self.running = running
+        self.chord = chord
+        self.fixed_n_notes = fixed_n_notes
+        self.answer_visible = answer_visible
+        self.reset_state = reset_state
+        self.stop = stop
+    }
+    
+    var body: some View {
+        Grid{
+            GridRow{
+                if chord{
+                    VStack{
+                        ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_sequence)
+                        Text(" ").opacity(0.0)
+                    }
+                }
+                ForEach(notes, id: \.self) { note in
+                    VStack{
+                        NoteButton(running: running, player: $player, note: note)
+                        Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
+                    }
+                }
+            }
+        }
+    }
 }

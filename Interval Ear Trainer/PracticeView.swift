@@ -70,22 +70,7 @@ struct PracticeView: View {
                     }.foregroundColor(Color(.systemGray))
                     Spacer()
                 }
-                Grid{
-                    GridRow{
-                        if chord{
-                            VStack{
-                                ChordButton(running: running, duration: params.delay * 0.5, player: $player, notes: notes, chord: chord, chord_delay: params.delay_sequence)
-                                Text(" ").opacity(0.0)
-                            }
-                        }
-                        ForEach(notes, id: \.self) { note in
-                            VStack{
-                                NoteButton(running: running, player: $player, note: note)
-                                Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
-                            }
-                        }
-                    }
-                }
+                NoteButtonsView(params: params, player: $player, notes: notes, root_note: root_note, chord: chord, running: running, answer_visible: answer_visible, fixed_n_notes: fixed_n_notes, chord_active:chord_active, reset_state: self.reset_state, stop: self.stop)
                 if (params.type == .scale_degree) {
                     ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
                 }
