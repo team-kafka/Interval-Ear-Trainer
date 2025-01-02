@@ -10,20 +10,40 @@ import SwiftUI
 struct ListeningView: View {
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
-    @State private var playing: Bool = false
-    @State var n_notes: Int = 2
-    @State var chord: Bool = true
-    @State private var spakerImg: Image = Image(systemName:"speaker.wave.2.fill")
+    @State private var playing: Bool
+    @State var n_notes: Int
+    @State var chord: Bool
+    @State private var speakerImg: Image
     @State private var timer: Timer?
     
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
 
     var player = MidiPlayer()
+
+    
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, chord: Bool=false){
+        _params = .init(initialValue: params)
+        if (params.type == .interval) {
+            self.sequenceGenerator = IntervalGenerator()
+        } else if (params.type == .triad){
+            self.sequenceGenerator = TriadGenerator()
+        } else {
+            self.sequenceGenerator = ScaleDegreeGenerator()
+        }
+        _speakerImg = .init(initialValue: Image(systemName: "speaker.wave.2.fill"))
+        _n_notes = .init(initialValue: n_notes)
+        _playing = .init(initialValue: false)
+        _chord = .init(initialValue: chord)
+        self.player = MidiPlayer()
+        _timer = .init(initialValue: nil)
+        _dftDelay = .init(projectedValue: dftDelay)
+        _dftFilterStr = .init(projectedValue: dftFilterStr)
+    }
     
     var body: some View {
         HStack{
-            spakerImg.onTapGesture {
+            speakerImg.onTapGesture {
                 if !playing {
                     start()
                 } else {
@@ -45,7 +65,7 @@ struct ListeningView: View {
     }
     
     func start() {
-        spakerImg = Image(systemName:"speaker.slash.fill")
+        speakerImg = Image(systemName:"speaker.slash.fill")
         playing = true
         timer?.invalidate()
         if (params.type == .scale_degree) {
@@ -62,7 +82,7 @@ struct ListeningView: View {
     func stop(){
         timer?.invalidate()
         playing = false
-        spakerImg = Image(systemName:"speaker.wave.2.fill")
+        speakerImg = Image(systemName:"speaker.wave.2.fill")
     }
 
     func loopFunction() {

@@ -77,24 +77,24 @@ struct MainMenu: View {
                 }
                 Section(header: Text("Listening: Intervals")) {
                     let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
-                    ListeningView(params:paramsIL1, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
+                    ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1, chord:false)
                     
                     let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
-                    ListeningView(params:paramsIL2, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
+                    ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2, chord:false)
                     
                     let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
-                    ListeningView(params: paramsIL3, sequenceGenerator: IntervalGenerator(), chord:false, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3, chord:false)
                 }
                 Section(header: Text("Listening: Triads")) {
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
                     let dftParamsTL = Parameters(type: .triad,
                                                  delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
-                    ListeningView(params: dftParamsTL, sequenceGenerator: TriadGenerator(), dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS)
+                    ListeningView(params: dftParamsTL, dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS, chord: true)
                 }
                 Section(header: Text("Listening: Scale Degrees")) {
                 let dftParamsSL = Parameters(type: .scale_degree,
                     delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
-                    ListeningView(params: dftParamsSL, sequenceGenerator: ScaleDegreeGenerator(), n_notes:1, chord:false, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
+                    ListeningView(params: dftParamsSL, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL, n_notes:1, chord:false)
             }
             }
         }
