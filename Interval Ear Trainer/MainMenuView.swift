@@ -59,6 +59,7 @@ struct MainMenu: View {
 
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
+                
                 Section(header: Text("Quiz")) {
                     let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
                     NavigationLink(destination: QuizView(params: paramsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){

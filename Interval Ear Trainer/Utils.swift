@@ -142,7 +142,7 @@ func str_to_interval_filter(filter_str: String) -> Set<Int>
     return Set<Int>(rv)
 }
 
-func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
+func interval_answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
 {
     var answers = [String]()
     if chord{
@@ -154,7 +154,7 @@ func answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
             answers.append(interval_name(interval_int:e2-e1, oriented: oriented))
         }
     }
-    return answers.joined(separator: "  ")
+    return answers.joined(separator: " ")
 }
 
 //-------------------------

@@ -20,6 +20,7 @@ struct IntervalAnswerButtonsView: View {
     
     var body: some View {
         let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
+        //let n_guess =  min(1, notes.count-1)
         HStack{
             ForEach(0..<4){ i in
                 VStack{
@@ -30,11 +31,11 @@ struct IntervalAnswerButtonsView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
                                     if (active) {
-                                        if (guess.count < notes.count){
+                                        if (guess.count < notes.count-1){
                                             guess.append(thisInt)
                                         }
-                                        guess_str = answer_string(notes: guess, chord: true, oriented: false)
-                                        if ((guess.count == notes.count) && !use_timer){
+                                        guess_str = interval_answer_string(notes: [0] + guess, chord: true, oriented: false)
+                                        if ((guess.count == notes.count-1) && !use_timer){
                                             set_timer()
                                         }
                                     }

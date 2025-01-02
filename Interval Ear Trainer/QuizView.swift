@@ -60,7 +60,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         _use_timer = .init(initialValue: true)
         _correct = .init(initialValue: false)
         _guess_str = .init(initialValue: " ")
-        _guess = .init(initialValue: [0])
+        _guess = .init(initialValue: [])
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
         _dftDelay = .init(projectedValue: dftDelay)
@@ -83,7 +83,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
                     ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
                 }
                 Spacer()
-                answerView(answer_str: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
+                answerView(answer: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
                 Text(guess_str).foregroundColor(Color(.systemGray)).font(.system(size: 40))
                 Spacer()
                 if (params.type == .interval) {
@@ -106,8 +106,16 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         
     }
     
-    func answerView(answer_str: String) -> AnyView {
-        return AnyView(Text(answer_str.split(separator: "/")[0]).font(.system(size: 40)))
+    func short_answer(answer: String, oriented: Bool = true) -> String {
+        let rv = String(answer.split(separator: "/")[0])
+        if !oriented {
+            return rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
+        }
+        return rv
+    }
+    
+    func answerView(answer: String) -> AnyView {
+        return AnyView(Text(short_answer(answer: answer)).font(.system(size: 40)))
     }
     
     func toggle_start_stop() {
@@ -170,7 +178,7 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     }
     
     func show_answer(){
-        correct = answer_str.hasSuffix(guess_str) && guess_str != " "
+        correct = short_answer(answer: answer_str, oriented: false) == guess_str
         answer_visible = 1.0
     }
 
