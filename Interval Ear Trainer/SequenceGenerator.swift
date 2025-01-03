@@ -50,9 +50,7 @@ class IntervalGenerator : SequenceGenerator{
             duration = params.delay * 0.5
             delay = 0.0
         } else {
-            var answers = [String]()
-            (notes, answers) = draw_notes(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
-            answer_str = answers.joined(separator: " ")
+            (notes, answer_str) = draw_notes(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
             duration = params.delay_sequence
             delay = params.delay_sequence * Double(n_notes-1) * 0.5
         }

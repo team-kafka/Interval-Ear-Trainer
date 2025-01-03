@@ -38,7 +38,25 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
         return direction + quality + octave
     }
 }
-func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> ([Int], [String])
+
+func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> (Int, String)
+{
+    let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
+    if (acceptable_intervals.isEmpty){
+        let new_note = Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
+        return (new_note, interval_name(interval_int: new_note-prev_note, oriented: true, octave: false))
+    }
+    
+    let rnd_interval = acceptable_intervals.randomElement()!
+    var octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
+    if (prev_note + rnd_interval + octave < lower_bound) || (prev_note + rnd_interval + octave > upper_bound) {
+        octave = 0
+    }
+    
+    return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
+}
+
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true) -> ([Int], String)
 {
     var intervals = [Int]()
     for _ in (1...n_notes-1) {
@@ -59,48 +77,13 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     }
 
     return ([first_note] + running_sum.map{first_note + $0},
-            intervals.map{interval_name(interval_int: $0, oriented: true, octave: false)})
-}
-
-func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> (Int, String)
-{
-    let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
-    if (acceptable_intervals.isEmpty){
-        let new_note = Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
-        return (new_note, interval_name(interval_int: new_note-prev_note, oriented: true, octave: false))
-    }
-    
-    let rnd_interval = acceptable_intervals.randomElement()!
-    var octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
-    if (prev_note + rnd_interval + octave < lower_bound) || (prev_note + rnd_interval + octave > upper_bound) {
-        octave = 0
-    }
-    
-    return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
+            intervals.map{interval_name(interval_int: $0, oriented: answer_oriented, octave: false)}.joined(separator: " "))
 }
 
 func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> ([Int], String)
 {
-    let note_0 = Int.random(in: lower_bound...upper_bound-12)
     let pos_intervals = Set<Int>(active_intervals.map{$0 > 0 ? $0 : -$0})
-    print(pos_intervals)
-    var acceptable_intervals = pos_intervals.filter{note_0+$0 <= upper_bound}
-    var notes = [note_0]
-    for _ in (0..<n_notes-1){
-        let rnd_int = acceptable_intervals.randomElement()!
-        let octave = (Double.random(in: 0...1) < largeIntevalsProba)
-                    && (note_0 + rnd_int + 12 < upper_bound) ? 12 : 0
-        if (acceptable_intervals.count > 1){
-            acceptable_intervals.remove(at:acceptable_intervals.firstIndex{$0 == rnd_int}!)
-        }
-        notes.append(note_0 + octave + rnd_int)
-    }
-    let rv = notes.sorted()
-    var answers = [String]()
-    for i in notes[1...] {
-        answers.append(interval_name(interval_int:i-notes[0], oriented: false))
-    }
-    return (rv, answers.joined(separator: "  "))
+    return draw_notes(n_notes:n_notes, active_intervals:pos_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:largeIntevalsProba, answer_oriented: false)
 }
 
 let NOTE_KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
