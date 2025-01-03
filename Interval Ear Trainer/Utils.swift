@@ -38,6 +38,29 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
         return direction + quality + octave
     }
 }
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> ([Int], [String])
+{
+    var intervals = [Int]()
+    for _ in (1...n_notes-1) {
+        let rnd_interval = active_intervals.randomElement()!
+        let octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
+        intervals.append(rnd_interval + octave)
+    }
+    
+    let running_sum: [Int] = intervals.enumerated().map { intervals.prefix($0).reduce($1, +) }
+    let ub2 = upper_bound - max(0, running_sum.max()!)
+    let lb2 = lower_bound - min(0, running_sum.min()!)
+    
+    var first_note: Int
+    if lb2 <= ub2 {
+        first_note = Int.random(in: lb2...ub2)
+    } else {
+        first_note = Int(floor(Double(lb2  + ub2) / 2))
+    }
+
+    return ([first_note] + running_sum.map{first_note + $0},
+            intervals.map{interval_name(interval_int: $0, oriented: true, octave: false)})
+}
 
 func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> (Int, String)
 {
