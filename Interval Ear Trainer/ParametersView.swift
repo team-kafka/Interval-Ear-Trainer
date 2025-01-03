@@ -179,14 +179,16 @@ struct ParametersView: View {
     }
     
     func toggle_active_intervals(intervals:[Int]){
-        for i in intervals{
-            if (params.active_intervals.contains(i))
-            {
-                params.active_intervals.remove(at: params.active_intervals.firstIndex(of: i)!)
-            } else
-            {
+        let inactive = intervals.filter({!params.active_intervals.contains($0)})
+        let active   = intervals.filter({ params.active_intervals.contains($0)})
+        for i in inactive {
                 params.active_intervals.insert(i)
+        }
+        for i in active {
+            if params.active_intervals.count > 1{
+                params.active_intervals.remove(at: params.active_intervals.firstIndex(of: i)!)
             }
         }
+
     }
 }

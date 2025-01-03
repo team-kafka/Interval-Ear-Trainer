@@ -121,7 +121,9 @@ struct IntervalCheckBoxView: View {
             .onTapGesture {
                 if (active.contains(interval_int))
                 {
-                    active.remove(at: active.firstIndex(of: interval_int)!)
+                    if (active.count > 1) {
+                        active.remove(at: active.firstIndex(of: interval_int)!)
+                    }
                 } else
                 {
                     active.insert(interval_int)
@@ -140,7 +142,9 @@ struct ChordCheckBoxView: View {
             .onTapGesture {
                 if (active.contains(key))
                 {
-                    active.remove(at: active.firstIndex(of: key)!)
+                    if (active.count > 1) {
+                        active.remove(at: active.firstIndex(of: key)!)
+                    }
                 } else
                 {
                     active.insert(key)
