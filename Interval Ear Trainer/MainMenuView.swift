@@ -7,6 +7,25 @@
 
 import SwiftUI
 
+extension Color {
+    init(hex: Int, opacity: Double = 1) {
+        self.init(
+            .sRGB,
+            red: Double((hex >> 16) & 0xff) / 255,
+            green: Double((hex >> 08) & 0xff) / 255,
+            blue: Double((hex >> 00) & 0xff) / 255,
+            opacity: opacity
+        )
+    }
+}
+
+let opacity: Double = 0.1
+let cs: [Color] =
+[
+    Color(hex: 0x007FFF, opacity: opacity),
+    Color(hex: 0xFE0089, opacity: opacity),
+    Color(hex: 0xFEDC00, opacity: opacity),
+]
 
 struct MainMenu: View {
     @AppStorage("dftDelayIP") var dftDelayIP: Double = 3.0
@@ -44,58 +63,56 @@ struct MainMenu: View {
                     let paramsIP = Parameters(type:.interval, delay: dftDelayIP, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIP))
                     NavigationLink(destination: PracticeView(params: paramsIP, dftDelay: $dftDelayIP, dftFilterStr: $dftFilterStrIP ).navigationBarBackButtonHidden(true)){
                             Text("Intervals").font(.headline)
-                        }
+                    }//.listRowBackground(cs[0])
                     let filtersTP = triad_filters_from_str(filter_str: dftFilterStrTP)
                     let paramsTP = Parameters(type:.triad, delay: dftDelayTP, active_qualities: filtersTP.0, active_inversions: filtersTP.1, active_voicings: filtersTP.2)
                     NavigationLink(destination:
                                     PracticeView(params: paramsTP, dftDelay: $dftDelayTP, dftFilterStr: $dftFilterStrTP, n_notes:3,
                                                  fixed_n_notes:true, chord:true).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
-                    }
+                    }//.listRowBackground(cs[1])
                         let paramsSP = Parameters(type:.scale_degree, delay: dftDelaySP, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSP))
                         NavigationLink(destination:
                                         PracticeView(params: paramsSP, dftDelay: $dftDelaySP, dftFilterStr: $dftFilterStrSP, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
                             Text("Scale Degrees").font(.headline)
 
-                    }
+                    }//.listRowBackground(cs[2])
                 }.navigationTitle(Text("Interval Ear Trainer"))
                 
                 Section(header: Text("Quiz")) {
                     let paramsIQ = Parameters(type:.interval, delay: dftDelayIQ, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIQ))
                     NavigationLink(destination: QuizView(params: paramsIQ, dftDelay: $dftDelayIQ, dftFilterStr: $dftFilterStrIQ).navigationBarBackButtonHidden(true)){
                         Text("Intervals").font(.headline)
-                    }
+                    }//.listRowBackground(cs[0])
                     let filtersTQ = triad_filters_from_str(filter_str: dftFilterStrTQ)
                     let paramsTQ = Parameters(type: .triad, delay: dftDelayTQ, active_qualities: filtersTQ.0, active_inversions: filtersTQ.1, active_voicings: filtersTQ.2)
                     NavigationLink(destination: QuizView(params: paramsTQ, dftDelay: $dftDelayTQ, dftFilterStr: $dftFilterStrTQ, n_notes:3,
                                                          fixed_n_notes:true, chord: true).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
-                    }
+                    }//.listRowBackground(cs[1])
                     let paramsSQ = Parameters(type: .scale_degree, delay: dftDelaySQ, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSQ))
                     NavigationLink(destination: QuizView(params: paramsSQ, dftDelay: $dftDelaySQ, dftFilterStr: $dftFilterStrSQ, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
                         Text("Scale Degrees").font(.headline)
-                    }
+                    }//.listRowBackground(cs[2])
                 }
-                Section(header: Text("Listening: Intervals")) {
+                Section(header: Text("Listening")) {
                     let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
-                    ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1, chord:false)
+                    ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1, chord:false)//.listRowBackground(cs[0])
                     
                     let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
-                    ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2, chord:false)
+                    ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2, chord:false)//.listRowBackground(cs[0])
                     
                     let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
-                    ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3, chord:false)
-                }
-                Section(header: Text("Listening: Triads")) {
+                    ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3, chord:false)//.listRowBackground(cs[0])
+
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
                     let dftParamsTL = Parameters(type: .triad,
                                                  delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)
-                    ListeningView(params: dftParamsTL, dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS, chord: true)
-                }
-                Section(header: Text("Listening: Scale Degrees")) {
+                    ListeningView(params: dftParamsTL, dftDelay: $dftDelayTL, dftFilterStr: $dftFilterStrTS, chord: true)//.listRowBackground(cs[1])
+
                 let dftParamsSL = Parameters(type: .scale_degree,
                     delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
-                    ListeningView(params: dftParamsSL, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL, n_notes:1, chord:false)
+                    ListeningView(params: dftParamsSL, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL, n_notes:1, chord:false)//.listRowBackground(cs[2])
             }
             }
         }

@@ -203,6 +203,7 @@ var body: some View {
         }
         GridRow{
             Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
+                reset_state()
                 play_scale(params:params, player:player)
             }.scaleEffect(1.5)
             Menu{

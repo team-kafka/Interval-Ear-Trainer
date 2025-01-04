@@ -262,7 +262,7 @@ let SCALES: [String: [Int]] = [
     "Harmonic Minor": [0, 2, 3, 5, 7, 8, 11],
     "Relative Minor": [0, 2, 3, 5, 7, 8, 10],
     "Melodic Minor":  [0, 2, 3, 5, 7, 9, 11],
-    "Dorian":         [0, 2, 3, 5, 7, 8, 10]
+    "Dorian":         [0, 2, 3, 5, 7, 9, 10]
 ]
 
 //let SCALE_DEGREE_KEYS = ["1", "2", "3", "4", "5", "6", "7"]
