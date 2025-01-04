@@ -52,6 +52,7 @@ struct ListeningView: View {
             }
             if (params.type == .scale_degree) {
                 Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
+                    stop()
                     params.key = NOTE_KEYS.randomElement()!
                 }
             } else{
@@ -86,7 +87,7 @@ struct ListeningView: View {
     }
 
     func loopFunction() {
-        var delay = params.delay * 0.5
+        var delay = params.delay
         delay += play_sequence()
         timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
             loopFunction()

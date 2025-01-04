@@ -17,7 +17,7 @@ struct Parameters {
     var type: ParamType = ParamType.interval
     
     // General
-    var upper_bound: Int = 107
+    var upper_bound: Int = 103
     var lower_bound: Int = 64
     var delay: Double = 2.8
     var delay_sequence: Double = 0.6
