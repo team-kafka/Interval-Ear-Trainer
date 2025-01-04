@@ -189,6 +189,7 @@ var body: some View {
     Grid{
         GridRow{
             Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
+                reset_state()
                 params.key = NOTE_KEYS.randomElement()!
             }.scaleEffect(1.5)
             Menu{
