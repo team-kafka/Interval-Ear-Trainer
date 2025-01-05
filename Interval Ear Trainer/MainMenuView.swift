@@ -7,25 +7,32 @@
 
 import SwiftUI
 
-extension Color {
-    init(hex: Int, opacity: Double = 1) {
-        self.init(
-            .sRGB,
-            red: Double((hex >> 16) & 0xff) / 255,
-            green: Double((hex >> 08) & 0xff) / 255,
-            blue: Double((hex >> 00) & 0xff) / 255,
-            opacity: opacity
-        )
-    }
-}
-
-let opacity: Double = 0.1
-let cs: [Color] =
-[
-    Color(hex: 0x007FFF, opacity: opacity),
-    Color(hex: 0xFE0089, opacity: opacity),
-    Color(hex: 0xFEDC00, opacity: opacity),
-]
+//extension Color {
+//    init(hex: Int, opacity: Double = 1) {
+//        self.init(
+//            .sRGB,
+//            red: Double((hex >> 16) & 0xff) / 255,
+//            green: Double((hex >> 08) & 0xff) / 255,
+//            blue: Double((hex >> 00) & 0xff) / 255,
+//            opacity: opacity
+//        )
+//    }
+//}
+//
+//let opacity: Double = 1
+//let cs_light: [Color] =
+//[
+//    Color(hex: 0xE7EFE7, opacity: opacity),
+//    Color(hex: 0xE5ECF0, opacity: opacity),
+//    Color(hex: 0xEEE8EC, opacity: opacity),
+//]
+//
+//let cs: [Color] =
+//[
+//    Color(hex: 0x182518, opacity: opacity),
+//    Color(hex: 0x162127, opacity: opacity),
+//    Color(hex: 0x231A21, opacity: opacity),
+//]
 
 struct MainMenu: View {
     @AppStorage("dftDelayIP") var dftDelayIP: Double = 3.0

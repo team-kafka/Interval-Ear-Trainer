@@ -22,8 +22,8 @@ class MidiPlayer {
         // Avoid stopping sounds upon screen lock
         let session = AVAudioSession.sharedInstance()
         do {
-            try session.setCategory(AVAudioSession.Category.playback,
-                                    options: [])
+            try session.setCategory(AVAudioSession.Category.playback,// mode: .moviePlayback,
+                                    options: [.mixWithOthers])
         } catch let error as NSError {
             print("Failed to set the audio session category and mode: \(error.localizedDescription)")
         }
