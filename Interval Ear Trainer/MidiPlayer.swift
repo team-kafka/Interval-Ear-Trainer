@@ -7,7 +7,7 @@
 
 import Foundation
 import AVFoundation
-
+import MediaPlayer
 
 class MidiPlayer {
     var midiPlayer: AVMIDIPlayer?
@@ -18,8 +18,6 @@ class MidiPlayer {
             fatalError("\"Arnold___David_Classical_Piano.sf2\" file not found.")
         }
         self.bankURL = bankURL
-        
-
     }
 
     
@@ -83,5 +81,5 @@ class MidiPlayer {
         self.prepare_song(musicSequence: musicSequence)
         self.playSong()
     }
-    
 }
+

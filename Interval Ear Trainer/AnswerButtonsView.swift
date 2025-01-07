@@ -112,7 +112,7 @@ struct ScaleDegreeAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var activeDegrees: Set<Int>
     var scale: String
-    var running: Bool
+    @Binding var running: Bool
     var notes: [Int]
     @Binding var guess_str: String
     @Binding var guess: [Int]
@@ -129,7 +129,7 @@ struct ScaleDegreeAnswerButtonsView: View {
                         let idx = j*4+i
                         if (idx < SCALE_DEGREES.values.count) {
                             let thisDegree = SCALE_DEGREES.values.sorted()[idx]
-                            let active = activeDegrees.contains(thisDegree) && running
+                            let active = activeDegrees.contains(thisDegree) && (running || (!use_timer && notes[0] != 0))
                             Text(scale_degree_answer_str(degrees: [thisDegree], scale:scale)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)

@@ -83,7 +83,7 @@ struct QuizView: View {
                 } else if (params.type == .triad) {
                     TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer)
                 } else if (params.type == .scale_degree) {
-                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
+                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running: $running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 }
             }
         }
@@ -110,8 +110,8 @@ struct QuizView: View {
     }
     
     func toggle_start_stop() {
-        running.toggle()
-        if running {
+        //running.toggle()
+        if !running {
             start()
         }
         else{
@@ -119,12 +119,24 @@ struct QuizView: View {
         }
     }
     
+//    func start() {
+//        if use_timer{
+//            running = true
+//        }
+//        timer?.invalidate()
+//        loopFunction()
+//    }
     func start() {
-        if use_timer{
-            running = true
-        }
         timer?.invalidate()
-        loopFunction()
+        running = use_timer
+        if (params.type == .scale_degree && notes[0] == 0) {
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+                self.loopFunction()
+            }
+        } else {
+            self.loopFunction()
+        }
     }
     
     func stop(){

@@ -75,13 +75,13 @@ struct MainMenu: View {
                     }
                 }
                 Section(header: Text("Listening")) {
-                    let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
+                    let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
                     ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
                     
-                    let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
+                    let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
                     ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
                     
-                    let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
+                    let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
                     ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
 
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)

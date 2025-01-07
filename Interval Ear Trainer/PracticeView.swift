@@ -101,8 +101,7 @@ struct PracticeView: View {
     
     func toggle_start_stop() {
         if use_timer {
-            running.toggle()
-            if running {
+            if !running {
                 start()
             }
             else{
@@ -116,7 +115,7 @@ struct PracticeView: View {
     func start() {
         timer?.invalidate()
         running = use_timer
-        if (params.type == .scale_degree && use_timer) {
+        if (params.type == .scale_degree && notes[0] == 0) {
             player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
             timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
                 self.loopFunction()

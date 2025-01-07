@@ -11,8 +11,7 @@ import MediaPlayer
 struct ListeningView: View {
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
-    @ObservedObject var player: ListeningModePlayer
-
+    var player: ListeningModePlayer
     @State private var playing: Bool
     
     @Binding var dftDelay: Double
@@ -37,8 +36,8 @@ struct ListeningView: View {
     
     var body: some View {
         HStack{
-            (playing ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
-                if !playing {
+            (self.playing ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
+                if !self.playing {
                     start()
                 } else {
                     stop()
@@ -69,40 +68,17 @@ struct ListeningView: View {
     }
     
     func start() {
-        playing = true
-        player.start()
+        self.playing = true
+        player.start(params: params)
     }
     
     func stop(){
-        playing = false
+        self.playing = false
         player.stop()
     }
 
     func update_function(newParams: Parameters){
         dftDelay = newParams.delay
         dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
-    }
-    
-    private func setupRemoteTransportControls() {
-        // Get the shared MPRemoteCommandCenter
-        let commandCenter = MPRemoteCommandCenter.shared()
-        
-        commandCenter.playCommand.addTarget { _ in
-            if !self.playing {
-                self.start()
-                self.playing = true
-                return .success
-            }
-            return .commandFailed
-        }
-        
-        commandCenter.pauseCommand.addTarget {  _ in
-            if self.playing {
-                self.stop()
-                self.playing = false
-                return .success
-            }
-            return .commandFailed
-        }
     }
 }

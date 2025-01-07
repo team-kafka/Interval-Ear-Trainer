@@ -201,15 +201,14 @@ var body: some View {
                     }
                 }.onChange(of: params.key) {reset_state()}
             } label: {
-                Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-            }.gridColumnAlignment(.leading)
+                Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray))//.gridColumnAlignment(.leading)
+            }
         }
         GridRow{
             Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
                 if !running {
                     play_scale(params:params, player:player)
                 }
-                
             }.scaleEffect(1.5)
             Menu{
                 Picker("Scale", selection: $params.scale) {
@@ -218,8 +217,8 @@ var body: some View {
                     }
                 }.accentColor(Color(.systemGray)).onChange(of: params.scale) {reset_state()}
             } label: {
-                Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
-            }.gridColumnAlignment(.leading)
+                Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray))//.gridColumnAlignment(.leading)
+            }
         }
     }
 }
