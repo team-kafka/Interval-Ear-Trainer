@@ -175,12 +175,14 @@ struct ScaleChooserView: View {
     @Binding var params: Parameters
     @Binding var player: MidiPlayer
     @Binding var timer: Timer?
+    @Binding var running: Bool
     var reset_state: () -> Void
 
-init(params: Binding<Parameters>, player: Binding<MidiPlayer>, timer: Binding<Timer?>, reset_state: @escaping () -> Void) {
+init(params: Binding<Parameters>, player: Binding<MidiPlayer>, timer: Binding<Timer?>, running: Binding<Bool>, reset_state: @escaping () -> Void) {
     _params = .init(projectedValue: params)
     _player = .init(projectedValue: player)
     _timer = .init(projectedValue: timer)
+    _running = .init(projectedValue: running)
     self.reset_state = reset_state
 }
 
@@ -204,8 +206,10 @@ var body: some View {
         }
         GridRow{
             Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                reset_state()
-                play_scale(params:params, player:player)
+                if !running {
+                    play_scale(params:params, player:player)
+                }
+                
             }.scaleEffect(1.5)
             Menu{
                 Picker("Scale", selection: $params.scale) {

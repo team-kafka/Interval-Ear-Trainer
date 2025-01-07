@@ -17,6 +17,8 @@ struct Parameters {
     var type: ParamType = ParamType.interval
     
     // General
+    var n_notes: Int = 2
+    var is_chord: Bool = false
     var upper_bound: Int = 103
     var lower_bound: Int = 64
     var delay: Double = 2.8

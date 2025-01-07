@@ -10,19 +10,16 @@ import SwiftUI
 struct PracticeView: View {
     @State var params: Parameters
     
-    @State private var button_lbl: Image
     @State private var running: Bool
     @State private var use_timer: Bool
     @State private var answer_str: String
     
     @State var notes: [Int]
-    @State var n_notes:Int
     @State var fixed_n_notes: Bool
     @State var chord_active: Bool
     @State private var root_note: Int
     
     @State var answer_visible: Double
-    @State var chord: Bool = false
     
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
@@ -32,7 +29,7 @@ struct PracticeView: View {
     var sequenceGenerator: SequenceGenerator
 
     
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false, chord_active: Bool=true, chord: Bool=false){
+    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, fixed_n_notes: Bool=false, chord_active: Bool=true){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -44,15 +41,12 @@ struct PracticeView: View {
             self.sequenceGenerator = ScaleDegreeGenerator()
             _answer_str = .init(initialValue: " ")
         }
-        _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
         _running = .init(initialValue: false)
         _answer_visible = .init(initialValue: 1.0)
-        _n_notes = .init(initialValue: n_notes)
-        _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
+        _notes = .init(initialValue: [Int].init(repeating: 0, count: params.n_notes))
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
         _root_note = .init(initialValue: 0)
-        _chord = .init(initialValue: chord)
         _use_timer = .init(initialValue: true)
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
@@ -64,17 +58,17 @@ struct PracticeView: View {
         
         NavigationStack{
             VStack {
-                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $n_notes, chord: $chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
+                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
                 HStack {
                     Spacer()
-                    button_lbl.resizable().scaledToFit().onTapGesture {
+                    (running ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                         toggle_start_stop()
                     }.foregroundColor(Color(.systemGray))
                     Spacer()
                 }
-                NoteButtonsView(params: params, player: $player, notes: notes, root_note: root_note, chord: chord, running: running, answer_visible: answer_visible, fixed_n_notes: fixed_n_notes, chord_active:chord_active, reset_state: self.reset_state, stop: self.stop)
+                NoteButtonsView(params: params, player: $player, notes: notes, root_note: root_note, chord: params.is_chord, running: running, answer_visible: answer_visible, fixed_n_notes: fixed_n_notes, chord_active:chord_active, reset_state: self.reset_state, stop: self.stop)
                 if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
+                    ScaleChooserView(params: $params, player: $player, timer:$timer, running:$running, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
@@ -120,17 +114,20 @@ struct PracticeView: View {
     }
     
     func start() {
-        if use_timer{
-            button_lbl = Image(systemName: "pause.circle")
-            running = true
-        }
         timer?.invalidate()
-        loopFunction()
+        running = use_timer
+        if (params.type == .scale_degree && use_timer) {
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+                self.loopFunction()
+            }
+        } else {
+            self.loopFunction()
+        }
     }
     
     func stop(){
         timer?.invalidate()
-        button_lbl = Image(systemName: "play.circle")
         running = false
     }
 
@@ -154,8 +151,8 @@ struct PracticeView: View {
         var duration: Double = 0
         var new_notes: [Int] = []
         
-        (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:n_notes, chord:chord, prev_note:notes.last ?? 0)
-        player.playNotes(notes: new_notes, duration: duration, chord: chord)
+        (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:notes.last ?? 0)
+        player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
         notes = new_notes
         
         return delay

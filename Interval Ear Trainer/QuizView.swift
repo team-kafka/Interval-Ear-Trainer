@@ -7,16 +7,14 @@
 
 import SwiftUI
 
-struct QuizView: View { // find a way to reuse commmon code with practice view
+struct QuizView: View {
     @State var params: Parameters
     
-    @State private var button_lbl: Image
     @State private var running: Bool
     @State var use_timer: Bool
     @State private var answer_str: String
     
     @State private var notes: [Int]
-    @State var n_notes:Int
     @State var fixed_n_notes: Bool
     @State var chord_active: Bool
     
@@ -26,9 +24,6 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     @State var answer_visible: Double
 
     @State private var timer: Timer?
-    
-    @State var chord: Bool
-    
 
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
@@ -48,15 +43,12 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         } else {
             self.sequenceGenerator = ScaleDegreeGenerator()
         }
-        _button_lbl = .init(initialValue: Image(systemName: "play.circle"))
         _running = .init(initialValue: false)
         _answer_str = .init(initialValue: " ")
         _answer_visible = .init(initialValue: 1.0)
-        _n_notes = .init(initialValue: n_notes)
-        _notes = .init(initialValue: [Int].init(repeating: 0, count: n_notes))
+        _notes = .init(initialValue: [Int].init(repeating: 0, count: params.n_notes))
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
-        _chord = .init(initialValue: chord)
         _use_timer = .init(initialValue: true)
         _correct = .init(initialValue: false)
         _guess_str = .init(initialValue: " ")
@@ -71,16 +63,16 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         
         NavigationStack{
             VStack {
-                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $n_notes, chord: $chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
+                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
                 HStack {
                     Spacer()
-                    button_lbl.resizable().scaledToFit().onTapGesture {
+                    (running ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                         toggle_start_stop()
                     }.foregroundColor(Color(.systemGray))
                     Spacer()
                 }
                 if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, player: $player, timer:$timer, reset_state: self.reset_state)
+                    ScaleChooserView(params: $params, player: $player, timer:$timer, running:$running, reset_state: self.reset_state)
                 }
                 Spacer()
                 answerView(answer: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
@@ -103,7 +95,6 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
             UIApplication.shared.isIdleTimerDisabled = false
             stop()
         }
-        
     }
     
     func short_answer(answer: String, oriented: Bool = true) -> String {
@@ -130,7 +121,6 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     
     func start() {
         if use_timer{
-            button_lbl = Image(systemName: "pause.circle")
             running = true
         }
         timer?.invalidate()
@@ -139,7 +129,6 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
     
     func stop(){
         timer?.invalidate()
-        button_lbl = Image(systemName: "play.circle")
         running = false
         notes = notes.map{$0 * 0}
         answer_str = " "
@@ -170,8 +159,8 @@ struct QuizView: View { // find a way to reuse commmon code with practice view
         var duration: Double = 0
         var new_notes: [Int] = []
         
-        (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:n_notes, chord:chord, prev_note:notes.last ?? 0)
-        player.playNotes(notes: new_notes, duration: duration, chord: chord)
+        (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:notes.last ?? 0)
+        player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
         notes = new_notes
         
         return delay
