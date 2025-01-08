@@ -8,29 +8,27 @@
 import Foundation
 import MediaPlayer
 
-class ListeningModePlayer: ObservableObject {
+class ListeningModePlayer {
     
     static let player = MidiPlayer()
     var timer: Timer?
-    var playing: Bool
-    var sequenceGenerator: SequenceGenerator
+    @Published var playing: Bool
     
-    init(params: Parameters, sequenceGenerator: SequenceGenerator) {
+    init() {
         self.timer = nil
-        self.sequenceGenerator = sequenceGenerator
         self.playing = false
     }
     
-    func start(params: Parameters) {
+    func start(params: Parameters, sequenceGenerator: SequenceGenerator) {
         self.playing = true
         timer?.invalidate()
         if (params.type == .scale_degree) {
             ListeningModePlayer.player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
             timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
-                self.loopFunction(params:params)
+                self.loopFunction(params:params, sequenceGenerator: sequenceGenerator)
             }
         } else {
-            self.loopFunction(params:params)
+            self.loopFunction(params:params, sequenceGenerator: sequenceGenerator)
         }
     }
     
@@ -39,15 +37,15 @@ class ListeningModePlayer: ObservableObject {
         timer?.invalidate()
     }
     
-    func loopFunction(params:Parameters) {
+    func loopFunction(params:Parameters, sequenceGenerator: SequenceGenerator) {
         var total_delay = params.delay
-        total_delay += play_sequence(params:params)
+        total_delay += play_sequence(params:params, sequenceGenerator: sequenceGenerator)
         timer = Timer.scheduledTimer(withTimeInterval:total_delay, repeats: false) { t in
-            self.loopFunction(params:params)
+            self.loopFunction(params:params, sequenceGenerator: sequenceGenerator)
         }
     }
     
-    func play_sequence(params:Parameters) -> Double {
+    func play_sequence(params:Parameters, sequenceGenerator: SequenceGenerator) -> Double {
         var delay: Double
         var duration: Double
         var notes: [Int] = [0, 0]

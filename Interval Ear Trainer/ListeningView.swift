@@ -11,12 +11,11 @@ import MediaPlayer
 struct ListeningView: View {
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
-    var player: ListeningModePlayer
+    static var player: ListeningModePlayer = ListeningModePlayer()
     @State private var playing: Bool
     
     @Binding var dftDelay: Double
     @Binding var dftFilterStr: String
-
 
     init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>){
         _params = .init(initialValue: params)
@@ -28,8 +27,7 @@ struct ListeningView: View {
             self.sequenceGenerator = ScaleDegreeGenerator()
         }
         _playing = .init(initialValue: false)
-        self.player = ListeningModePlayer(params: params, sequenceGenerator: sequenceGenerator)
-        
+
         _dftDelay = .init(projectedValue: dftDelay)
         _dftFilterStr = .init(projectedValue: dftFilterStr)
     }
@@ -37,9 +35,9 @@ struct ListeningView: View {
     var body: some View {
         HStack{
             (self.playing ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
-                if !self.playing {
+                if (!self.playing && !ListeningView.player.playing) {
                     start()
-                } else {
+                } else if (self.playing){
                     stop()
                 }
             }
@@ -69,12 +67,12 @@ struct ListeningView: View {
     
     func start() {
         self.playing = true
-        player.start(params: params)
+        ListeningView.player.start(params: params, sequenceGenerator: sequenceGenerator)
     }
     
     func stop(){
         self.playing = false
-        player.stop()
+        ListeningView.player.stop()
     }
 
     func update_function(newParams: Parameters){
