@@ -43,7 +43,9 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
 {
     let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
     if (acceptable_intervals.isEmpty){
-        let new_note = Int.random(in: max(prev_note-12, lower_bound)..<min(prev_note+12, upper_bound))
+        var draw_set = Set(max(prev_note-12, lower_bound)...min(prev_note+12, upper_bound))
+        draw_set.remove(prev_note)
+        let new_note = draw_set.randomElement()!
         return (new_note, interval_name(interval_int: new_note-prev_note, oriented: true, octave: false))
     }
     
@@ -56,7 +58,7 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
     return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
 }
 
-func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true) -> ([Int], String)
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0) -> ([Int], String)
 {
     var intervals = [Int]()
     for _ in (1...n_notes-1) {
@@ -70,10 +72,14 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     let lb2 = lower_bound - min(0, running_sum.min()!)
     
     var first_note: Int
-    if lb2 <= ub2 {
-        first_note = Int.random(in: lb2...ub2)
+    if lb2 < ub2 {
+        var draw_set = Set(lb2...ub2)
+        if (draw_set.count > 1 && draw_set.contains(prev_note)){
+            draw_set.remove(prev_note)
+        }
+        first_note = draw_set.randomElement()!
     } else {
-        first_note = Int(floor(Double(lb2  + ub2) / 2))
+        first_note = Int(floor(Double(lb2 + ub2) / 2))
     }
 
     return ([first_note] + running_sum.map{first_note + $0},

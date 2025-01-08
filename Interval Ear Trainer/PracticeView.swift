@@ -150,8 +150,12 @@ struct PracticeView: View {
         var duration: Double = 0
         var new_notes: [Int] = []
         
-        (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:notes.last ?? 0)
-        player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+        (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        if ((params.n_notes == 1) && (notes[0] != 0)) {
+            player.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
+        } else {
+            player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+        }
         notes = new_notes
         
         return delay

@@ -20,13 +20,12 @@ struct IntervalAnswerButtonsView: View {
     
     var body: some View {
         let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
-        //let n_guess =  min(1, notes.count-1)
         HStack{
             ForEach(0..<4){ i in
                 VStack{
                     ForEach(0..<3){ j in
                         let thisInt = j*4+i+1
-                        let active = (activeIntAbs.contains(thisInt) && running)
+                        let active = activeIntAbs.contains(thisInt) && (running || (!use_timer && notes[0] != 0))
                         Text(interval_name(interval_int: thisInt, oriented: false)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
@@ -63,6 +62,7 @@ struct TriadAnswerButtonsView: View {
     var running: Bool
     @Binding var guess_str: String
     var use_timer: Bool
+    var notes: [Int]
     
     @State private var timer: Timer?
     
@@ -75,7 +75,7 @@ struct TriadAnswerButtonsView: View {
                         let idx = i*2+j
                         if (idx < TRIAD_KEYS.count){
                             let thisTriad = TRIAD_KEYS[idx]
-                            let active = activeTriads.contains(thisTriad) && running
+                            let active = activeTriads.contains(thisTriad) && (running || (!use_timer && notes[0] != 0))
                             Text(thisTriad.prefix(3)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{

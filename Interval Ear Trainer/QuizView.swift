@@ -81,7 +81,7 @@ struct QuizView: View {
                 if (params.type == .interval) {
                     IntervalAnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: params.active_intervals, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 } else if (params.type == .triad) {
-                    TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer)
+                    TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer, notes: notes)
                 } else if (params.type == .scale_degree) {
                     ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running: $running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
                 }
@@ -110,7 +110,6 @@ struct QuizView: View {
     }
     
     func toggle_start_stop() {
-        //running.toggle()
         if !running {
             start()
         }
@@ -119,13 +118,6 @@ struct QuizView: View {
         }
     }
     
-//    func start() {
-//        if use_timer{
-//            running = true
-//        }
-//        timer?.invalidate()
-//        loopFunction()
-//    }
     func start() {
         timer?.invalidate()
         running = use_timer
@@ -171,10 +163,13 @@ struct QuizView: View {
         var duration: Double = 0
         var new_notes: [Int] = []
         
-        (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:notes.last ?? 0)
-        player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+        (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes,                 chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        if ((params.n_notes == 1) && (notes[0] != 0)) {
+         player.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
+        } else {
+         player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+        }
         notes = new_notes
-        
         return delay
     }
     
