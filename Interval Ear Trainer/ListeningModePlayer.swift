@@ -12,11 +12,13 @@ class ListeningModePlayer {
     
     static let player = MidiPlayer()
     var timer: Timer?
-    @Published var playing: Bool
+    var playing: Bool
+    var notes: [Int]
     
     init() {
         self.timer = nil
         self.playing = false
+        self.notes = [0]
     }
     
     func start(params: Parameters, sequenceGenerator: SequenceGenerator) {
@@ -48,11 +50,11 @@ class ListeningModePlayer {
     func play_sequence(params:Parameters, sequenceGenerator: SequenceGenerator) -> Double {
         var delay: Double
         var duration: Double
-        var notes: [Int] = [0, 0]
+        var new_notes: [Int]
         
-        (notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord)
-        ListeningModePlayer.player.playNotes(notes: notes, duration: duration, chord: params.is_chord)
-        
+        (new_notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        ListeningModePlayer.player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+        notes = new_notes
         return delay
     }
 }

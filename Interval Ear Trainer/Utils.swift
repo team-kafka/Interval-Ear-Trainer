@@ -86,10 +86,10 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
             intervals.map{interval_name(interval_int: $0, oriented: answer_oriented, octave: false)}.joined(separator: " "))
 }
 
-func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> ([Int], String)
+func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, prev_note:Int=0) -> ([Int], String)
 {
     let pos_intervals = Set<Int>(active_intervals.map{$0 > 0 ? $0 : -$0})
-    return draw_notes(n_notes:n_notes, active_intervals:pos_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:largeIntevalsProba, answer_oriented: false)
+    return draw_notes(n_notes:n_notes, active_intervals:pos_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:largeIntevalsProba, answer_oriented: false, prev_note: prev_note)
 }
 
 let NOTE_KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]

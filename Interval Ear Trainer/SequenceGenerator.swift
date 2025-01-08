@@ -46,7 +46,7 @@ class IntervalGenerator : SequenceGenerator{
                 delay = 0.0
             }
         } else if chord{
-            (notes, answer_str) = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+            (notes, answer_str) = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note)
             duration = params.delay * 0.5
             delay = 0.0
         } else {
