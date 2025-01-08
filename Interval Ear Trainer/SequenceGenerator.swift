@@ -100,7 +100,7 @@ class ScaleDegreeGenerator : SequenceGenerator{
         var notes = [Int]()
         var answers = [String]()
 
-        (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba)
+        (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba, prev_note: prev_note)
 
         let answer_str = answers.joined(separator: " ")
         let duration = params.delay_sequence

@@ -43,13 +43,19 @@ struct ListeningView: View {
             }
             if (params.type == .scale_degree) {
                 Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
-                    stop()
+                    if self.playing {
+                        stop()
+                    }
                     params.key = NOTE_KEYS.randomElement()!
                 }
             } else{
                 ChordArpSwitchView(chord: $params.is_chord)
             }
-            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {stop()}){
+            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {
+                if self.playing {
+                    stop()
+                }
+            }){
             }.opacity(0)
             Text(sequenceGenerator.generateLabelString(params: params)).lineLimit(1)
             Image(systemName: "gearshape.fill")

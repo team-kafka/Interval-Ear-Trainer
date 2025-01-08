@@ -309,22 +309,42 @@ func middle_note(key: String, upper_bound:Int, lower_bound:Int) -> Int{
     return Int(floor(Double(mid_note - pitch_int) / 12)) * 12 + pitch_int
 }
 
-func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double) -> ([Int], [String])
+func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> ([Int], [String])
 {
     var notes = [Int]()
     var answers = [String]()
+    var this_prev_note:Int = prev_note
     
     for _ in 0..<n_notes
     {
-        let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
-        let this_degree = active_degrees.randomElement() ?? 0
-        let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
-        let raw_int = SCALES[scale]![this_degree]
-        let new_note = mid_note + raw_int + octave
+        var new_note:Int
+        var new_answer:String
+        (new_note, new_answer) = draw_random_scale_degree(scale:scale, active_degrees:active_degrees, key:key, upper_bound:upper_bound, lower_bound:lower_bound, large_interval_proba:large_interval_proba, prev_note:this_prev_note)
         notes.append(new_note)
-        answers.append(interval_name(interval_int:raw_int, oriented:false))
+        answers.append(new_answer)
+        this_prev_note = new_note
     }
     return (notes, answers)
+}
+
+func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> (Int, String)
+{
+    let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
+
+    var draw_choices = active_degrees
+    if ((active_degrees.count > 1) && prev_note != 0){
+        let prev_int = (prev_note - mid_note) % 12 + ((prev_note - mid_note) % 12 < 0 ? 12 : 0)
+        print(prev_int)
+        let prev_degree = SCALES[scale]!.firstIndex(of: prev_int) ?? -1
+        draw_choices.remove(prev_degree)
+    }
+
+    let this_degree = draw_choices.randomElement() ?? 0
+    let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
+    let raw_int = SCALES[scale]![this_degree]
+    let new_note = mid_note + raw_int + octave
+
+    return (new_note, interval_name(interval_int:raw_int, oriented:false))
 }
 
 func scale_degree_filter_to_str(intervals:Set<Int>) -> String
