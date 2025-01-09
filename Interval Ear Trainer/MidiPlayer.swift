@@ -38,19 +38,20 @@ class MidiPlayer {
             fatalError("Cannot add track")
         }
         
+        let duration_120bpm = duration * 2
         var position = 0.0
         for note in notes{
                 var musicNote = MIDINoteMessage(channel: 0,
                                                 note: UInt8(note),
                                                 velocity: 64,
                                                 releaseVelocity: 0,
-                                                duration: Float(duration*0.95))
+                                                duration: Float(duration_120bpm*0.95))
                 
                 guard MusicTrackNewMIDINoteEvent(track!, MusicTimeStamp(position), &musicNote) == OSStatus(noErr) else {
                     fatalError("Cannot add Note")
             }
             if (!chord){
-                position += duration
+                position += duration_120bpm
             }
         }
         return musicSequence!

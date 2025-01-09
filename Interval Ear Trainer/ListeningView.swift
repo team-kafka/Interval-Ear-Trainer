@@ -49,7 +49,7 @@ struct ListeningView: View {
                     params.key = NOTE_KEYS.randomElement()!
                 }
             } else{
-                ChordArpSwitchView(chord: $params.is_chord)
+                ChordArpSwitchView(chord: $params.is_chord, active: !self.playing)
             }
             NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {
                 if self.playing {

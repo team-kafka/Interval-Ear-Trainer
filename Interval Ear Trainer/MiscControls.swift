@@ -72,8 +72,8 @@ struct ChordArpSwitchView: View {
     var visible: Bool = true
 
     var body: some View {
-        let rotation = (chord && active) ? 90.0 : 0.0
-        Image(systemName:"00.square").rotationEffect(Angle(degrees: rotation))
+        let rotation = (chord) ? 90.0 : 0.0
+        Image(systemName:"00.square.hi").rotationEffect(Angle(degrees: rotation))
             .foregroundColor(Color.secondary).opacity(visible ? 1 : 0)
             .onTapGesture {
                 if active {
