@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+
 struct MainMenu: View {
     @AppStorage("dftDelayIP") var dftDelayIP: Double = 3.0
     @AppStorage("dftDelayIQ") var dftDelayIQ: Double = 3.0
@@ -36,6 +37,7 @@ struct MainMenu: View {
     @AppStorage("dftDelaySQ") var dftDelaySQ: Double = 3.0
     @AppStorage("dftFilterStrSQ") var dftFilterStrSQ: String = "1 2 3 4 5 6 7"
 
+    
     var body: some View {
         NavigationStack{
             List{
@@ -92,6 +94,11 @@ struct MainMenu: View {
                     delay: dftDelaySL, active_scale_degrees: str_to_scale_degree_filter(filter_str: dftFilterStrSL))
                     ListeningView(params: dftParamsSL, dftDelay: $dftDelaySL, dftFilterStr: $dftFilterStrSL)
             }
+                Section(header: Text("Stats")) {
+                    NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")
+                        Text("Statistics").font(.headline)
+                    }
+                }
             }
         }
     }  

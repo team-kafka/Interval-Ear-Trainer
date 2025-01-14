@@ -7,6 +7,7 @@
 
 import Foundation
 
+let INTERVAL_KEYS: [String] = ["2♭", "2", "3♭", "3", "4", "5♭","5", "6♭", "6", "7♭","7", "8"]
 let INTERVAL_NAME_TO_INT: [String :Int] = [
     "2♭": 1,
     "2": 2,

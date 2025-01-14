@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct Interval_Ear_TrainerApp: App {
+    
+    
     var body: some Scene {
         WindowGroup {
             MainMenu()
