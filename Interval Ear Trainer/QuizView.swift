@@ -10,7 +10,7 @@ import SwiftUI
 let answer_colors: [AnswerType: Color] = [
     .correct: Color.green,
     .incorrect: Color.red,
-    .timeout: Color.red.opacity(0.5)
+    .timeout: Color.orange
 ]
 
 struct QuizView: View {
