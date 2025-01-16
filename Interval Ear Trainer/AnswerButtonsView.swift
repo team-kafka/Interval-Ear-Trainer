@@ -12,8 +12,7 @@ struct IntervalAnswerButtonsView: View {
     var activeIntervals: Set<Int>
     var running: Bool
     var notes: [Int]
-    @Binding var guess_str: String
-    @Binding var guess: [Int]
+    @Binding var guesses: [String]
     var use_timer: Bool
     
     @State private var timer: Timer?
@@ -30,16 +29,14 @@ struct IntervalAnswerButtonsView: View {
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
                                     if (active) {
-                                        if (guess.count < notes.count-1){
-                                            guess.append(thisInt)
+                                        if (guesses.count < notes.count-1){
+                                            guesses.append(interval_name(interval_int: thisInt, oriented: false))
                                         }
-                                        guess_str = interval_answer_string(notes: [0] + guess, chord: true, oriented: false)
-                                        if ((guess.count == notes.count-1) && !use_timer){
+                                        if ((guesses.count == notes.count-1) && !use_timer){
                                             set_timer()
                                         }
                                     }
                                 }
-                    
                     }
                 }.fixedSize(horizontal: false, vertical: true)
             }
@@ -60,7 +57,7 @@ struct TriadAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var params: Parameters
     var running: Bool
-    @Binding var guess_str: String
+    @Binding var guesses: [String]
     var use_timer: Bool
     var notes: [Int]
     
@@ -80,7 +77,7 @@ struct TriadAnswerButtonsView: View {
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
                                         if active {
-                                            guess_str = thisTriad
+                                            guesses = [thisTriad]
                                             if !use_timer {
                                                 set_timer()
                                             }
@@ -112,10 +109,9 @@ struct ScaleDegreeAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var activeDegrees: Set<Int>
     var scale: String
-    @Binding var running: Bool
+    var running: Bool
     var notes: [Int]
-    @Binding var guess_str: String
-    @Binding var guess: [Int]
+    @Binding var guesses: [String]
     var use_timer: Bool
     
     @State private var timer: Timer?
@@ -135,11 +131,10 @@ struct ScaleDegreeAnswerButtonsView: View {
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)
                             .onTapGesture{
                                     if (active) {
-                                        if (guess.count < notes.count){
-                                            guess.append(thisDegree)
+                                        if (guesses.count < notes.count){
+                                            guesses.append(scale_degree_answer_str(degrees: [thisDegree], scale:scale))
                                         }
-                                        guess_str = scale_degree_answer_str(degrees: guess, scale:scale)
-                                        if ((guess.count == notes.count) && !use_timer){
+                                        if ((guesses.count == notes.count) && !use_timer){
                                             set_timer()
                                         }
                                     }

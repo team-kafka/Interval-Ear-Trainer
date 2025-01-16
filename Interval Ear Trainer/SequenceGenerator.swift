@@ -9,8 +9,8 @@ import Foundation
 import SwiftUI
 
 class SequenceGenerator {
-    func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, String, Int) {
-        return ([], 0, 0, "", 0)
+    func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
+        return ([], 0, 0, [], 0)
     }
     
     func generateFilterString(params: Parameters) -> String{
@@ -24,37 +24,39 @@ class SequenceGenerator {
 
 class IntervalGenerator : SequenceGenerator{
     
-    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, String, Int) {
+    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         var notes = [Int].init(repeating: 0, count: n_notes)
         var duration : Double = params.delay_sequence
         var delay: Double = 0.0
-        var answer_str = ""
+        var answers = [String]()
         
         if (n_notes == 1) {
             if (prev_note == 0) {
                 notes.append(0)
+                answers.append("")
                 notes[0] = Int.random(in: params.lower_bound..<params.upper_bound)
-                (notes[1], answer_str) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+                (notes[1], answers[0]) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 duration = params.delay_sequence
                 delay = params.delay_sequence
             }
             else {
                 notes.append(0)
                 notes[0] = prev_note
-                (notes[1], answer_str) = draw_new_note(prev_note: prev_note, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
+                answers.append("")
+                (notes[1], answers[0]) = draw_new_note(prev_note: prev_note, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 duration = params.delay_sequence
                 delay = 0.0
             }
         } else if chord{
-            (notes, answer_str) = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note)
+            (notes, answers) = draw_random_chord(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note)
             duration = params.delay * 0.5
             delay = 0.0
         } else {
-            (notes, answer_str) = draw_notes(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note)
+            (notes, answers) = draw_notes(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note)
             duration = params.delay_sequence
             delay = params.delay_sequence * Double(n_notes-1)
         }
-        return (notes, duration, delay, answer_str, 0)
+        return (notes, duration, delay, answers, 0)
     }
     
     override func generateFilterString(params: Parameters) -> String{
@@ -68,7 +70,7 @@ class IntervalGenerator : SequenceGenerator{
 
 class TriadGenerator : SequenceGenerator{
     
-    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, String, Int) {
+    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         let delay = chord ? 0.0 : params.delay_sequence * 2.0 * 0.5 // x n_notes - 1 (triad) and x 0.5 (tempo = 120)
         let duration = chord ? params.delay * 0.5 : params.delay_sequence
         
@@ -81,7 +83,7 @@ class TriadGenerator : SequenceGenerator{
         let root_note = res.2
         let answer_str = [quality, inversion, voicing].joined(separator: "/")
         
-        return (notes, duration, delay, answer_str, root_note)
+        return (notes, duration, delay, [answer_str], root_note)
     }
     
     override func generateFilterString(params: Parameters) -> String{
@@ -95,17 +97,16 @@ class TriadGenerator : SequenceGenerator{
 
 class ScaleDegreeGenerator : SequenceGenerator{
     
-    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, String, Int) {
+    override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         var notes = [Int]()
         var answers = [String]()
 
         (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba, prev_note: prev_note)
 
-        let answer_str = answers.joined(separator: " ")
         let duration = params.delay_sequence
         let delay = params.delay_sequence * Double(n_notes-1) 
         
-        return (notes, duration, delay, answer_str, 0)
+        return (notes, duration, delay, answers, 0)
     }
     
     override func generateFilterString(params: Parameters) -> String{

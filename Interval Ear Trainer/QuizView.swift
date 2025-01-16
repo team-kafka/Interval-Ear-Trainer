@@ -7,20 +7,24 @@
 
 import SwiftUI
 
+let answer_colors: [AnswerType: Color] = [
+    .correct: Color.green,
+    .incorrect: Color.red,
+    .timeout: Color.red.opacity(0.5)
+]
+
 struct QuizView: View {
     @State var params: Parameters
     
     @State private var running: Bool
     @State var use_timer: Bool
-    @State private var answer_str: String
-    
+    @State private var answers: [String]
+
     @State private var notes: [Int]
     @State var fixed_n_notes: Bool
     @State var chord_active: Bool
     
-    @State var correct: Bool
-    @State private var guess_str: String
-    @State private var guess: [Int]
+    @State private var guesses: [String]
     @State var answer_visible: Double
 
     @State private var timer: Timer?
@@ -44,15 +48,13 @@ struct QuizView: View {
             self.sequenceGenerator = ScaleDegreeGenerator()
         }
         _running = .init(initialValue: false)
-        _answer_str = .init(initialValue: " ")
+        _answers = .init(initialValue: [])
         _answer_visible = .init(initialValue: 1.0)
         _notes = .init(initialValue: [Int].init(repeating: 0, count: params.n_notes))
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)
-        _correct = .init(initialValue: false)
-        _guess_str = .init(initialValue: " ")
-        _guess = .init(initialValue: [])
+        _guesses = .init(initialValue: [])
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
         _dftDelay = .init(projectedValue: dftDelay)
@@ -75,15 +77,15 @@ struct QuizView: View {
                     ScaleChooserView(params: $params, player: $player, timer:$timer, running:$running, reset_state: self.reset_state)
                 }
                 Spacer()
-                answerView(answer: answer_str).opacity(answer_visible).foregroundStyle(correct ? Color.green : Color.red)
-                Text(guess_str).foregroundColor(Color(.systemGray)).font(.system(size: 40))
+                answerView().opacity(answer_visible)
+                guessView()
                 Spacer()
                 if (params.type == .interval) {
-                    IntervalAnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: params.active_intervals, running: running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
+                    IntervalAnswerButtonsView(loopFunction: self.loopFunction, activeIntervals: params.active_intervals, running: (running && (answer_visible==0.0)), notes: notes, guesses: $guesses, use_timer: use_timer)
                 } else if (params.type == .triad) {
-                    TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: running, guess_str: $guess_str, use_timer: use_timer, notes: notes)
+                    TriadAnswerButtonsView(loopFunction: self.loopFunction, params: params, running: (running && (answer_visible==0.0)), guesses: $guesses, use_timer: use_timer, notes: notes)
                 } else if (params.type == .scale_degree) {
-                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running: $running, notes: notes, guess_str: $guess_str, guess: $guess, use_timer: use_timer)
+                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, running:  (running && (answer_visible==0.0)), notes: notes, guesses: $guesses, use_timer: use_timer)
                 }
             }
         }
@@ -97,16 +99,25 @@ struct QuizView: View {
         }
     }
     
-    func short_answer(answer: String, oriented: Bool = true) -> String {
-        let rv = String(answer.split(separator: "/")[0])
-        if !oriented {
-            return rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
-        }
-        return rv
+    func answerView() -> AnyView {
+        let guess_eval = evaluate_guess(guess: guesses, answer: answers)
+        return AnyView(
+            HStack{
+                Text(" ").font(.system(size: 40))
+                ForEach(Array(zip(answers, guess_eval)), id: \.0) { ans, eval in
+                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(answer_colors[eval]!)
+                }
+            })
     }
     
-    func answerView(answer: String) -> AnyView {
-        return AnyView(Text(short_answer(answer: answer)).font(.system(size: 40)))
+    func guessView() -> AnyView {
+        return AnyView(
+            HStack{
+                Text(" ").font(.system(size: 40))
+                ForEach(Array(guesses), id: \.self) { g in
+                    Text(short_answer(answer: g)).foregroundColor(Color(.systemGray)).font(.system(size: 40))
+                }
+            })
     }
     
     func toggle_start_stop() {
@@ -122,8 +133,9 @@ struct QuizView: View {
         timer?.invalidate()
         running = use_timer
         if (params.type == .scale_degree && notes[0] == 0) {
-            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+            let scale_delay:Double = 0.2
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: scale_delay)
+            timer = Timer.scheduledTimer(withTimeInterval:scale_delay * 9, repeats: false) { t in
                 self.loopFunction()
             }
         } else {
@@ -135,18 +147,16 @@ struct QuizView: View {
         timer?.invalidate()
         running = false
         notes = notes.map{$0 * 0}
-        answer_str = " "
-        guess_str = " "
+        answers = []
+        guesses = []
         answer_visible = 1.0
     }
 
     func loopFunction() {
         var delay = params.delay * 0.5
         if (answer_visible == 1.0){
-            correct = false
             answer_visible = 0.0
-            guess_str = " "
-            guess = []
+            guesses = []
             delay += play_sequence()
         } else{
             show_answer()
@@ -159,11 +169,11 @@ struct QuizView: View {
     }
     
     func play_sequence() -> Double {
-        var delay: Double = 0
-        var duration: Double = 0
-        var new_notes: [Int] = []
+        var delay: Double
+        var duration: Double
+        var new_notes: [Int]
         
-        (new_notes, duration, delay, answer_str, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes,                 chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        (new_notes, duration, delay, answers, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes,                 chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
         if ((params.n_notes == 1) && (notes[0] != 0)) {
          player.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
         } else {
@@ -174,15 +184,11 @@ struct QuizView: View {
     }
     
     func show_answer(){
-        correct = short_answer(answer: answer_str, oriented: false) == guess_str
         answer_visible = 1.0
     }
 
     func reset_state(){
         stop()
-        answer_visible = 1.0
-        guess_str = " "
-        guess = [Int](repeating: 0, count: notes.count)
     }
     
     func update_function(newParams: Parameters){

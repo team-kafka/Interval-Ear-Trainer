@@ -70,13 +70,12 @@ func randomDF(date:Date, ids: [String]) -> DataFrame
     dataFrame.append(column: colQE)
     dataFrame.append(column: colQT)
     
-    print("\(dataFrame)")
     return dataFrame
 }
 
 func sampleDF(ids:[String]) -> DataFrame
 {
-    let nDates = 10
+    let nDates = 2
     let gregorianCalendar = Calendar(identifier: .gregorian)
     let dates = Range(1...nDates).map { Calendar.current.startOfDay(for: gregorianCalendar.date(
         byAdding:DateComponents(day: -$0), to:Date())!)}
@@ -84,9 +83,74 @@ func sampleDF(ids:[String]) -> DataFrame
     var rv = randomDF(date:dates[0], ids:ids)
     for d in dates[1...] {
         rv.append(randomDF(date:d, ids:ids))
-        print("\(rv)")
     }
     
     return rv
 }
 
+func randomPLDF(date:Date, ids: [String]) -> DataFrame
+{
+    let colDate = Column<Date>(name:"date", contents: Array(repeating: date, count: ids.count))
+    let colId = Column<String>(name:"id", contents: ids)
+    let colListening = Column<Int>(name:"listening", contents: ids.map{_ in Int.random(in:0...20)})
+    let colPractice = Column<Int>(name:"practice", contents:  ids.map{_ in Int.random(in:0...20)})
+    
+    var dataFrame = DataFrame()
+    dataFrame.append(column: colDate)
+    dataFrame.append(column: colId)
+    dataFrame.append(column: colListening)
+    dataFrame.append(column: colPractice)
+    
+    return dataFrame
+}
+
+func samplePLDF(ids:[String]) -> DataFrame
+{
+    let nDates = 2
+    let gregorianCalendar = Calendar(identifier: .gregorian)
+    let dates = Range(1...nDates).map { Calendar.current.startOfDay(for: gregorianCalendar.date(
+        byAdding:DateComponents(day: -$0), to:Date())!)}
+
+    var rv = randomDF(date:dates[0], ids:ids)
+    for d in dates[1...] {
+        rv.append(randomDF(date:d, ids:ids))
+    }
+    
+    return rv
+}
+
+func testMerge() -> DataFrame
+{
+    var df = samplePLDF(ids: ["2", "4", "5"])
+    
+    var dictL: [String:Int] = [
+        "2":10,
+        "3":24,
+        "5":7
+    ]
+    var dictP: [String:Int] = [
+        "2":1,
+        "3":4,
+        "7":2
+    ]
+    let date = df["date"][0]
+    let dfL:DataFrame = ["id":Array(dictL.keys), "listening":Array(dictL.values), "date":dictL.map{_ in date}]
+    let dfP:DataFrame = ["id":Array(dictP.keys), "practice":Array(dictP.values), "date":dictP.map{_ in date}]
+//    print("\(df)")
+//    print("\(df2)")
+    df.append(dfL)
+    df.append(dfP)
+    //print(df)
+    df.transformColumn("listening") {
+        (l:Int?) -> Int in
+        l ?? 0
+    }
+    //print(df)
+//    
+//    let df3 = df.grouped(by: "id", "date").mapGroups { group in
+//        group.summary(of: "listening")
+//    }.ungrouped()
+//    
+//    print(df.sum)
+    return df
+}

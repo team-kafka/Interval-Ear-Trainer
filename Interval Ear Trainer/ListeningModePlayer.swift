@@ -25,15 +25,16 @@ class ListeningModePlayer {
         self.playing = true
         timer?.invalidate()
         if (params.type == .scale_degree) {
-            ListeningModePlayer.player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+            let scale_delay:Double = 0.2
+            ListeningModePlayer.player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration:scale_delay)
+            timer = Timer.scheduledTimer(withTimeInterval:scale_delay * 9, repeats: false) { t in
                 self.loopFunction(params:params, sequenceGenerator: sequenceGenerator)
             }
         } else {
             self.loopFunction(params:params, sequenceGenerator: sequenceGenerator)
         }
     }
-    
+
     func stop(){
         self.playing = false
         timer?.invalidate()

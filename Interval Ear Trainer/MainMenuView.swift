@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import SwiftData
 
 struct MainMenu: View {
     @AppStorage("dftDelayIP") var dftDelayIP: Double = 3.0
@@ -78,13 +78,13 @@ struct MainMenu: View {
                 }
                 Section(header: Text("Listening")) {
                     let paramsIL1 = Parameters(type:.interval, delay: dftDelayIL1, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL1))
-                    ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1)
+                    ListeningView(params:paramsIL1, dftDelay: $dftDelayIL1, dftFilterStr: $dftFilterStrIL1).modelContainer(for: IntervalData.self)
                     
                     let paramsIL2 = Parameters(type:.interval, delay: dftDelayIL2, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL2))
-                    ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2)
+                    ListeningView(params:paramsIL2, dftDelay: $dftDelayIL2, dftFilterStr: $dftFilterStrIL2).modelContainer(for: IntervalData.self)
                     
                     let paramsIL3 = Parameters(type:.interval, delay: dftDelayIL3, delay_sequence: 1.5, active_intervals: str_to_interval_filter(filter_str: dftFilterStrIL3))
-                    ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3)
+                    ListeningView(params: paramsIL3, dftDelay: $dftDelayIL3, dftFilterStr: $dftFilterStrIL3).modelContainer(for: IntervalData.self)
 
                     let filtersTL = triad_filters_from_str(filter_str: dftFilterStrTS)
                     let dftParamsTL = Parameters(type:.triad, is_chord:true, delay: dftDelayTQ, active_qualities: filtersTL.0, active_inversions: filtersTL.1, active_voicings: filtersTL.2)

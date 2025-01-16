@@ -9,6 +9,9 @@ import SwiftUI
 import MediaPlayer
 
 struct ListeningView: View {
+    @Environment(\.modelContext) var modelContext
+    @State var tmpData: [String: Int]
+    
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
     static var player: ListeningModePlayer = ListeningModePlayer()
@@ -30,6 +33,7 @@ struct ListeningView: View {
 
         _dftDelay = .init(projectedValue: dftDelay)
         _dftFilterStr = .init(projectedValue: dftFilterStr)
+        _tmpData = .init(initialValue: [:])
     }
     
     var body: some View {

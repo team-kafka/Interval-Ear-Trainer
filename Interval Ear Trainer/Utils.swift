@@ -59,7 +59,7 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
     return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
 }
 
-func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0) -> ([Int], String)
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0) -> ([Int], [String])
 {
     var intervals = [Int]()
     for _ in (1...n_notes-1) {
@@ -84,10 +84,10 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     }
 
     return ([first_note] + running_sum.map{first_note + $0},
-            intervals.map{interval_name(interval_int: $0, oriented: answer_oriented, octave: false)}.joined(separator: " "))
+            intervals.map{interval_name(interval_int: $0, oriented: answer_oriented, octave: false)})
 }
 
-func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, prev_note:Int=0) -> ([Int], String)
+func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, prev_note:Int=0) -> ([Int], [String])
 {
     let pos_intervals = Set<Int>(active_intervals.map{$0 > 0 ? $0 : -$0})
     return draw_notes(n_notes:n_notes, active_intervals:pos_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:largeIntevalsProba, answer_oriented: false, prev_note: prev_note)
@@ -377,4 +377,55 @@ func scale_notes(scale:String, key:String, upper_bound:Int, lower_bound:Int) -> 
     var notes = SCALES[scale] ?? []
     notes.append(12)
     return notes.map{mid_note + $0}
+}
+
+func rounded_date(date:Date) -> Date
+{
+    return Calendar.current.startOfDay(for:date)//-TimeInterval(3600*24*2))
+}
+
+
+func compare_intervals(lhs:String, rhs:String) -> Bool
+{
+    if lhs == rhs { return true }
+    if lhs.replacingOccurrences(of: "♭", with: "") == rhs.replacingOccurrences(of: "♭", with: ""){
+        if lhs.hasSuffix("♭") {
+            return true
+        } else {
+            return false
+        }
+    }
+    if lhs < rhs {
+        return true
+    } else {
+        return false
+    }
+}
+
+enum AnswerType{
+    case correct
+    case incorrect
+    case timeout
+}
+
+func evaluate_guess(guess:[String], answer:[String]) -> [AnswerType]
+{
+    var rv = [AnswerType].init(repeating: .timeout, count: answer.count)
+    
+    for (i, g) in guess.enumerated(){
+        if g == short_answer(answer:answer[i], oriented: false){
+            rv[i] = .correct
+        } else {
+            rv[i] = .incorrect
+        }
+    }
+    return rv
+}
+
+func short_answer(answer: String, oriented: Bool = true) -> String {
+    let rv = String(answer.split(separator: "/")[0])
+    if !oriented {
+        return rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
+    }
+    return rv
 }

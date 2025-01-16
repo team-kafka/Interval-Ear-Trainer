@@ -71,7 +71,7 @@ struct PracticeView: View {
                     ScaleChooserView(params: $params, player: $player, timer:$timer, running:$running, reset_state: self.reset_state)
                 }
                 Spacer()
-                answerView(answer_str: answer_str).opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
+                answerView().opacity(answer_visible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
                 Spacer()
             }
         }
@@ -85,7 +85,7 @@ struct PracticeView: View {
         }
     }
     
-    func answerView(answer_str: String) -> AnyView {
+    func answerView() -> AnyView {
         let answerArray = answer_str.split(separator: "/")
         if answerArray.count < 2{
             return AnyView(VStack{Text(answer_str).font(.system(size: 45))})
@@ -116,8 +116,9 @@ struct PracticeView: View {
         timer?.invalidate()
         running = use_timer
         if (params.type == .scale_degree && notes[0] == 0) {
-            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay_sequence * 0.8 * 7, repeats: false) { t in
+            let scale_delay:Double = 0.2
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: scale_delay)
+            timer = Timer.scheduledTimer(withTimeInterval:scale_delay * 9, repeats: false) { t in
                 self.loopFunction()
             }
         } else {
@@ -146,11 +147,13 @@ struct PracticeView: View {
     }
     
     func play_sequence() -> Double {
-        var delay: Double = 0
-        var duration: Double = 0
-        var new_notes: [Int] = []
+        var delay: Double
+        var duration: Double
+        var new_notes: [Int]
+        var answers: [String]
         
-        (new_notes, duration, delay, answer_str, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        (new_notes, duration, delay, answers, root_note) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        answer_str = answers.joined(separator: " ")
         if ((params.n_notes == 1) && (notes[0] != 0)) {
             player.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
         } else {
@@ -178,4 +181,4 @@ struct PracticeView: View {
     }
 }
 
-
+                  
