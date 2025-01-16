@@ -17,7 +17,7 @@ struct StatView: View {
     
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView().modelContainer(for: IntervalData.self)
+            StatsIntervalView().modelContainer(for: HistoricalData.self)
             .tabItem {
                 Text("Intervals")
                 Image(systemName: "arrow.up.and.down.square")
@@ -51,7 +51,7 @@ struct StatView: View {
 struct StatsIntervalView: View {
     
     @Environment(\.modelContext) private var modelContext
-    @Query() var intervalData: [IntervalData]
+    @Query() var historicalData: [HistoricalData]
     
     var body: some View {
 
@@ -60,61 +60,61 @@ struct StatsIntervalView: View {
 
             GroupBox("Practice and listening") {
                 Chart {
-                    ForEach(intervalData.sorted(by: { compare_intervals(lhs: $0.interval, rhs: $1.interval) }), id: \.self) { d in
+                    ForEach(historicalData.sorted(by: { compare_intervals(lhs: $0.id, rhs: $1.id) }), id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("practice+listening", d.practice + d.listening)
                         )
                     }
-                }//.padding()
+                }
                 Chart {
-                    ForEach(intervalData.sorted(by: { compare_intervals(lhs: $0.interval, rhs: $1.interval) }), id: \.self) { d in
-                        if d.interval.hasPrefix("↑") {
-                            BarMark(x: .value("id", d.interval),
+                    ForEach(historicalData.sorted(by: { compare_intervals(lhs: $0.id, rhs: $1.id) }), id: \.self) { d in
+                        if d.id.hasPrefix("↑") {
+                            BarMark(x: .value("id", d.id),
                                     y: .value("practice+listening", d.practice + d.listening)
                             )
                         }
                     }
-                }//.padding()
+                }
                 Chart {
-                    ForEach(intervalData.sorted(by: { compare_intervals(lhs: $0.interval, rhs: $1.interval) }), id: \.self) { d in
-                        if d.interval.hasPrefix("↓") {
-                            BarMark(x: .value("id", d.interval),
+                    ForEach(historicalData.sorted(by: { compare_intervals(lhs: $0.id, rhs: $1.id) }), id: \.self) { d in
+                        if d.id.hasPrefix("↓") {
+                            BarMark(x: .value("id", d.id),
                                     y: .value("practice+listening", d.practice + d.listening)
                             )
                         }
                     }
-                }//.padding()
+                }
             }
             GroupBox("Quiz") {
                 Chart {
-                    ForEach(intervalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.interval),
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.correct)
                         ).foregroundStyle(by: .value("correct", "correct"))
                     }
-                    ForEach(intervalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.interval),
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(by: .value("error", "error"))
                     }
-                    ForEach(intervalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.interval),
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.timeout)
                         ).foregroundStyle(by: .value("timeout", "timeout"))
                     }
                 }
                 .padding()
                 .chartForegroundStyleScale([
-                    "correct" : .blue,
-                    "error": .red,
-                    "timeout": .red.opacity(0.7)
+                    "correct" : answer_colors[.correct]!,
+                    "error": answer_colors[.incorrect]!,
+                    "timeout": answer_colors[.timeout]!,
                 ])
             }
             Spacer()
                 HStack {
                     Button(role: .destructive) {
                         do {
-                            try modelContext.delete(model: IntervalData.self)
+                            try modelContext.delete(model: HistoricalData.self)
                         } catch {
                             fatalError(error.localizedDescription)
                         }
@@ -130,18 +130,20 @@ struct StatsIntervalView: View {
 
 struct StatsTriadView: View {
     
+    @Environment(\.modelContext) private var modelContext
+    
+    @Query() var historicalData: [HistoricalData]
+    
     var body: some View {
-        let data2 = sampleDF(ids:TRIAD_KEYS)
         VStack{
             Text("Triads").font(.title)
             GroupBox("Practice and listening") {
                 Chart {
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["date", Date.self]!),
-                                y: .value("practice+listening", d["practice", Int.self]! + d["listening", Int.self]!)).foregroundStyle(by: .value("practice+listening", "practice+listening"))
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("practice+listening", d.practice + d.listening)).foregroundStyle(by: .value("practice+listening", "practice+listening"))
                     }
                 }
-                //.frame(height: 300)
                 .padding()
                 .chartForegroundStyleScale([
                     "practice+listening" : .gray,
@@ -149,23 +151,22 @@ struct StatsTriadView: View {
             }
             GroupBox("Quiz") {
                 Chart {
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_correct", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.correct)
                         ).foregroundStyle(by: .value("correct", "correct"))
                     }
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_error", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.incorrect)
                         ).foregroundStyle(by: .value("error", "error"))
                     }
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_timeout", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.timeout)
                         ).foregroundStyle(by: .value("timeout", "timeout"))
                     }
                 }
-                //.frame(height: 300)
                 .padding()
                 .chartForegroundStyleScale([
                     "correct" : .blue,
@@ -187,44 +188,42 @@ struct StatsTriadView: View {
 
 
 struct StatsScaleDegreeView: View {
-
+    @Environment(\.modelContext) private var modelContext
+    @Query() var historicalData: [HistoricalData]
+    
     var body: some View {
-        let data2 = sampleDF(ids:SCALE_KEYS)
         
         VStack{
             Text("Scale Degrees").font(.title)
             GroupBox("Practice and listening") {
                 Chart {
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["date", Date.self]!),
-                                y: .value("practice+listening", d["practice", Int.self]! + d["listening", Int.self]!)).foregroundStyle(by: .value("practice+listening", "practice+listening"))
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("practice+listening", d.practice + d.listening)).foregroundStyle(by: .value("practice+listening", "practice+listening"))
                     }
                 }
-                //.frame(height: 300)
-                .padding()
                 .chartForegroundStyleScale([
                     "practice+listening" : .gray,
                 ])
             }
             GroupBox("Quiz") {
                 Chart {
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_correct", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.correct)
                         ).foregroundStyle(by: .value("correct", "correct"))
                     }
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_error", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.incorrect)
                         ).foregroundStyle(by: .value("error", "error"))
                     }
-                    ForEach(data2.rows, id: \.index) { d in
-                        BarMark(x: .value("Id", d["id", String.self]!),
-                                y: .value("res", d["quiz_timeout", Int.self]!)
+                    ForEach(historicalData, id: \.self) { d in
+                        BarMark(x: .value("Id", d.id),
+                                y: .value("res", d.timeout)
                         ).foregroundStyle(by: .value("timeout", "timeout"))
                     }
                 }
-                //.frame(height: 300)
                 .padding()
                 .chartForegroundStyleScale([
                     "correct" : .blue,

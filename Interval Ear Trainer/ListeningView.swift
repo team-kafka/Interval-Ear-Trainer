@@ -17,10 +17,10 @@ struct ListeningView: View {
     static var player: ListeningModePlayer = ListeningModePlayer()
     @State private var playing: Bool
     
-    @Binding var dftDelay: Double
-    @Binding var dftFilterStr: String
+    @Binding var dftParams: String
 
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>){
+
+    init(params: Parameters, dftParams: Binding<String>){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -30,9 +30,7 @@ struct ListeningView: View {
             self.sequenceGenerator = ScaleDegreeGenerator()
         }
         _playing = .init(initialValue: false)
-
-        _dftDelay = .init(projectedValue: dftDelay)
-        _dftFilterStr = .init(projectedValue: dftFilterStr)
+        _dftParams = .init(projectedValue: dftParams)
         _tmpData = .init(initialValue: [:])
     }
     
@@ -64,7 +62,7 @@ struct ListeningView: View {
             Text(sequenceGenerator.generateLabelString(params: params)).lineLimit(1)
             Image(systemName: "gearshape.fill")
         }.onAppear{
-            update_function(newParams: params)
+            save_dft_params(newParams: params)
             let session = AVAudioSession.sharedInstance()
             do {
                 try session.setCategory(AVAudioSession.Category.playback, mode: .default, options: [.mixWithOthers])
@@ -85,8 +83,7 @@ struct ListeningView: View {
         ListeningView.player.stop()
     }
 
-    func update_function(newParams: Parameters){
-        dftDelay = newParams.delay
-        dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
+    func save_dft_params(newParams: Parameters){
+        dftParams = newParams.encode()
     }
 }

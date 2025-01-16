@@ -291,6 +291,8 @@ let SCALE_SHORT_NAMES: [String: String] = [
     "Dorian":         "Dor"
 ]
 
+let SCALE_DELAY: Double = 0.2
+
 func scale_degree_name(degree_int: Int) -> String
 {
     let quality = SCALE_DEGREES.filter{$1 == degree_int}.map{$0.0}[0]

@@ -18,18 +18,16 @@ struct PracticeView: View {
     @State var fixed_n_notes: Bool
     @State var chord_active: Bool
     @State private var root_note: Int
-    
     @State var answer_visible: Double
     
-    @Binding var dftDelay: Double
-    @Binding var dftFilterStr: String
+    @Binding var dftParams: String
 
     @State private var timer: Timer?
     @State var player = MidiPlayer()
     var sequenceGenerator: SequenceGenerator
 
     
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, fixed_n_notes: Bool=false, chord_active: Bool=true){
+    init(params: Parameters, dftParams: Binding<String>, fixed_n_notes: Bool=false, chord_active: Bool=true){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -50,8 +48,7 @@ struct PracticeView: View {
         _use_timer = .init(initialValue: true)
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
-        _dftDelay = .init(projectedValue: dftDelay)
-        _dftFilterStr = .init(projectedValue: dftFilterStr)
+        _dftParams = .init(projectedValue: dftParams)
     }
     
     var body: some View {
@@ -77,7 +74,7 @@ struct PracticeView: View {
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            update_function(newParams: params)
+            save_dft_params(newParams: params)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -116,9 +113,8 @@ struct PracticeView: View {
         timer?.invalidate()
         running = use_timer
         if (params.type == .scale_degree && notes[0] == 0) {
-            let scale_delay:Double = 0.2
-            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: scale_delay)
-            timer = Timer.scheduledTimer(withTimeInterval:scale_delay * 9, repeats: false) { t in
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
+            timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
                 self.loopFunction()
             }
         } else {
@@ -175,9 +171,8 @@ struct PracticeView: View {
         notes = notes.map{$0 * 0}
     }
     
-    func update_function(newParams: Parameters){
-        dftDelay = newParams.delay
-        dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
+    func save_dft_params(newParams: Parameters){
+        dftParams = newParams.encode()
     }
 }
 

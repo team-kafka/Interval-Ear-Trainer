@@ -7,13 +7,13 @@
 
 import Foundation
 
- enum ParamType {
+enum ParamType: Codable {
     case interval
     case triad
     case scale_degree
 }
 
-struct Parameters {
+struct Parameters : Codable {
     var type: ParamType = ParamType.interval
     
     // General
@@ -21,7 +21,7 @@ struct Parameters {
     var is_chord: Bool = false
     var upper_bound: Int = 103
     var lower_bound: Int = 64
-    var delay: Double = 2.8
+    var delay: Double = 2.4
     var delay_sequence: Double = 0.3
     
     // Interval related
@@ -38,3 +38,27 @@ struct Parameters {
     var active_scale_degrees: Set<Int> = Set<Int>(SCALE_DEGREES.values)
     var key: String = "A"
 }
+
+extension Parameters {
+    func encode() -> String {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        do {
+            let data = try encoder.encode(self)
+            return String(data: data, encoding: .utf8)!
+        } catch {
+            fatalError("Error encoding parameters: \(error)")
+        }
+    }
+        
+    static func decode(_ string: String) -> Parameters {
+        let decoder = JSONDecoder()
+        do {
+            let parameters = try decoder.decode(Parameters.self, from: string.data(using: .utf8)!)
+            return parameters
+        } catch {
+            fatalError("Error decoding parameters: \(error)")
+        }
+    }
+}
+

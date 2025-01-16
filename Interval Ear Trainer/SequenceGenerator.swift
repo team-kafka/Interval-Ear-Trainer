@@ -71,7 +71,7 @@ class IntervalGenerator : SequenceGenerator{
 class TriadGenerator : SequenceGenerator{
     
     override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
-        let delay = chord ? 0.0 : params.delay_sequence * 2.0 * 0.5 // x n_notes - 1 (triad) and x 0.5 (tempo = 120)
+        let delay = chord ? 0.0 : params.delay_sequence * 2.0  // x n_notes - 1 (triad) 
         let duration = chord ? params.delay * 0.5 : params.delay_sequence
         
         let res = draw_random_triad(active_qualities: params.active_qualities, active_inversions: params.active_inversions, active_voicings: params.active_voicings, upper_bound: params.upper_bound, lower_bound: params.lower_bound)

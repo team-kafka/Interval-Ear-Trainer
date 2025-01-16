@@ -223,7 +223,7 @@ var body: some View {
     }
 }
     func play_scale(params:Parameters, player:MidiPlayer){
-        player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: params.delay_sequence*0.8)
+        player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
     }
 }
 

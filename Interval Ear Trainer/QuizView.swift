@@ -28,15 +28,14 @@ struct QuizView: View {
     @State var answer_visible: Double
 
     @State private var timer: Timer?
-
-    @Binding var dftDelay: Double
-    @Binding var dftFilterStr: String
+    
+    @Binding var dftParams: String
 
     @State var player: MidiPlayer
     var sequenceGenerator: SequenceGenerator
 
     
-    init(params: Parameters, dftDelay: Binding<Double>, dftFilterStr: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
+    init(params: Parameters, dftParams: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -57,8 +56,7 @@ struct QuizView: View {
         _guesses = .init(initialValue: [])
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
-        _dftDelay = .init(projectedValue: dftDelay)
-        _dftFilterStr = .init(projectedValue: dftFilterStr)
+        _dftParams = .init(projectedValue: dftParams)
     }
     
     var body: some View {
@@ -91,7 +89,7 @@ struct QuizView: View {
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            update_function(newParams: params)
+            save_dft_params(newParams: params)
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -101,11 +99,14 @@ struct QuizView: View {
     
     func answerView() -> AnyView {
         let guess_eval = evaluate_guess(guess: guesses, answer: answers)
+        print(guesses)
+        print(answers)
+        print(guess_eval)
         return AnyView(
             HStack{
                 Text(" ").font(.system(size: 40))
-                ForEach(Array(zip(answers, guess_eval)), id: \.0) { ans, eval in
-                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(answer_colors[eval]!)
+                ForEach(Array(answers.enumerated()), id: \.offset) { i, ans in
+                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(answer_colors[guess_eval[i]]!)
                 }
             })
     }
@@ -133,9 +134,8 @@ struct QuizView: View {
         timer?.invalidate()
         running = use_timer
         if (params.type == .scale_degree && notes[0] == 0) {
-            let scale_delay:Double = 0.2
-            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: scale_delay)
-            timer = Timer.scheduledTimer(withTimeInterval:scale_delay * 9, repeats: false) { t in
+            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
+            timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
                 self.loopFunction()
             }
         } else {
@@ -190,9 +190,8 @@ struct QuizView: View {
     func reset_state(){
         stop()
     }
-    
-    func update_function(newParams: Parameters){
-        dftDelay = newParams.delay
-        dftFilterStr = sequenceGenerator.generateFilterString(params: newParams)
+
+    func save_dft_params(newParams: Parameters){
+        dftParams = newParams.encode()
     }
 }
