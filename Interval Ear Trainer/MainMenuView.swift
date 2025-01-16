@@ -11,17 +11,17 @@ import SwiftData
 struct MainMenu: View {
     
     @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
-    @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, is_chord:true).encode()
+    @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSP") var paramsSP: String = Parameters(type:.scale_degree, n_notes:1).encode()
 
     @AppStorage("paramsIQ") var paramsIQ: String = Parameters(type:.interval).encode()
-    @AppStorage("paramsTQ") var paramsTQ: String = Parameters(type:.triad, is_chord:true).encode()
+    @AppStorage("paramsTQ") var paramsTQ: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSQ") var paramsSQ: String = Parameters(type:.scale_degree, n_notes:1).encode()
 
     @AppStorage("paramsIL1") var paramsIL1: String = Parameters(type:.interval, active_intervals:[3, 4]).encode()
     @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[8, 9, 10]).encode()
     @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8, -9, -10]).encode()
-    @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, is_chord:true).encode()
+    @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
     
     var body: some View {

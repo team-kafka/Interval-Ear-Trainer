@@ -303,7 +303,7 @@ struct NoteButtonsView: View {
                         Text(" ").opacity(0.0)
                     }
                 }
-                ForEach(notes, id: \.self) { note in
+                ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
                     VStack{
                         NoteButton(running: running, player: $player, note: note)
                         Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)

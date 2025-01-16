@@ -89,7 +89,7 @@ struct PracticeView: View {
         } else {
             return AnyView(VStack{
                 Text(answerArray[0]).font(.system(size: 40))
-                ForEach(answerArray[1...], id: \.self){ans in
+                ForEach(Array(answerArray[1...].enumerated()), id: \.offset){_, ans in
                     Text(ans).font(.system(size: 30))
                 }
             })

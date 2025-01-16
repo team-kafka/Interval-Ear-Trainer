@@ -337,7 +337,6 @@ func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String,
     var draw_choices = active_degrees
     if ((active_degrees.count > 1) && prev_note != 0){
         let prev_int = (prev_note - mid_note) % 12 + ((prev_note - mid_note) % 12 < 0 ? 12 : 0)
-        print(prev_int)
         let prev_degree = SCALES[scale]!.firstIndex(of: prev_int) ?? -1
         draw_choices.remove(prev_degree)
     }
