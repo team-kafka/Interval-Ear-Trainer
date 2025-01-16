@@ -99,9 +99,6 @@ struct QuizView: View {
     
     func answerView() -> AnyView {
         let guess_eval = evaluate_guess(guess: guesses, answer: answers)
-        print(guesses)
-        print(answers)
-        print(guess_eval)
         return AnyView(
             HStack{
                 Text(" ").font(.system(size: 40))

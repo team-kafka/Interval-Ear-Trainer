@@ -63,12 +63,9 @@ struct ListeningView: View {
             Image(systemName: "gearshape.fill")
         }.onAppear{
             save_dft_params(newParams: params)
-            let session = AVAudioSession.sharedInstance()
-            do {
-                try session.setCategory(AVAudioSession.Category.playback, mode: .default, options: [.mixWithOthers])
-                try session.setActive(true)
-            } catch let error as NSError {
-                print("Failed to set the audio session category and mode: \(error.localizedDescription)")
+        }.onDisappear{
+            if self.playing {
+                stop()
             }
         }
     }
