@@ -53,6 +53,8 @@ struct StatsIntervalView: View {
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↑") && $0.type == "interval"}) var ascData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↓") && $0.type == "interval"}) var descData: [HistoricalData]
 
+    @State private var showingConfirmation = false
+    
     var body: some View {
 
         VStack{
@@ -150,17 +152,19 @@ struct StatsIntervalView: View {
                 ])
             }
             Spacer()
-                HStack {
-                    Button(role: .destructive) {
-                        do {
-                            try modelContext.delete(model: HistoricalData.self)
-                        } catch {
-                            fatalError(error.localizedDescription)
+            HStack {
+                Button("Delete Interval History", systemImage: "trash", role: .destructive){
+                    showingConfirmation = true
+                }
+                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
+                    Button("Yes", role: .destructive) {
+                        for hd in historicalData {
+                            modelContext.delete(hd)
                         }
-                    } label: {
-                        Label("Delete Interval History", systemImage: "trash")
-                    }.scaleEffect(0.8)
-                    Spacer()
+                    }
+                    Button("No", role: .cancel) {}
+                }.scaleEffect(0.8)
+                Spacer()
             }
             Spacer()
         }
@@ -172,6 +176,8 @@ struct StatsTriadView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var historicalData: [HistoricalData]
 
+    @State private var showingConfirmation = false
+    
     var body: some View {
 
         VStack{
@@ -232,17 +238,19 @@ struct StatsTriadView: View {
                 ]).chartLegend(.hidden)
             }
             Spacer()
-                HStack {
-                    Button(role: .destructive) {
-                        do {
-                            try modelContext.delete(model: HistoricalData.self)
-                        } catch {
-                            fatalError(error.localizedDescription)
+            HStack {
+                Button("Delete Triad History", systemImage: "trash", role: .destructive){
+                    showingConfirmation = true
+                }
+                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
+                    Button("Yes", role: .destructive) {
+                        for hd in historicalData {
+                            modelContext.delete(hd)
                         }
-                    } label: {
-                        Label("Delete Triad History", systemImage: "trash")
-                    }.scaleEffect(0.8)
-                    Spacer()
+                    }
+                    Button("No", role: .cancel) {}
+                }.scaleEffect(0.8)
+                Spacer()
             }
             Spacer()
         }
@@ -254,6 +262,8 @@ struct StatsScaleDegreeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
 
+    @State private var showingConfirmation = false
+    
     var body: some View {
 
         VStack{
@@ -314,17 +324,19 @@ struct StatsScaleDegreeView: View {
                 ]).chartLegend(.hidden)
             }
             Spacer()
-                HStack {
-                    Button(role: .destructive) {
-                        do {
-                            try modelContext.delete(model: HistoricalData.self)
-                        } catch {
-                            fatalError(error.localizedDescription)
+            HStack {
+                Button("Delete Scale Degree History", systemImage: "trash", role: .destructive){
+                    showingConfirmation = true
+                }
+                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
+                    Button("Yes", role: .destructive) {
+                        for hd in historicalData {
+                            modelContext.delete(hd)
                         }
-                    } label: {
-                        Label("Delete Scale Degree History", systemImage: "trash")
-                    }.scaleEffect(0.8)
-                    Spacer()
+                    }
+                    Button("No", role: .cancel) {}
+                }.scaleEffect(0.8)
+                Spacer()
             }
             Spacer()
         }
