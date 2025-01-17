@@ -10,6 +10,7 @@ import MediaPlayer
 
 class ListeningModePlayer {
     
+    var cacheData: [String: Int]
     static let player = MidiPlayer()
     var timer: Timer?
     var playing: Bool
@@ -19,6 +20,7 @@ class ListeningModePlayer {
         self.timer = nil
         self.playing = false
         self.notes = [0]
+        self.cacheData = [:]
     }
     
     func start(params: Parameters, sequenceGenerator: SequenceGenerator) {
@@ -51,10 +53,32 @@ class ListeningModePlayer {
         var delay: Double
         var duration: Double
         var new_notes: [Int]
+        var answers: [String]
         
-        (new_notes, duration, delay, _, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
+        (new_notes, duration, delay, answers, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
         ListeningModePlayer.player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
         notes = new_notes
+        update_cacheData(answers:answers)
         return delay
+    }
+    
+    func update_cacheData(answers:[String])
+    {
+        for ans in answers{
+            if !cacheData.keys.contains(ans){
+                cacheData[ans] = 0
+            }
+            cacheData[ans]! += 1
+        }
+    }
+    
+    func get_cacheData() -> [String:Int]
+    {
+        return cacheData
+    }
+    
+    func clear_cacheData()
+    {
+         cacheData = [:]
     }
 }

@@ -43,14 +43,14 @@ struct MainMenu: View {
                 }.navigationTitle(Text("Interval Ear Trainer"))
             
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Intervals").font(.headline)
                     }
 
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, n_notes:3, fixed_n_notes:true, chord: true).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
                     }
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, n_notes:1, chord_active: false).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Scale Degrees").font(.headline)
                     }
                 }

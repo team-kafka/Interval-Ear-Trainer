@@ -272,7 +272,8 @@ let SCALES: [String: [Int]] = [
     "Dorian":         [0, 2, 3, 5, 7, 9, 10]
 ]
 
-//let SCALE_DEGREE_KEYS = ["1", "2", "3", "4", "5", "6", "7"]
+let SCALE_DEGREE_KEYS = ["1", "2", "3", "4", "5", "6", "7"]
+let SCALE_DEGREE_KEYS_W_ALT = ["1", "2♭","2", "3♭","3", "4", "5", "6♭", "6", "7♭", "7"]
 let SCALE_DEGREES = [
     "1" : 0,
     "2" : 1,
@@ -423,10 +424,11 @@ func evaluate_guess(guess:[String], answer:[String]) -> [AnswerType]
     return rv
 }
 
-func short_answer(answer: String, oriented: Bool = true) -> String {
-    let rv = String(answer.split(separator: "/")[0])
+func short_answer(answer: String, oriented: Bool=true, abbreviate: Bool=false) -> String {
+    var rv: String
+    rv = answer.contains("/") ? String(answer.split(separator: "/")[0]) : answer
     if !oriented {
-        return rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
+        rv = rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
     }
-    return rv
+    return abbreviate ? String(rv.prefix(3)) : rv
 }

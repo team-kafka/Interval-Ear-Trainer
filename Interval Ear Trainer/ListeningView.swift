@@ -10,7 +10,6 @@ import MediaPlayer
 
 struct ListeningView: View {
     @Environment(\.modelContext) var modelContext
-    @State var tmpData: [String: Int]
     
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
@@ -31,7 +30,6 @@ struct ListeningView: View {
         }
         _playing = .init(initialValue: false)
         _dftParams = .init(projectedValue: dftParams)
-        _tmpData = .init(initialValue: [:])
     }
     
     var body: some View {
@@ -78,9 +76,21 @@ struct ListeningView: View {
     func stop(){
         self.playing = false
         ListeningView.player.stop()
+        persist_hist_data()
     }
 
     func save_dft_params(newParams: Parameters){
         dftParams = newParams.encode()
+    }
+    
+    func persist_hist_data()
+    {
+        let cd = ListeningView.player.get_cacheData()
+        for k in cd.keys {
+            let hd = HistoricalData(date: Date(), type:ex_type_to_str(ex_type:params.type), id:short_answer(answer: k), listening: cd[k]!)
+            modelContext.insert(hd)
+        }
+        try! modelContext.save()
+        ListeningView.player.clear_cacheData()
     }
 }

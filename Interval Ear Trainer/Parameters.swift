@@ -7,14 +7,23 @@
 
 import Foundation
 
-enum ParamType: Codable {
+enum ExerciseType: Codable {
     case interval
     case triad
     case scale_degree
 }
 
+func ex_type_to_str(ex_type:ExerciseType) -> String
+{
+    return switch ex_type
+    {
+        case .scale_degree:  "scale_degree"
+        case .interval:      "interval"
+        case .triad:         "triad"
+    }
+}
 struct Parameters : Codable {
-    var type: ParamType = ParamType.interval
+    var type: ExerciseType = ExerciseType.interval
     
     // General
     var n_notes: Int = 2

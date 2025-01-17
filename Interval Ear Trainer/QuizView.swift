@@ -14,6 +14,9 @@ let answer_colors: [AnswerType: Color] = [
 ]
 
 struct QuizView: View {
+    @Environment(\.modelContext) var modelContext
+    @State var cacheData: [String: HistoricalData]
+    
     @State var params: Parameters
     
     @State private var running: Bool
@@ -57,6 +60,7 @@ struct QuizView: View {
         _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
         _dftParams = .init(projectedValue: dftParams)
+        _cacheData = .init(initialValue: [:])
     }
     
     var body: some View {
@@ -94,6 +98,7 @@ struct QuizView: View {
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             stop()
+            persist_cache()
         }
     }
     
@@ -157,6 +162,7 @@ struct QuizView: View {
             delay += play_sequence()
         } else{
             show_answer()
+            save_to_cache()
         }
         if (use_timer){
             timer = Timer.scheduledTimer(withTimeInterval:delay, repeats: false) { t in
@@ -190,5 +196,32 @@ struct QuizView: View {
 
     func save_dft_params(newParams: Parameters){
         dftParams = newParams.encode()
+    }
+    
+    func save_to_cache()
+    {
+        let guess_eval = evaluate_guess(guess: guesses, answer: answers)
+        for (res, ans) in zip(guess_eval, answers){
+            if !cacheData.keys.contains(ans){
+                cacheData[ans] = HistoricalData(date:Date(), type:ex_type_to_str(ex_type:params.type), id:short_answer(answer: ans))
+            }
+            switch res{
+                case .correct:
+                    cacheData[ans]!.correct += 1
+                case .incorrect:
+                    cacheData[ans]!.incorrect += 1
+                case .timeout:
+                    cacheData[ans]!.timeout += 1
+            }
+        }
+    }
+    
+    func persist_cache()
+    {
+        for hd in cacheData.values{
+            modelContext.insert(hd)
+        }
+        try! modelContext.save()
+        cacheData = [String:HistoricalData]()
     }
 }
