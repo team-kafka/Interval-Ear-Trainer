@@ -31,12 +31,64 @@ import SwiftData
 }
 
 extension HistoricalData {
-    static var samples: [HistoricalData] = [
-        HistoricalData(date:rounded_date(date:Date()), type:"interval", id:"2", listening:10, practice:11, correct:13, incorrect:6, timeout:4),
-        HistoricalData(date:rounded_date(date:Date()), type:"interval", id:"3", listening:13, practice:13, correct:15, incorrect:9, timeout:3),
-        HistoricalData(date:rounded_date(date:Date()), type:"interval", id:"5", listening:12, practice:1, correct:10, incorrect:6, timeout:6),
-        HistoricalData(date:rounded_date(date:Date()), type:"interval", id:"7", listening:2, practice:1, correct:10, incorrect:0, timeout:0),
-        HistoricalData(date:rounded_date(date:Date()), type:"interval", id:"8", listening:1, practice:10, correct:10, incorrect:0, timeout:1),
-    ]
-    
+    static var samples_int_asc  = generateIntervalSampleData(nDates:30, asc:true)
+    static var samples_int_desc = generateIntervalSampleData(nDates:30, asc:false)
+}
+
+func generateIntervalSampleData(nDates:Int=10, asc:Bool=true) -> [HistoricalData] {
+    var rv = [HistoricalData]()
+    for i in 0..<nDates {
+        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let nInts = Int.random(in: 0...INTERVAL_KEYS.count)
+        for interval in INTERVAL_KEYS.shuffled().prefix(nInts){
+            let total = Int.random(in: 20...100)
+            let correct = Int(Double(total) * (proba_success + Double.random(in: -0.15...0.15)))
+            let incorrect_all = total - correct
+            let timeout = Int.random(in: 0...Int(Double(incorrect_all)/2.0))
+            let incorrect = incorrect_all - timeout
+            let ihd = HistoricalData(date:rounded_date(date:Date() - TimeInterval(i*3600*24)), type:"interval", id: (asc ? "↑" : "↓") + interval, listening:Int.random(in: 0...100), practice:Int.random(in: 0...100), correct:correct, incorrect:incorrect, timeout:timeout)
+            rv.append(ihd)
+        }
+    }
+    return rv
+}
+
+func generateTriadSampleData(nDates:Int=10) -> [HistoricalData] {
+    var rv = [HistoricalData]()
+    for i in 0..<nDates {
+        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let nInts = Int.random(in: 0...TRIAD_KEYS.count)
+        for id in TRIAD_KEYS.shuffled().prefix(nInts){
+            let total = Int.random(in: 20...100)
+            let correct = Int(Double(total) * (proba_success + Double.random(in: -0.15...0.15)))
+            let incorrect_all = total - correct
+            let timeout = Int.random(in: 0...Int(Double(incorrect_all)/2.0))
+            let incorrect = incorrect_all - timeout
+            let ihd = HistoricalData(date:rounded_date(date:Date() - TimeInterval(i*3600*24)), type:"triad", id: id, listening:Int.random(in: 0...100), practice:Int.random(in: 0...100), correct:correct, incorrect:incorrect, timeout:timeout)
+            rv.append(ihd)
+        }
+    }
+    return rv
+}
+
+func generateScaleDegreeSampleData(nDates:Int=10) -> [HistoricalData] {
+    var rv = [HistoricalData]()
+    for i in 0..<nDates {
+        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let nInts = Int.random(in: 0...SCALE_KEYS.count)
+        for sc_id in SCALE_KEYS.shuffled().prefix(nInts){
+            let degree_array = SCALE_DEGREES.values.map{interval_name(interval_int:SCALES[sc_id]![$0], oriented:false)}
+            let d_ids = degree_array.shuffled().prefix(4)
+            for d_id in d_ids{
+                let total = Int.random(in: 20...100)
+                let correct = Int(Double(total) * (proba_success + Double.random(in: -0.15...0.15)))
+                let incorrect_all = total - correct
+                let timeout = Int.random(in: 0...Int(Double(incorrect_all)/2.0))
+                let incorrect = incorrect_all - timeout
+                let ihd = HistoricalData(date:rounded_date(date:Date() - TimeInterval(i*3600*24)), type:"scle_degree", id: d_id, listening:Int.random(in: 0...100), practice:Int.random(in: 0...100), correct:correct, incorrect:incorrect, timeout:timeout)
+                rv.append(ihd)
+            }
+        }
+    }
+    return rv
 }

@@ -12,11 +12,11 @@ import SwiftData
 
 struct StatView: View {
     @State private var selectedIndex: Int = 0
+    @State var useTestData: Bool = false
 
-    
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView().modelContainer(for: HistoricalData.self)
+            StatsIntervalView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
             .tabItem {
                 Text("Intervals")
                 Image(systemName: "arrow.up.and.down.square")
@@ -35,6 +35,12 @@ struct StatView: View {
                 Image(systemName: "key")
             }
             .tag(2)
+            StatParamsView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
+            .tabItem {
+                Text("Params")
+                Image(systemName: "gearshape.fill")
+            }
+            .tag(3)
         }
         .tint(Color.gray.opacity(0.7))
         .onAppear(perform: {
@@ -48,13 +54,12 @@ struct StatView: View {
 
 struct StatsIntervalView: View {
     
+    @Binding var useTestData: Bool
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "interval"})  var historicalData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↑") && $0.type == "interval"}) var ascData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↓") && $0.type == "interval"}) var descData: [HistoricalData]
 
-    @State private var showingConfirmation = false
-    
     var body: some View {
 
         VStack{
@@ -68,7 +73,8 @@ struct StatsIntervalView: View {
                     BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
                             y: .value("practice+listening", 0)
                     )
-                    ForEach(historicalData, id: \.self) { d in
+                    let all_data = useTestData ? historicalData + HistoricalData.self.samples_int_asc + HistoricalData.self.samples_int_desc : historicalData
+                    ForEach(all_data, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("practice+listening", d.practice + d.listening)
                         )
@@ -79,7 +85,8 @@ struct StatsIntervalView: View {
                             BarMark(x: .value("Id", "↑" + k ),
                                     y: .value("res",0))
                     }
-                    ForEach(ascData, id: \.self) { d in
+                    let all_data = useTestData ? ascData + HistoricalData.self.samples_int_asc : ascData
+                    ForEach(all_data, id: \.self) { d in
                             BarMark(x: .value("id", d.id),
                                     y: .value("practice+listening", d.practice + d.listening)
                             )
@@ -90,7 +97,8 @@ struct StatsIntervalView: View {
                             BarMark(x: .value("Id", "↓" + k ),
                                     y: .value("res",0))
                     }
-                    ForEach(descData, id: \.self) { d in
+                    let all_data = useTestData ? descData + HistoricalData.self.samples_int_desc : descData
+                    ForEach(all_data, id: \.self) { d in
                             BarMark(x: .value("id", d.id),
                                     y: .value("practice+listening", d.practice + d.listening)
                             )
@@ -103,17 +111,18 @@ struct StatsIntervalView: View {
                             BarMark(x: .value("Id", "↑" + k ),
                                     y: .value("res",0))
                     }
-                    ForEach(ascData, id: \.self) { d in
+                    let all_data = useTestData ? ascData + HistoricalData.self.samples_int_asc : ascData
+                    ForEach(all_data, id: \.self) { d in
                             BarMark(x: .value("Id", d.id),
                                     y: .value("res", d.correct)
                             ).foregroundStyle(by: .value("correct", "correct"))
                     }
-                    ForEach(ascData, id: \.self) { d in
+                    ForEach(all_data, id: \.self) { d in
                             BarMark(x: .value("Id", d.id),
                                     y: .value("res", d.timeout)
                             ).foregroundStyle(by: .value("timeout", "timeout"))
                     }
-                    ForEach(ascData, id: \.self) { d in
+                    ForEach(all_data, id: \.self) { d in
                             BarMark(x: .value("Id", d.id),
                                     y: .value("res", d.incorrect)
                             ).foregroundStyle(by: .value("error", "error"))
@@ -129,17 +138,18 @@ struct StatsIntervalView: View {
                             BarMark(x: .value("Id", "↓" + k ),
                                     y: .value("res",0))
                     }
-                    ForEach(descData, id: \.self) { d in
+                    let all_data = useTestData ? descData + HistoricalData.self.samples_int_desc : descData
+                    ForEach(all_data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.correct)
                         ).foregroundStyle(by: .value("correct", "correct"))
                     }
-                    ForEach(descData, id: \.self) { d in
+                    ForEach(all_data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.timeout)
                         ).foregroundStyle(by: .value("timeout", "timeout"))
                     }
-                    ForEach(descData, id: \.self) { d in
+                    ForEach(all_data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(by: .value("error", "error"))
@@ -152,20 +162,7 @@ struct StatsIntervalView: View {
                 ])
             }
             Spacer()
-            HStack {
-                Button("Delete Interval History", systemImage: "trash", role: .destructive){
-                    showingConfirmation = true
-                }
-                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
-                    Button("Yes", role: .destructive) {
-                        for hd in historicalData {
-                            modelContext.delete(hd)
-                        }
-                    }
-                    Button("No", role: .cancel) {}
-                }.scaleEffect(0.8)
-                Spacer()
-            }
+
             Spacer()
         }
     }
@@ -176,8 +173,8 @@ struct StatsTriadView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var historicalData: [HistoricalData]
 
-    @State private var showingConfirmation = false
-    
+    @State var selectedIndex: String?
+
     var body: some View {
 
         VStack{
@@ -211,46 +208,34 @@ struct StatsTriadView: View {
             }
             GroupBox("Quiz") {
                 Chart {
-                    ForEach(TRIAD_KEYS, id: \.self) { k in
-                        BarMark(x: .value("Id", short_answer(answer:k)),
-                                y: .value("res",0))
-                    }
+//                    ForEach(TRIAD_KEYS, id: \.self) { k in
+//                        BarMark(x: .value("Id", short_answer(answer:k)),
+//                                y: .value("res",0))
+//                    }
                     ForEach(historicalData, id: \.self) { d in
+                        let isSelected = selectedIndex != nil && d.id == selectedIndex!
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.correct)
-                        ).foregroundStyle(by: .value("correct", "correct"))
+                        ).foregroundStyle(isSelected ? .yellow : answer_colors[.correct]!)//by: .value("correct", "correct"))
                     }
                     ForEach(historicalData, id: \.self) { d in
+                        let isSelected = selectedIndex != nil && d.id == selectedIndex!
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.timeout)
-                        ).foregroundStyle(by: .value("timeout", "timeout"))
+                        ).foregroundStyle(isSelected ? .yellow : answer_colors[.timeout]!)
                     }
                     ForEach(historicalData, id: \.self) { d in
+                        let isSelected = selectedIndex != nil && d.id == selectedIndex!
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.incorrect)
-                        ).foregroundStyle(by: .value("error", "error"))
+                        ).foregroundStyle(isSelected ? .yellow : answer_colors[.incorrect]!)
                     }
-                }
+                }.chartXSelection(value: $selectedIndex)
                 .chartForegroundStyleScale([
                     "correct" : answer_colors[.correct]!,
                     "timeout": answer_colors[.timeout]!,
                     "error": answer_colors[.incorrect]!,
-                ]).chartLegend(.hidden)
-            }
-            Spacer()
-            HStack {
-                Button("Delete Triad History", systemImage: "trash", role: .destructive){
-                    showingConfirmation = true
-                }
-                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
-                    Button("Yes", role: .destructive) {
-                        for hd in historicalData {
-                            modelContext.delete(hd)
-                        }
-                    }
-                    Button("No", role: .cancel) {}
-                }.scaleEffect(0.8)
-                Spacer()
+                ])//.chartLegend(.hidden)//.chartXSelection(value: $selectedIndex)
             }
             Spacer()
         }
@@ -262,8 +247,6 @@ struct StatsScaleDegreeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
 
-    @State private var showingConfirmation = false
-    
     var body: some View {
 
         VStack{
@@ -322,21 +305,6 @@ struct StatsScaleDegreeView: View {
                     "timeout": answer_colors[.timeout]!,
                     "error": answer_colors[.incorrect]!,
                 ]).chartLegend(.hidden)
-            }
-            Spacer()
-            HStack {
-                Button("Delete Scale Degree History", systemImage: "trash", role: .destructive){
-                    showingConfirmation = true
-                }
-                .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
-                    Button("Yes", role: .destructive) {
-                        for hd in historicalData {
-                            modelContext.delete(hd)
-                        }
-                    }
-                    Button("No", role: .cancel) {}
-                }.scaleEffect(0.8)
-                Spacer()
             }
             Spacer()
         }
