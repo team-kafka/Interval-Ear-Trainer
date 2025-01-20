@@ -33,12 +33,13 @@ import SwiftData
 extension HistoricalData {
     static var samples_int_asc  = generateIntervalSampleData(nDates:30, asc:true)
     static var samples_int_desc = generateIntervalSampleData(nDates:30, asc:false)
+    static var samples_triad    = generateTriadSampleData(nDates:30)
 }
 
 func generateIntervalSampleData(nDates:Int=10, asc:Bool=true) -> [HistoricalData] {
     var rv = [HistoricalData]()
     for i in 0..<nDates {
-        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let proba_success = 0.5 + 0.3 * Double(nDates-i) / Double(nDates)
         let nInts = Int.random(in: 0...INTERVAL_KEYS.count)
         for interval in INTERVAL_KEYS.shuffled().prefix(nInts){
             let total = Int.random(in: 20...100)
@@ -56,7 +57,7 @@ func generateIntervalSampleData(nDates:Int=10, asc:Bool=true) -> [HistoricalData
 func generateTriadSampleData(nDates:Int=10) -> [HistoricalData] {
     var rv = [HistoricalData]()
     for i in 0..<nDates {
-        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let proba_success = 0.5 + 0.3 * Double(nDates-i) / Double(nDates)
         let nInts = Int.random(in: 0...TRIAD_KEYS.count)
         for id in TRIAD_KEYS.shuffled().prefix(nInts){
             let total = Int.random(in: 20...100)
@@ -74,7 +75,7 @@ func generateTriadSampleData(nDates:Int=10) -> [HistoricalData] {
 func generateScaleDegreeSampleData(nDates:Int=10) -> [HistoricalData] {
     var rv = [HistoricalData]()
     for i in 0..<nDates {
-        let proba_success = 0.5 + 0.3 * Double(i) / Double(nDates)
+        let proba_success = 0.5 + 0.3 * Double(nDates-i) / Double(nDates)
         let nInts = Int.random(in: 0...SCALE_KEYS.count)
         for sc_id in SCALE_KEYS.shuffled().prefix(nInts){
             let degree_array = SCALE_DEGREES.values.map{interval_name(interval_int:SCALES[sc_id]![$0], oriented:false)}
