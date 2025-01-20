@@ -27,7 +27,7 @@ struct StatView: View {
                 Label("Triads", systemImage: "music.quarternote.3")
             }
             .tag(1)
-            StatsScaleDegreeView().modelContainer(for: HistoricalData.self)
+            StatsScaleDegreeView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
             .tabItem {
                 Text("Scale Degrees")
                 Image(systemName: "key")
@@ -35,7 +35,7 @@ struct StatView: View {
             .tag(2)
             StatParamsView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
             .tabItem {
-                Text("Params")
+                Text("Settings")
                 Image(systemName: "gearshape.fill")
             }
             .tag(3)
@@ -51,115 +51,31 @@ struct StatView: View {
 }
 
 struct StatsIntervalView: View {
-    @Binding var useTestData: Bool
+    
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "interval"})  var historicalData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↑") && $0.type == "interval"}) var ascData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↓") && $0.type == "interval"}) var descData: [HistoricalData]
 
+    @Binding var useTestData: Bool
+
     var body: some View {
 
         VStack{
             Text("Intervals").font(.title)
-
-            GroupBox("Practice and listening") {
-                Chart {
-                    BarMark(x: .value("date", Date(), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    let all_data = useTestData ? historicalData + HistoricalData.self.samples_int_asc + HistoricalData.self.samples_int_desc : historicalData
-                    ForEach(all_data, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
-                                y: .value("practice+listening", d.practice + d.listening)
-                        )
-                    }
-                }
-                Chart {
-                    ForEach(INTERVAL_KEYS, id: \.self) { k in
-                            BarMark(x: .value("Id", "↑" + k ),
-                                    y: .value("res",0))
-                    }
-                    let all_data = useTestData ? ascData + HistoricalData.self.samples_int_asc : ascData
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("practice+listening", d.practice + d.listening)
-                            )
-                        }
-                }
-                Chart {
-                    ForEach(INTERVAL_KEYS, id: \.self) { k in
-                            BarMark(x: .value("Id", "↓" + k ),
-                                    y: .value("res",0))
-                    }
-                    let all_data = useTestData ? descData + HistoricalData.self.samples_int_desc : descData
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("practice+listening", d.practice + d.listening)
-                            )
-                        }
-                }
+            if useTestData{
+                PracticeChart(histData: historicalData + HistoricalData.self.samples_int_desc + HistoricalData.self.samples_int_asc,
+                              detailledData: [ascData  + HistoricalData.self.samples_int_asc , descData + HistoricalData.self.samples_int_desc],
+                              allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
+                QuizzChart(allData: [ascData  + HistoricalData.self.samples_int_asc, descData + HistoricalData.self.samples_int_desc],
+                           allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
+            }else{
+                PracticeChart(histData: historicalData ,
+                              detailledData: [ascData, descData],
+                              allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
+                QuizzChart(allData: [ascData, descData],
+                           allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
             }
-            GroupBox("Quiz") {
-                Chart {
-                    ForEach(INTERVAL_KEYS, id: \.self) { k in
-                            BarMark(x: .value("Id", "↑" + k ),
-                                    y: .value("res",0))
-                    }
-                    let all_data = useTestData ? ascData + HistoricalData.self.samples_int_asc : ascData
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.correct)
-                            ).foregroundStyle(by: .value("correct", "correct"))
-                    }
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.timeout)
-                            ).foregroundStyle(by: .value("timeout", "timeout"))
-                    }
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.incorrect)
-                            ).foregroundStyle(by: .value("error", "error"))
-                    }
-                }
-                .chartForegroundStyleScale([
-                    "correct" : answer_colors[.correct]!,
-                    "timeout": answer_colors[.timeout]!,
-                    "error": answer_colors[.incorrect]!,
-                ]).chartLegend(.hidden)
-                Chart {
-                    ForEach(INTERVAL_KEYS, id: \.self) { k in
-                            BarMark(x: .value("Id", "↓" + k ),
-                                    y: .value("res",0))
-                    }
-                    let all_data = useTestData ? descData + HistoricalData.self.samples_int_desc : descData
-                    ForEach(all_data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.correct)
-                        ).foregroundStyle(by: .value("correct", "correct"))
-                    }
-                    ForEach(all_data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.timeout)
-                        ).foregroundStyle(by: .value("timeout", "timeout"))
-                    }
-                    ForEach(all_data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.incorrect)
-                        ).foregroundStyle(by: .value("error", "error"))
-                    }
-                }
-                .chartForegroundStyleScale([
-                    "correct" : answer_colors[.correct]!,
-                    "timeout": answer_colors[.timeout]!,
-                    "error": answer_colors[.incorrect]!,
-                ])
-            }
-            Spacer()
-
             Spacer()
         }
     }
@@ -167,79 +83,103 @@ struct StatsIntervalView: View {
 
 struct StatsTriadView: View {
     
-    @Binding var useTestData: Bool
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var historicalData: [HistoricalData]
 
     @State var selectedIndex: String?
+    @Binding var useTestData: Bool
+
+    var body: some View {
+        VStack{
+            Text("Triads").font(.title)
+            if useTestData {
+                PracticeChart(histData:historicalData + HistoricalData.self.samples_triad,
+                              detailledData: [historicalData + HistoricalData.self.samples_triad],
+                              allKeys:[TRIAD_KEYS])
+                QuizzChart(allData: [historicalData + HistoricalData.self.samples_triad], allKeys: [TRIAD_KEYS])
+            } else {
+                PracticeChart(histData:historicalData,
+                              detailledData: [historicalData],
+                              allKeys:[TRIAD_KEYS])
+                QuizzChart(allData: [historicalData], allKeys: [TRIAD_KEYS])
+
+            }
+            Spacer()
+        }
+    }
+}
+
+struct StatsScaleDegreeView: View {
+        
+    @Environment(\.modelContext) private var modelContext
+    @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
+    
+    @Binding var useTestData: Bool
 
     var body: some View {
 
         VStack{
-            Text("Triads").font(.title)
-            let all_data = useTestData ? historicalData + HistoricalData.self.samples_triad : historicalData
-            GroupBox("Practice and listening") {
-                Chart {
-                    BarMark(x: .value("date", Date(), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    ForEach(all_data, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
-                                y: .value("practice+listening", d.practice + d.listening)
-                        )
-                    }
-                }
-                Chart {
-                    ForEach(TRIAD_KEYS, id: \.self) { k in
-                        BarMark(x: .value("Id",  short_answer(answer:k)),
-                                    y: .value("res",0))
-                    }
-                    ForEach(all_data, id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("practice+listening", d.practice + d.listening)
-                            )
-                        }
-                }
+            Text("Scale Degrees").font(.title)
+            if useTestData {
+                PracticeChart(histData:historicalData + HistoricalData.self.samples_scale_degree,
+                              detailledData: [historicalData + HistoricalData.self.samples_scale_degree],
+                              allKeys:[SCALE_DEGREE_KEYS_W_ALT])
+                QuizzChart(allData: [historicalData + HistoricalData.self.samples_scale_degree], allKeys: [SCALE_DEGREE_KEYS_W_ALT])
+            } else {
+                PracticeChart(histData:historicalData,
+                              detailledData: [historicalData],
+                              allKeys:[SCALE_DEGREE_KEYS_W_ALT])
+                QuizzChart(allData: [historicalData], allKeys: [SCALE_DEGREE_KEYS_W_ALT])
+
             }
-            GroupBox("Quiz") {
+            Spacer()
+        }
+    }
+}
+
+struct QuizzChart: View {
+   
+    @State var allData: [[HistoricalData]]
+    @State var allKeys: [[String]]
+    
+    @State var selectedIndex: String?
+
+    var body: some View {
+        GroupBox("Quiz") {
+            ForEach(Array(zip(allData, allKeys)), id: \.0){ data, keys in
                 Chart {
-                    ForEach(TRIAD_KEYS, id: \.self) { k in
+                    ForEach(keys, id: \.self) { k in
                         BarMark(x: .value("Id", short_answer(answer:k)),
                                 y: .value("res",0))
                     }
-                    ForEach(all_data, id: \.self) { d in
+                    ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.correct)
                         ).foregroundStyle(answer_colors[.correct]!)
                     }
-                    ForEach(all_data, id: \.self) { d in
+                    ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.timeout)
                         ).foregroundStyle(answer_colors[.timeout]!)
                     }
-                    ForEach(all_data, id: \.self) { d in
+                    ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(answer_colors[.incorrect]!)
                     }
                 }.chartXSelection(value: $selectedIndex)
-                .chartForegroundStyleScale([
-                    "correct" : answer_colors[.correct]!,
-                    "timeout": answer_colors[.timeout]!,
-                    "error": answer_colors[.incorrect]!,
-                ])
-                .chartOverlay { pr in
-                    if selectedIndex != nil {
-                        let filtered_data = all_data.filter{ $0.id == selectedIndex }
-                        OverlayView(filtered_data: filtered_data)
-                        //Text("U suck")
+                    .chartForegroundStyleScale([
+                        "correct" : answer_colors[.correct]!,
+                        "timeout": answer_colors[.timeout]!,
+                        "error": answer_colors[.incorrect]!,
+                    ])
+                    .chartOverlay { pr in
+                        if selectedIndex != nil {
+                            let filtered_data = data.filter{ $0.id == selectedIndex }
+                            OverlayView(filtered_data: filtered_data)
+                        }
                     }
-                }
             }
-            Spacer()
         }
     }
 }
@@ -279,74 +219,43 @@ struct OverlayView: View {
     }
 }
 
-struct StatsScaleDegreeView: View {
+struct PracticeChart: View {
+    @State var histData: [HistoricalData]
+    @State var detailledData: [[HistoricalData]]
+    @State var allKeys: [[String]]
     
-    @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
-
     var body: some View {
-
-        VStack{
-            Text("Scale Degrees").font(.title)
-
-            GroupBox("Practice and listening") {
+        GroupBox("Practice and listening") {
+            Chart {
+                BarMark(x: .value("date", Date(), unit: .day),
+                        y: .value("practice+listening", 0)
+                )
+                BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
+                        y: .value("practice+listening", 0)
+                )
+                ForEach(histData, id: \.self) { d in
+                    BarMark(x: .value("date", d.date, unit: .day),
+                            y: .value("practice+listening", d.practice + d.listening)
+                    )
+                }
+            }
+            ForEach(Array(zip(detailledData, allKeys)), id: \.0){ data, keys in
                 Chart {
-                    BarMark(x: .value("date", Date(), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
-                            y: .value("practice+listening", 0)
-                    )
-                    ForEach(historicalData, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
+                    ForEach(keys, id: \.self) { k in
+                        BarMark(x: .value("Id",  short_answer(answer:k)),
+                                y: .value("res",0))
+                    }
+                    ForEach(data, id: \.self) { d in
+                        BarMark(x: .value("id", d.id),
                                 y: .value("practice+listening", d.practice + d.listening)
                         )
                     }
                 }
-                Chart {
-                    ForEach(SCALE_DEGREE_KEYS_W_ALT, id: \.self) { k in
-                        BarMark(x: .value("Id", k),
-                                    y: .value("res",0))
-                    }
-                    ForEach(historicalData, id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("practice+listening", d.practice + d.listening)
-                            )
-                        }
-                }
             }
-            GroupBox("Quiz") {
-                Chart {
-                    ForEach(SCALE_DEGREE_KEYS_W_ALT, id: \.self) { k in
-                        BarMark(x: .value("Id", k),
-                                y: .value("res",0))
-                    }
-                    ForEach(historicalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.correct)
-                        ).foregroundStyle(by: .value("correct", "correct"))
-                    }
-                    ForEach(historicalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.timeout)
-                        ).foregroundStyle(by: .value("timeout", "timeout"))
-                    }
-                    ForEach(historicalData, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.incorrect)
-                        ).foregroundStyle(by: .value("error", "error"))
-                    }
-                }
-                .chartForegroundStyleScale([
-                    "correct" : answer_colors[.correct]!,
-                    "timeout": answer_colors[.timeout]!,
-                    "error": answer_colors[.incorrect]!,
-                ]).chartLegend(.hidden)
-            }
-            Spacer()
         }
     }
 }
+
 
 #Preview {
     StatView()

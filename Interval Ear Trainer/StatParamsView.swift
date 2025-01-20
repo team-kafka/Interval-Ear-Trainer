@@ -15,11 +15,12 @@ struct StatParamsView: View {
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var triadData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var scaleDegreeData: [HistoricalData]
     @State private var showingConfirmation = false
+    
     @Binding var useTestData: Bool
     
     var body: some View {
         VStack{
-        Text("Historical Data Parameters") // until the bug with nav stack inside tabs is fixed
+        Text("Historical Data") // until the bug with nav stack inside tabs is fixed
             NavigationStack{
                 List{
                     Section(header: Text("Data Size")) {
