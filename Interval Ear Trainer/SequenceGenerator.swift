@@ -114,6 +114,6 @@ class ScaleDegreeGenerator : SequenceGenerator{
     }
     
     override func generateLabelString(params: Parameters) -> String{
-        return params.key + " " + SCALE_SHORT_NAMES[params.scale]!
+        return params.key + " " + SCALE_SHORT_NAMES[params.scale]! + ", " + scale_degree_answer_str(degrees: Array(params.active_scale_degrees).sorted(), scale: params.scale)
     }
 }

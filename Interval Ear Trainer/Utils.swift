@@ -119,11 +119,16 @@ func midi_note_to_name(note_int: Int) -> String
     return note_name + String(format:"%d", octave)
 }
 
-func interval_filter_to_str(intervals:Set<Int>) -> String
+func interval_filter_to_str(intervals:Set<Int>, oriented:Bool = true) -> String
 {
     let intervals_abs = Set<Int>(intervals.map{$0 > 0 ? $0 : -$0}).sorted()
     let intervals_strs = intervals_abs.map{helper_func(interval_abs: $0, intervals:intervals)}
-    return intervals_strs.joined(separator: " ")
+    let rv = intervals_strs.joined(separator: " ")
+    if oriented{
+        return rv
+    } else {
+        return rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
+    }
 }
 
 func helper_func(interval_abs: Int, intervals:Set<Int>) -> String

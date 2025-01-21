@@ -95,7 +95,7 @@ struct PracticeView: View {
             })
         }
     }
-    
+
     func toggle_start_stop() {
         if use_timer {
             if !running {
@@ -156,7 +156,6 @@ struct PracticeView: View {
             player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
         }
         notes = new_notes
-        
         return delay
     }
     

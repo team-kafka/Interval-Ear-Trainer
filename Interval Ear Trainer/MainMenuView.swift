@@ -55,11 +55,11 @@ struct MainMenu: View {
                     }
                 }
                 Section(header: Text("Listening")) {
-                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1).modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2).modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3).modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL).modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL).modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, id:"LVI1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, id:"LVI2").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, id:"LVI3").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, id:"LVT1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, id:"LVS1").modelContainer(for: HistoricalData.self)
             }
                 Section(header: Text("Stats")) {
                     NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")

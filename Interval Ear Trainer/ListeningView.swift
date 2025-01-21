@@ -11,15 +11,16 @@ import MediaPlayer
 struct ListeningView: View {
     @Environment(\.modelContext) var modelContext
     
+    let id: String
+    
     @State var params: Parameters
     var sequenceGenerator: SequenceGenerator
     static var player: ListeningModePlayer = ListeningModePlayer()
-    @State private var playing: Bool
     
     @Binding var dftParams: String
 
 
-    init(params: Parameters, dftParams: Binding<String>){
+    init(params: Parameters, dftParams: Binding<String>, id: String){
         _params = .init(initialValue: params)
         if (params.type == .interval) {
             self.sequenceGenerator = IntervalGenerator()
@@ -28,31 +29,31 @@ struct ListeningView: View {
         } else {
             self.sequenceGenerator = ScaleDegreeGenerator()
         }
-        _playing = .init(initialValue: false)
         _dftParams = .init(projectedValue: dftParams)
+        self.id = id
     }
     
     var body: some View {
         HStack{
-            (self.playing ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
-                if (!self.playing && !ListeningView.player.playing) {
+            ((ListeningView.player.playing && self.id == ListeningView.player.owner)  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
+                if (!ListeningView.player.playing) {
                     start()
-                } else if (self.playing){
+                } else if self.id == ListeningView.player.owner {
                     stop()
                 }
             }
             if (params.type == .scale_degree) {
                 Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
-                    if self.playing {
+                    if (ListeningView.player.playing && self.id == ListeningView.player.owner ) {
                         stop()
                     }
                     params.key = NOTE_KEYS.randomElement()!
                 }
             } else{
-                ChordArpSwitchView(chord: $params.is_chord, active: !self.playing)
+                ChordArpSwitchView(chord: $params.is_chord, active: !(ListeningView.player.playing && self.id == ListeningView.player.owner))
             }
             NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {
-                if self.playing {
+                if (ListeningView.player.playing && self.id == ListeningView.player.owner ) {
                     stop()
                 }
             }){
@@ -62,19 +63,17 @@ struct ListeningView: View {
         }.onAppear{
             save_dft_params(newParams: params)
         }.onDisappear{
-            if self.playing {
-                stop()
-            }
         }
     }
     
     func start() {
-        self.playing = true
-        ListeningView.player.start(params: params, sequenceGenerator: sequenceGenerator)
+        ListeningView.player.setParameters(params)
+        ListeningView.player.setSequenceGenerator(sequenceGenerator)
+        ListeningView.player.setOwner(self.id)
+        _ = ListeningView.player.start()
     }
     
     func stop(){
-        self.playing = false
         ListeningView.player.stop()
         persist_hist_data()
     }
