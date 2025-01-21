@@ -165,7 +165,7 @@ import SwiftUI
         do {
             try session.setActive(active)
         } catch let error as NSError {
-            print("Failed to set the audio session category and mode: \(error.localizedDescription)")
+            print("Failed (de)activate the audio session: \(error.localizedDescription)")
         }
     }
 }
