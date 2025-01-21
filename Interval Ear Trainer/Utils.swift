@@ -135,9 +135,9 @@ func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
 {
     var rv = interval_name(interval_int: interval_abs, oriented: false, octave: false)
     if ((intervals.contains(interval_abs)) && (!intervals.contains(-interval_abs))){
-        rv += "↑"
+        rv = "↑" + rv
     } else if ((!intervals.contains(interval_abs)) && (intervals.contains(-interval_abs))){
-        rv += "↓"
+        rv = "↓" + rv
     }
     return rv
 }

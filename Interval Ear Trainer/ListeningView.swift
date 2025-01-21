@@ -44,10 +44,9 @@ struct ListeningView: View {
             }
             if (params.type == .scale_degree) {
                 Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
-                    if (ListeningView.player.playing && self.id == ListeningView.player.owner ) {
-                        stop()
+                    if (!(ListeningView.player.playing && self.id == ListeningView.player.owner)) {
+                        params.key = NOTE_KEYS.randomElement()!
                     }
-                    params.key = NOTE_KEYS.randomElement()!
                 }
             } else{
                 ChordArpSwitchView(chord: $params.is_chord, active: !(ListeningView.player.playing && self.id == ListeningView.player.owner))
