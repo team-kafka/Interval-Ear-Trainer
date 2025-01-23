@@ -17,7 +17,7 @@ import SwiftUI
     var notes: [Int]
     var answers: [String]
     var answerVisible: Double
-    var root: Int
+    var rootNote: Int
     
     @ObservationIgnored() private var timer: Timer?
     @ObservationIgnored() private var timerAnswer: Timer?
@@ -31,7 +31,7 @@ import SwiftUI
         self.timerAnswer = nil
         self.playing = false
         self.notes = [0]
-        self.root = 0
+        self.rootNote = 0
         self.cacheData = [:]
         self.seqGen = nil
         self.params = nil
@@ -189,7 +189,7 @@ import SwiftUI
         var seq_duration: Double
         var note_duration: Double
         let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
-        (notes, note_duration, seq_duration, answers, root) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
+        (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
         setupNowPlaying()
         MidiPlayer.shared.playNotes(notes: params.n_notes == 1 ? [notes.last!] : notes, duration: note_duration, chord: params.is_chord)
         update_cacheData(answers:answers)

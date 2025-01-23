@@ -12,7 +12,6 @@ struct PracticeView: View {
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
-    @State private var root_note: Int
     
     @Binding private var dftParams: String
 
@@ -22,7 +21,6 @@ struct PracticeView: View {
         _params = .init(initialValue: params)
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
-        _root_note = .init(initialValue: 0)
         _use_timer = .init(initialValue: true)
         _dftParams = .init(projectedValue: dftParams)
         _player = .init(initialValue: SequencePlayer.shared)
@@ -43,7 +41,7 @@ struct PracticeView: View {
                     }.foregroundColor(Color(.systemGray))
                     Spacer()
                 }
-                NoteButtonsView(params: params, notes: $player.notes, root_note: root_note, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
+                NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                 if (params.type == .scale_degree) {
                     ScaleChooserView(params: $params, running:player.playing)
                         .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
