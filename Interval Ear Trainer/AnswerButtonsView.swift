@@ -10,7 +10,7 @@ import SwiftUI
 struct IntervalAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var activeIntervals: Set<Int>
-    var running: Bool
+    var active: Bool
     var notes: [Int]
     @Binding var guesses: [String]
     var use_timer: Bool
@@ -24,7 +24,7 @@ struct IntervalAnswerButtonsView: View {
                 VStack{
                     ForEach(0..<3){ j in
                         let thisInt = j*4+i+1
-                        let active = activeIntAbs.contains(thisInt) && (running || (!use_timer && notes[0] != 0))
+                        let active = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
                         Text(interval_name(interval_int: thisInt, oriented: false)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
@@ -56,7 +56,7 @@ struct IntervalAnswerButtonsView: View {
 struct TriadAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var params: Parameters
-    var running: Bool
+    var active: Bool
     @Binding var guesses: [String]
     var use_timer: Bool
     var notes: [Int]
@@ -72,7 +72,7 @@ struct TriadAnswerButtonsView: View {
                         let idx = i*2+j
                         if (idx < TRIAD_KEYS.count){
                             let thisTriad = TRIAD_KEYS[idx]
-                            let active = activeTriads.contains(thisTriad) && (running || (!use_timer && notes[0] != 0))
+                            let active = activeTriads.contains(thisTriad) && (active || (!use_timer && notes[0] != 0))
                             Text(thisTriad.prefix(3)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
@@ -109,7 +109,7 @@ struct ScaleDegreeAnswerButtonsView: View {
     public var loopFunction: (() -> Void)
     var activeDegrees: Set<Int>
     var scale: String
-    var running: Bool
+    var active: Bool
     var notes: [Int]
     @Binding var guesses: [String]
     var use_timer: Bool
@@ -125,7 +125,7 @@ struct ScaleDegreeAnswerButtonsView: View {
                         let idx = j*4+i
                         if (idx < SCALE_DEGREES.values.count) {
                             let thisDegree = SCALE_DEGREES.values.sorted()[idx]
-                            let active = activeDegrees.contains(thisDegree) && (running || (!use_timer && notes[0] != 0))
+                            let active = activeDegrees.contains(thisDegree) && (active || (!use_timer && notes[0] != 0))
                             Text(scale_degree_answer_str(degrees: [thisDegree], scale:scale)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                             RoundedRectangle(cornerRadius: 10)
                                 .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)
