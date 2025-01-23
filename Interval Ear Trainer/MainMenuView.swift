@@ -68,7 +68,7 @@ struct MainMenu: View {
                 }
             }
         }
-    }  
+    }
 }
 
 #Preview {

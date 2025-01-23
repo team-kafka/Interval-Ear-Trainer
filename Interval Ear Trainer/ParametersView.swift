@@ -19,8 +19,6 @@ struct ParametersView: View {
     @Binding var params : Parameters
     @State private var preset = 0
     
-    let player = MidiPlayer()
-    
     let preset_values = ["", "3rds", "Large Intervals", "4ths and 5ths"] // get this from dict
     
     var body: some View {
@@ -157,7 +155,7 @@ struct ParametersView: View {
                             Text(midi_note_to_name(note_int: params.lower_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.lower_bound], duration: 1)
+                                MidiPlayer.shared.playNotes(notes: [params.lower_bound], duration: 1)
                             }
                         }
                         HStack{
@@ -165,7 +163,7 @@ struct ParametersView: View {
                             Text(midi_note_to_name(note_int: params.upper_bound)).bold()
                             Spacer()
                             Image(systemName: "speaker.wave.2.fill").onTapGesture {
-                                player.playNotes(notes: [params.upper_bound], duration: 1)
+                                MidiPlayer.shared.playNotes(notes: [params.upper_bound], duration: 1)
                             }
                         }
                         VStack{

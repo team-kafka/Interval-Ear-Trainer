@@ -10,17 +10,18 @@ import AVFoundation
 import MediaPlayer
 
 class MidiPlayer {
+    static var shared = MidiPlayer()
+    
     var midiPlayer: AVMIDIPlayer?
     var bankURL: URL
     
-    init() {
+    private init() {
         guard let bankURL = Bundle.main.url(forResource: "Arnold___David_Classical_Piano", withExtension: "sf2") else {
             fatalError("\"Arnold___David_Classical_Piano.sf2\" file not found.")
         }
         self.bankURL = bankURL
     }
 
-    
     func playSong() {
         if let md = self.midiPlayer {
             md.currentPosition = 0
@@ -81,6 +82,12 @@ class MidiPlayer {
         let musicSequence = self.prepare_sequence(notes: notes, duration:duration, chord:chord)
         self.prepare_song(musicSequence: musicSequence)
         self.playSong()
+    }
+    
+    func stop() {
+        if let md = self.midiPlayer {
+            md.stop()
+        }
     }
 }
 

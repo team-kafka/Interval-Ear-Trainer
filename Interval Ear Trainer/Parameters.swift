@@ -46,6 +46,31 @@ struct Parameters : Codable {
     var scale: String = SCALE_KEYS.first!
     var active_scale_degrees: Set<Int> = Set<Int>(SCALE_DEGREES.values)
     var key: String = "A"
+    
+    
+    func generateFilterString() -> String{
+        if type == .interval{
+            return interval_filter_to_str(intervals: self.active_intervals)
+        } else if type == .triad{
+            return triad_filters_to_str(active_qualities: self.active_qualities, active_inversions: self.active_inversions, active_voicings: self.active_voicings)
+        } else if type == .scale_degree{
+            return scale_degree_filter_to_str(intervals: self.active_scale_degrees)
+        } else {
+            return ""
+        }
+    }
+    
+    func generateLabelString() -> String{
+        if type == .interval{
+            return interval_filter_to_str(intervals: self.active_intervals)
+        } else if type == .triad{
+            return triad_qualities_to_str(active_qualities: self.active_qualities)
+        } else if type == .scale_degree{
+            return self.key + " " + SCALE_SHORT_NAMES[self.scale]! + ", " + scale_degree_answer_str(degrees: Array(self.active_scale_degrees).sorted(), scale: self.scale)
+        } else {
+            return ""
+        }
+    }
 }
 
 extension Parameters {

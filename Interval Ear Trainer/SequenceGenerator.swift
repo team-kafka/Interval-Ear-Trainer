@@ -13,13 +13,13 @@ class SequenceGenerator {
         return ([], 0, 0, [], 0)
     }
     
-    func generateFilterString(params: Parameters) -> String{
-       return ""
-    }
-    
-    func generateLabelString(params: Parameters) -> String{
-        return ""
-    }
+//    func generateFilterString(params: Parameters) -> String{
+//       return ""
+//    }
+//    
+//    func generateLabelString(params: Parameters) -> String{
+//        return ""
+//    }
 }
 
 class IntervalGenerator : SequenceGenerator{
@@ -58,21 +58,13 @@ class IntervalGenerator : SequenceGenerator{
         }
         return (notes, duration, delay, answers, 0)
     }
-    
-    override func generateFilterString(params: Parameters) -> String{
-        return interval_filter_to_str(intervals: params.active_intervals)
-    }
-    
-    override func generateLabelString(params: Parameters) -> String{
-        return interval_filter_to_str(intervals: params.active_intervals)
-    }
 }
 
 class TriadGenerator : SequenceGenerator{
     
     override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
-        let delay = chord ? 0.0 : params.delay_sequence * 2.0  // x n_notes - 1 (triad) 
-        let duration = chord ? params.delay * 0.5 : params.delay_sequence
+        let seq_duration = chord ? 0.0 : params.delay_sequence * 2.0  // x n_notes - 1 (triad)
+        let note_duration = chord ? params.delay * 0.5 : params.delay_sequence
         
         let res = draw_random_triad(active_qualities: params.active_qualities, active_inversions: params.active_inversions, active_voicings: params.active_voicings, upper_bound: params.upper_bound, lower_bound: params.lower_bound)
 
@@ -83,15 +75,7 @@ class TriadGenerator : SequenceGenerator{
         let root_note = res.2
         let answer_str = [quality, inversion, voicing].joined(separator: "/")
         
-        return (notes, duration, delay, [answer_str], root_note)
-    }
-    
-    override func generateFilterString(params: Parameters) -> String{
-        return triad_filters_to_str(active_qualities: params.active_qualities, active_inversions: params.active_inversions, active_voicings: params.active_voicings)
-    }
-    
-    override func generateLabelString(params: Parameters) -> String{
-        return triad_qualities_to_str(active_qualities: params.active_qualities)
+        return (notes, note_duration, seq_duration, [answer_str], root_note)
     }
 }
 
@@ -107,13 +91,5 @@ class ScaleDegreeGenerator : SequenceGenerator{
         let delay = params.delay_sequence * Double(n_notes-1) 
         
         return (notes, duration, delay, answers, 0)
-    }
-    
-    override func generateFilterString(params: Parameters) -> String{
-        return scale_degree_filter_to_str(intervals: params.active_scale_degrees)
-    }
-    
-    override func generateLabelString(params: Parameters) -> String{
-        return params.key + " " + SCALE_SHORT_NAMES[params.scale]! + ", " + scale_degree_answer_str(degrees: Array(params.active_scale_degrees).sorted(), scale: params.scale)
     }
 }

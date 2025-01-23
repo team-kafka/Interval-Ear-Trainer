@@ -34,7 +34,6 @@ struct QuizView: View {
     
     @Binding var dftParams: String
 
-    @State var player: MidiPlayer
     var sequenceGenerator: SequenceGenerator
 
     
@@ -57,7 +56,6 @@ struct QuizView: View {
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)
         _guesses = .init(initialValue: [])
-        _player = .init(initialValue: MidiPlayer())
         _timer = .init(initialValue: nil)
         _dftParams = .init(projectedValue: dftParams)
         _cacheData = .init(initialValue: [:])
@@ -67,7 +65,7 @@ struct QuizView: View {
         
         NavigationStack{
             VStack {
-                QuickParamButtonsView(params: $params, notes: $notes, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active, reset_state: self.reset_state, stop: self.stop)
+                QuickParamButtonsView(params: $params, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
                 HStack {
                     Spacer()
                     (running ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
@@ -76,7 +74,7 @@ struct QuizView: View {
                     Spacer()
                 }
                 if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, player: $player, timer:$timer, running:$running, reset_state: self.reset_state)
+                    ScaleChooserView(params: $params, running:running)
                 }
                 Spacer()
                 answerView().opacity(answer_visible)
@@ -136,7 +134,7 @@ struct QuizView: View {
         timer?.invalidate()
         running = use_timer
         if (params.type == .scale_degree && notes[0] == 0) {
-            player.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
+            MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
             timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
                 self.loopFunction()
             }
@@ -178,9 +176,9 @@ struct QuizView: View {
         
         (new_notes, duration, delay, answers, _) = sequenceGenerator.generateSequence(params: params, n_notes:params.n_notes,                 chord:params.is_chord, prev_note:params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0)
         if ((params.n_notes == 1) && (notes[0] != 0)) {
-         player.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
+            MidiPlayer.shared.playNotes(notes: [new_notes.last!], duration: duration, chord: params.is_chord)
         } else {
-         player.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
+            MidiPlayer.shared.playNotes(notes: new_notes, duration: duration, chord: params.is_chord)
         }
         notes = new_notes
         return delay
