@@ -1,0 +1,3 @@
+
+- Can now pause/resume from the lock screen
+- No longer crashes when another app plays sound (incoming call / music etc...)

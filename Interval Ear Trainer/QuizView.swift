@@ -48,7 +48,7 @@ struct QuizView: View {
                 QuickParamButtonsView(params: $params, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
                     .onChange(of: params.n_notes) { player.setParameters(params) ; player.resetState(params:params) }
                     .onChange(of: params.is_chord) { player.setParameters(params) }
-                    .onChange(of: use_timer) { player.stop(); player.setParameters(params) }
+                    .onChange(of: use_timer) { player.stop(); player.setParameters(params) ; player.resetState(params:params) }
                 HStack {
                     Spacer()
                     (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
@@ -58,6 +58,8 @@ struct QuizView: View {
                 }
                 if (params.type == .scale_degree) {
                     ScaleChooserView(params: $params, running:player.playing)
+                        .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
+                        .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
                 }
                 Spacer()
                 answerView().opacity(player.answerVisible)
@@ -66,11 +68,11 @@ struct QuizView: View {
                 guessView()
                 Spacer()
                 if (params.type == .interval) {
-                    IntervalAnswerButtonsView(loopFunction: player.loopFunction, activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
+                    IntervalAnswerButtonsView(loopFunction: self.loopFunction(), activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
                 } else if (params.type == .triad) {
-                    TriadAnswerButtonsView(loopFunction: player.loopFunction, params: params, active: (player.playing && (player.answerVisible==0.0)), guesses: $guesses, use_timer: use_timer, notes: player.notes)
+                    TriadAnswerButtonsView(loopFunction: self.loopFunction(), params: params, active: (player.playing && (player.answerVisible==0.0)), guesses: $guesses, use_timer: use_timer, notes: player.notes)
                 } else if (params.type == .scale_degree) {
-                    ScaleDegreeAnswerButtonsView(loopFunction: player.loopFunction, activeDegrees: params.active_scale_degrees, scale:params.scale, active:  (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
+                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction(), activeDegrees: params.active_scale_degrees, scale:params.scale, active:  (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
                 }
             }
         }
@@ -110,12 +112,21 @@ struct QuizView: View {
     }
     
     func toggle_start_stop() {
-        if !player.playing {
-            player.setParameters(params)
-            _ = player.start()
-        }
-        else{
-            player.stop()
+        if use_timer {
+            if !player.playing {
+                player.setParameters(params)
+                _ = player.start()
+            }
+            else{
+                player.stop()
+            }
+        } else {
+            player.step()
+            if player.answerVisible == 1.0 {
+                timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
+                    player.step()
+                }
+            }
         }
     }
 
@@ -123,6 +134,14 @@ struct QuizView: View {
         dftParams = newParams.encode()
     }
     
+    func loopFunction() -> (() -> ())
+    {
+        if use_timer {
+            return player.loopFunction
+        } else {
+            return player.step
+        }
+    }
     func save_to_cache()
     {
         let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
