@@ -9,6 +9,10 @@ import Foundation
 import MediaPlayer
 import SwiftUI
 
+
+let ANSWER_TIME = 0.8 // how long does the answer shows before moving on to the next question
+
+
 @Observable class SequencePlayer{
     static let shared = SequencePlayer()
     
@@ -174,14 +178,17 @@ import SwiftUI
     }
 
     func loopFunction() {
+        timer?.invalidate()
         if answerVisible == 1.0 {
             answerVisible = 0.0
             let seq_duration = play_sequence()
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration, repeats: false) { _ in self.loopFunction() }
-            timerAnswer = Timer.scheduledTimer(withTimeInterval:params.delay * 0.5 + seq_duration, repeats: false) { _ in self.answerVisible = 1.0 }
+            timer?.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration + ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
+            timerAnswer?.invalidate()
+            timerAnswer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration, repeats: false) { _ in self.answerVisible = 1.0 }
         } else {
             answerVisible = 1.0
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay * 0.5, repeats: false) { _ in self.loopFunction() }
+            timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
         }
     }
     

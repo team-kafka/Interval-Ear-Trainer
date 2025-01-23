@@ -64,15 +64,16 @@ struct QuizView: View {
                 Spacer()
                 answerView().opacity(player.answerVisible)
                     .onChange(of: player.answerVisible) { if player.answerVisible == 0.0 { guesses = [] } }
+                    .onChange(of: guesses) { if guesses.count == player.answers.count { self.advanceState() } }
 
                 guessView()
                 Spacer()
                 if (params.type == .interval) {
-                    IntervalAnswerButtonsView(loopFunction: self.loopFunction(), activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
+                    IntervalAnswerButtonsView(loopFunction: {}, activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
                 } else if (params.type == .triad) {
-                    TriadAnswerButtonsView(loopFunction: self.loopFunction(), params: params, active: (player.playing && (player.answerVisible==0.0)), guesses: $guesses, use_timer: use_timer, notes: player.notes)
+                    TriadAnswerButtonsView(loopFunction: {}, params: params, active: (player.playing && (player.answerVisible==0.0)), guesses: $guesses, use_timer: use_timer, notes: player.notes)
                 } else if (params.type == .scale_degree) {
-                    ScaleDegreeAnswerButtonsView(loopFunction: self.loopFunction(), activeDegrees: params.active_scale_degrees, scale:params.scale, active:  (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
+                    ScaleDegreeAnswerButtonsView(loopFunction: {}, activeDegrees: params.active_scale_degrees, scale:params.scale, active:  (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer)
                 }
             }
         }
@@ -120,10 +121,10 @@ struct QuizView: View {
             else{
                 player.stop()
             }
-        } else {
+        } else { // Give up
             player.step()
             if player.answerVisible == 1.0 {
-                timer = Timer.scheduledTimer(withTimeInterval:0.6, repeats: false) { t in
+                timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { t in
                     player.step()
                 }
             }
@@ -134,14 +135,16 @@ struct QuizView: View {
         dftParams = newParams.encode()
     }
     
-    func loopFunction() -> (() -> ())
+    func advanceState()
     {
-        if use_timer {
-            return player.loopFunction
+        if !use_timer {
+            player.step()
+            timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { t in player.step() }
         } else {
-            return player.step
+            player.loopFunction()
         }
     }
+    
     func save_to_cache()
     {
         let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
