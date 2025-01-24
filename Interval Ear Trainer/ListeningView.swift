@@ -10,7 +10,8 @@ import MediaPlayer
 
 struct ListeningView: View {
     @Environment(\.modelContext) var modelContext
-    
+    @State private var cacheData: [String: HistoricalData]
+
     let id: String
     @State var params: Parameters
     @Binding var dftParams: String
@@ -18,6 +19,7 @@ struct ListeningView: View {
     init(params: Parameters, dftParams: Binding<String>, id: String){
         _params = .init(initialValue: params)
         _dftParams = .init(projectedValue: dftParams)
+        _cacheData = .init(initialValue: [:])
         self.id = id
     }
     
@@ -36,6 +38,7 @@ struct ListeningView: View {
                         params.key = NOTE_KEYS.randomElement()!
                     }
                 }
+                // add number of notes
             } else{
                 ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
             }
@@ -49,35 +52,48 @@ struct ListeningView: View {
             Image(systemName: "gearshape.fill")
         }.onAppear{
             save_dft_params(newParams: params)
-        }.onDisappear{
+        }.onChange(of: SequencePlayer.shared.answerVisible) {
+            if (SequencePlayer.shared.answerVisible == 1.0 && self.id == SequencePlayer.shared.getOwner()) {
+                save_to_cache()
+            }
         }
     }
     
     func start() {
         SequencePlayer.shared.setParameters(params)
         SequencePlayer.shared.setOwner(self.id)
-        SequencePlayer.shared.clear_cacheData()
         _ = SequencePlayer.shared.start()
     }
     
     func stop(){
         SequencePlayer.shared.stop()
         SequencePlayer.shared.resetState(params: params)
-        persist_hist_data()
+        persist_cache()
     }
 
     func save_dft_params(newParams: Parameters){
         dftParams = newParams.encode()
     }
     
-    func persist_hist_data()
+    func save_to_cache()
     {
-        let cd = SequencePlayer.shared.get_cacheData()
-        for k in cd.keys {
-            let hd = HistoricalData(date: rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:k, listening: cd[k]!)
+        for ans in SequencePlayer.shared.answers {
+            let short = short_answer(answer: ans)
+            if !cacheData.keys.contains(short){
+                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+            }
+            cacheData[short]!.listening += 1
+        }
+        print(cacheData)
+    }
+
+    func persist_cache()
+    {
+        for hd in cacheData.values{
+            print(hd.id, hd.listening)
             modelContext.insert(hd)
         }
         try! modelContext.save()
-        SequencePlayer.shared.clear_cacheData()
+        cacheData = [String:HistoricalData]()
     }
 }

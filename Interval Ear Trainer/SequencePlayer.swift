@@ -28,7 +28,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     @ObservationIgnored() private var seqGen: SequenceGenerator!
     @ObservationIgnored() private var params: Parameters!
     @ObservationIgnored() private var owner: String?
-    @ObservationIgnored() private var cacheData: [String: Int]
 
     private init() {
         self.timer = nil
@@ -36,7 +35,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         self.playing = false
         self.notes = [0]
         self.rootNote = 0
-        self.cacheData = [:]
         self.seqGen = nil
         self.params = nil
         self.answers = []
@@ -59,8 +57,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     }
     func setOwner(_ id: String) { self.owner = id }
     func getOwner() -> String? { return self.owner }
-    func get_cacheData() -> [String:Int]{ return cacheData }
-    func clear_cacheData() { cacheData = [:] }
     
     // Main interface
     func start() -> Bool {
@@ -114,7 +110,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
         setupNowPlaying()
         MidiPlayer.shared.playNotes(notes: params.n_notes == 1 ? [notes.last!] : notes, duration: note_duration, chord: params.is_chord)
-        update_cacheData(answers:answers)
         return seq_duration
     }
     
@@ -133,16 +128,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         }
     }
 
-    func update_cacheData(answers:[String]) {
-        for ans in answers{
-            let short = short_answer(answer: ans)
-            if !cacheData.keys.contains(short){
-                cacheData[short] = 0
-            }
-            cacheData[short]! += 1
-        }
-    }
-    
     func resetState(params: Parameters) {
         self.answers = []
         self.answerVisible = 1

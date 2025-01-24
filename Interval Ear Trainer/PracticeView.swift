@@ -14,7 +14,8 @@ struct PracticeView: View {
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
-    
+    @State private var cacheData: [String: HistoricalData]
+
     @Binding private var dftParams: String
 
     @State private var player: SequencePlayer
@@ -26,6 +27,7 @@ struct PracticeView: View {
         _use_timer = .init(initialValue: true)
         _dftParams = .init(projectedValue: dftParams)
         _player = .init(initialValue: SequencePlayer.shared)
+        _cacheData = .init(initialValue: [:])
     }
     
     var body: some View {
@@ -60,12 +62,15 @@ struct PracticeView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
-            player.clear_cacheData()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()
-            persist_hist_data()
+            persist_cache()
+        }.onChange(of: SequencePlayer.shared.answerVisible) {
+            if (SequencePlayer.shared.answerVisible == 1.0) {
+                save_to_cache()
+            }
         }
     }
     
@@ -102,18 +107,26 @@ struct PracticeView: View {
     func save_dft_params(newParams: Parameters){
         dftParams = newParams.encode()
     }
-    
-    func persist_hist_data()
+
+    func save_to_cache()
     {
-        let cd = SequencePlayer.shared.get_cacheData()
-        print(cd)
-        for k in cd.keys {
-            let hd = HistoricalData(date: rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type),
-                                    id:short_answer(answer: k), practice: cd[k]!)
-            print(hd)
+        for ans in SequencePlayer.shared.answers {
+            let short = short_answer(answer: ans)
+            if !cacheData.keys.contains(short){
+                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+            }
+            cacheData[short]!.listening += 1
+        }
+        print(cacheData)
+    }
+    
+    func persist_cache()
+    {
+        for hd in cacheData.values{
+            print(hd.id, hd.listening)
             modelContext.insert(hd)
         }
         try! modelContext.save()
-        SequencePlayer.shared.clear_cacheData()
+        cacheData = [String:HistoricalData]()
     }
 }

@@ -85,7 +85,6 @@ struct QuizView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
-            player.clear_cacheData()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -165,6 +164,7 @@ struct QuizView: View {
                     cacheData[short]!.timeout += 1
             }
         }
+        print(cacheData)
     }
     
     func persist_cache()
