@@ -12,70 +12,85 @@ import SwiftData
 
 struct StatView: View {
     @State private var selectedIndex: Int = 0
-    @State var useTestData: Bool = false
 
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
-            .tabItem {
-                Text("Intervals")
-                Image(systemName: "arrow.up.and.down.square")
-            }
-            .tag(0)
-            StatsTriadView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
+            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("Inter", systemImage: "arrow.up.square")
+                }
+                .tag(0)
+            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("Inter", systemImage: "arrow.down.square")
+                }
+                .tag(1)
+            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("Inter", systemImage: "h.square")
+                }
+                .tag(2)
+            StatsTriadView().modelContainer(for: HistoricalData.self)
             .tabItem {
                 Label("Triads", systemImage: "music.quarternote.3")
             }
-            .tag(1)
-            StatsScaleDegreeView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
+            .tag(3)
+            StatsScaleDegreeView().modelContainer(for: HistoricalData.self)
             .tabItem {
                 Text("Scale Degrees")
                 Image(systemName: "key")
             }
-            .tag(2)
-            StatParamsView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
+            .tag(4)
+            StatParamsView().modelContainer(for: HistoricalData.self)
             .tabItem {
                 Text("Settings")
                 Image(systemName: "gearshape.fill")
             }
-            .tag(3)
-        }
+            .tag(5)
+        }//.tabViewStyle()
         .tint(Color.gray.opacity(0.7))
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
             UITabBarItem.appearance().badgeColor = .systemGray
             UITabBar.appearance().backgroundColor = .systemGray4.withAlphaComponent(0.4)
-            UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.systemGray]
+            UINavigationBar.appearance()//.largeTitleTextAttributes = [.foregroundColor: UIColor.systemGray]
         })
     }
 }
+//extension UITabBarController {
+//    override open func viewDidLoad() {
+//        let standardAppearance = UITabBarAppearance()
+//        
+////        standardAppearance.st
+//        standardAppearance.stackedItemPositioning = .centered
+//        standardAppearance.stackedItemSpacing = 10
+//        standardAppearance.stackedItemWidth = 30
+//        
+//        tabBar.standardAppearance = standardAppearance
+//    }
+//}
 
 struct StatsIntervalView: View {
     
+    var filter: String
+    
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<HistoricalData> {$0.type == "interval"})  var historicalData: [HistoricalData]
-    @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↑") && $0.type == "interval"}) var ascData: [HistoricalData]
-    @Query(filter: #Predicate<HistoricalData> {$0.id.contains("↓") && $0.type == "interval"}) var descData: [HistoricalData]
 
-    @Binding var useTestData: Bool
+    @Query var data: [HistoricalData]
 
+    init(filter: String) {
+        self.filter = filter
+        self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == "interval"})
+    }
     var body: some View {
 
         VStack{
             Text("Intervals").font(.title)
-            if useTestData{
-                PracticeChart(histData: historicalData + HistoricalData.self.samples_int_desc + HistoricalData.self.samples_int_asc,
-                              detailledData: [ascData  + HistoricalData.self.samples_int_asc , descData + HistoricalData.self.samples_int_desc],
-                              allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
-                QuizzChart(allData: [ascData  + HistoricalData.self.samples_int_asc, descData + HistoricalData.self.samples_int_desc],
-                           allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
-            }else{
-                PracticeChart(histData: historicalData ,
-                              detailledData: [ascData, descData],
-                              allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
-                QuizzChart(allData: [ascData, descData],
-                           allKeys:[INTERVAL_KEYS.map{"↑" + $0}, INTERVAL_KEYS.map{"↓" + $0}])
-            }
+            PracticeChart(histData: data ,
+                          detailledData: data,
+                          keys:INTERVAL_KEYS.map{filter + $0})
+                       QuizzChart(data: data,
+                       keys:INTERVAL_KEYS.map{filter + $0})
             Spacer()
         }
     }
@@ -86,24 +101,13 @@ struct StatsTriadView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var historicalData: [HistoricalData]
 
-    @State var selectedIndex: String?
-    @Binding var useTestData: Bool
-
     var body: some View {
         VStack{
             Text("Triads").font(.title)
-            if useTestData {
-                PracticeChart(histData:historicalData + HistoricalData.self.samples_triad,
-                              detailledData: [historicalData + HistoricalData.self.samples_triad],
-                              allKeys:[TRIAD_KEYS])
-                QuizzChart(allData: [historicalData + HistoricalData.self.samples_triad], allKeys: [TRIAD_KEYS])
-            } else {
-                PracticeChart(histData:historicalData,
-                              detailledData: [historicalData],
-                              allKeys:[TRIAD_KEYS])
-                QuizzChart(allData: [historicalData], allKeys: [TRIAD_KEYS])
-
-            }
+            PracticeChart(histData:historicalData,
+                          detailledData: historicalData,
+                          keys:TRIAD_KEYS)
+            QuizzChart(data: historicalData, keys: TRIAD_KEYS)
             Spacer()
         }
     }
@@ -114,24 +118,13 @@ struct StatsScaleDegreeView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
     
-    @Binding var useTestData: Bool
-
     var body: some View {
-
         VStack{
             Text("Scale Degrees").font(.title)
-            if useTestData {
-                PracticeChart(histData:historicalData + HistoricalData.self.samples_scale_degree,
-                              detailledData: [historicalData + HistoricalData.self.samples_scale_degree],
-                              allKeys:[SCALE_DEGREE_KEYS_W_ALT])
-                QuizzChart(allData: [historicalData + HistoricalData.self.samples_scale_degree], allKeys: [SCALE_DEGREE_KEYS_W_ALT])
-            } else {
-                PracticeChart(histData:historicalData,
-                              detailledData: [historicalData],
-                              allKeys:[SCALE_DEGREE_KEYS_W_ALT])
-                QuizzChart(allData: [historicalData], allKeys: [SCALE_DEGREE_KEYS_W_ALT])
-
-            }
+            PracticeChart(histData:historicalData,
+                          detailledData: historicalData,
+                          keys:SCALE_DEGREE_KEYS_W_ALT)
+            QuizzChart(data: historicalData, keys: SCALE_DEGREE_KEYS_W_ALT)
             Spacer()
         }
     }
@@ -139,14 +132,13 @@ struct StatsScaleDegreeView: View {
 
 struct QuizzChart: View {
    
-    @State var allData: [[HistoricalData]]
-    @State var allKeys: [[String]]
+    @State var data: [HistoricalData]
+    @State var keys: [String]
     
     @State var selectedIndex: String?
 
     var body: some View {
         GroupBox("Quiz") {
-            ForEach(Array(zip(allData, allKeys)), id: \.0){ data, keys in
                 Chart {
                     ForEach(keys, id: \.self) { k in
                         BarMark(x: .value("Id", short_answer(answer:k)),
@@ -179,7 +171,6 @@ struct QuizzChart: View {
                             OverlayView(filtered_data: filtered_data)
                         }
                     }
-            }
         }
     }
 }
@@ -199,17 +190,17 @@ struct OverlayView: View {
                             y: .value("res", 0)
                     )
                     ForEach(filtered_data, id: \.self) { d in
-                        BarMark(x: .value("date", d.date),
+                        BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.correct)
                         ).foregroundStyle(answer_colors[.correct]!)
                     }
                     ForEach(filtered_data, id: \.self) { d in
-                        BarMark(x: .value("date", d.date),
+                        BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.timeout)
                         ).foregroundStyle(answer_colors[.timeout]!)
                     }
                     ForEach(filtered_data, id: \.self) { d in
-                        BarMark(x: .value("date", d.date),
+                        BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(answer_colors[.incorrect]!)
                     }
@@ -221,16 +212,16 @@ struct OverlayView: View {
 
 struct PracticeChart: View {
     @State var histData: [HistoricalData]
-    @State var detailledData: [[HistoricalData]]
-    @State var allKeys: [[String]]
+    @State var detailledData: [HistoricalData]
+    @State var keys: [String]
     
     var body: some View {
         GroupBox("Practice and listening") {
             Chart {
-                BarMark(x: .value("date", Date(), unit: .day),
+                BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
                         y: .value("practice+listening", 0)
                 )
-                BarMark(x: .value("date", Date().addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
+                BarMark(x: .value("date", rounded_date(date: Date().addingTimeInterval(TimeInterval(-86400*7))), unit: .day),
                         y: .value("practice+listening", 0)
                 )
                 ForEach(histData, id: \.self) { d in
@@ -239,17 +230,15 @@ struct PracticeChart: View {
                     )
                 }
             }
-            ForEach(Array(zip(detailledData, allKeys)), id: \.0){ data, keys in
-                Chart {
-                    ForEach(keys, id: \.self) { k in
-                        BarMark(x: .value("Id",  short_answer(answer:k)),
-                                y: .value("res",0))
-                    }
-                    ForEach(data, id: \.self) { d in
-                        BarMark(x: .value("id", d.id),
-                                y: .value("practice+listening", d.practice + d.listening)
-                        )
-                    }
+            Chart {
+                ForEach(keys, id: \.self) { k in
+                    BarMark(x: .value("Id", short_answer(answer:k)),
+                            y: .value("res",0))
+                }
+                ForEach(detailledData, id: \.self) { d in
+                    BarMark(x: .value("id", d.id),
+                            y: .value("practice+listening", d.practice + d.listening)
+                    )
                 }
             }
         }

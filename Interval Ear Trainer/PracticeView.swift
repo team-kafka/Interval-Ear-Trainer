@@ -8,6 +8,8 @@
 import SwiftUI
 
 struct PracticeView: View {
+    @Environment(\.modelContext) var modelContext
+    
     @State private var params: Parameters
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
@@ -58,10 +60,12 @@ struct PracticeView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
+            player.clear_cacheData()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()
+            persist_hist_data()
         }
     }
     
@@ -97,5 +101,19 @@ struct PracticeView: View {
     
     func save_dft_params(newParams: Parameters){
         dftParams = newParams.encode()
+    }
+    
+    func persist_hist_data()
+    {
+        let cd = SequencePlayer.shared.get_cacheData()
+        print(cd)
+        for k in cd.keys {
+            let hd = HistoricalData(date: rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type),
+                                    id:short_answer(answer: k), practice: cd[k]!)
+            print(hd)
+            modelContext.insert(hd)
+        }
+        try! modelContext.save()
+        SequencePlayer.shared.clear_cacheData()
     }
 }

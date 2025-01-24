@@ -10,7 +10,7 @@ import MediaPlayer
 import SwiftUI
 
 
-let ANSWER_TIME = 0.8 // how long does the answer shows before moving on to the next question
+let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to the next question
 
 
 @Observable class SequencePlayer{
@@ -62,6 +62,95 @@ let ANSWER_TIME = 0.8 // how long does the answer shows before moving on to the 
     func get_cacheData() -> [String:Int]{ return cacheData }
     func clear_cacheData() { cacheData = [:] }
     
+    // Main interface
+    func start() -> Bool {
+        if (seqGen != nil && params != nil) {
+            setAVSession(active: true)
+            playing = true
+            setupNowPlaying()
+            timer?.invalidate()
+            if (params.type == .scale_degree && notes[0] == 0) {
+                MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration:SCALE_DELAY)
+                timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
+                    self.loopFunction()
+                }
+            } else {
+                self.loopFunction()
+            }
+            return true
+        } else {
+            return false
+        }
+    }
+
+    func stop(){
+        MidiPlayer.shared.stop()
+        self.setAVSession(active: false)
+        self.playing = false
+        setupNowPlaying()
+        timer?.invalidate()
+        timerAnswer?.invalidate()
+    }
+ 
+    func loopFunction() {
+        timer?.invalidate()
+        if answerVisible == 1.0 {
+            answerVisible = 0.0
+            let seq_duration = play_sequence()
+            timer?.invalidate()
+            timer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration + ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
+            timerAnswer?.invalidate()
+            timerAnswer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration, repeats: false) { _ in self.answerVisible = 1.0 }
+        } else {
+            answerVisible = 1.0
+            timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
+        }
+    }
+    
+    func play_sequence() -> Double {
+        var seq_duration: Double
+        var note_duration: Double
+        let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
+        (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
+        setupNowPlaying()
+        MidiPlayer.shared.playNotes(notes: params.n_notes == 1 ? [notes.last!] : notes, duration: note_duration, chord: params.is_chord)
+        update_cacheData(answers:answers)
+        return seq_duration
+    }
+    
+    func step(){
+        if (seqGen != nil && params != nil && !playing) {
+            if answerVisible == 1.0 {
+                answerVisible = 0.0
+                setAVSession(active: true)
+                let seq_duration = play_sequence()
+                timer = Timer.scheduledTimer(withTimeInterval:seq_duration + params.delay_sequence + 0.1, repeats: false) { t in
+                    self.setAVSession(active: false)
+                }
+            } else {
+                answerVisible = 1.0
+            }
+        }
+    }
+
+    func update_cacheData(answers:[String]) {
+        for ans in answers{
+            let short = short_answer(answer: ans)
+            if !cacheData.keys.contains(short){
+                cacheData[short] = 0
+            }
+            cacheData[short]! += 1
+        }
+    }
+    
+    func resetState(params: Parameters) {
+        self.answers = []
+        self.answerVisible = 1
+        let note_size = (params.type == .interval) ? max(self.params.n_notes, 2) : self.params.n_notes
+        self.notes = [Int].init(repeating: 0, count: note_size)
+    }
+    
+    // I/O management related
     func setupRemoteTransportControls() {
         let commandCenter = MPRemoteCommandCenter.shared()
 
@@ -131,91 +220,5 @@ let ANSWER_TIME = 0.8 // how long does the answer shows before moving on to the 
         } catch let error as NSError {
             print("Failed (de)activate the audio session: \(error.localizedDescription)")
         }
-    }
-
-    func start() -> Bool {
-        if (seqGen != nil && params != nil) {
-            setAVSession(active: true)
-            playing = true
-            setupNowPlaying()
-            timer?.invalidate()
-            if (params.type == .scale_degree && notes[0] == 0) {
-                MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration:SCALE_DELAY)
-                timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
-                    self.loopFunction()
-                }
-            } else {
-                self.loopFunction()
-            }
-            return true
-        } else {
-            return false
-        }
-    }
-
-    func stop(){
-        MidiPlayer.shared.stop()
-        self.setAVSession(active: false)
-        self.playing = false
-        setupNowPlaying()
-        timer?.invalidate()
-        timerAnswer?.invalidate()
-    }
-    
-    func step(){
-        if (seqGen != nil && params != nil && !playing) {
-            if answerVisible == 1.0 {
-                answerVisible = 0.0
-                setAVSession(active: true)
-                let seq_duration = play_sequence()
-                timer = Timer.scheduledTimer(withTimeInterval:seq_duration + params.delay_sequence + 0.1, repeats: false) { t in
-                    self.setAVSession(active: false)
-                }
-            } else {
-                answerVisible = 1.0
-            }
-        }
-    }
-
-    func loopFunction() {
-        timer?.invalidate()
-        if answerVisible == 1.0 {
-            answerVisible = 0.0
-            let seq_duration = play_sequence()
-            timer?.invalidate()
-            timer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration + ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
-            timerAnswer?.invalidate()
-            timerAnswer = Timer.scheduledTimer(withTimeInterval:params.delay + seq_duration, repeats: false) { _ in self.answerVisible = 1.0 }
-        } else {
-            answerVisible = 1.0
-            timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { _ in self.loopFunction() }
-        }
-    }
-    
-    func play_sequence() -> Double {
-        var seq_duration: Double
-        var note_duration: Double
-        let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
-        (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
-        setupNowPlaying()
-        MidiPlayer.shared.playNotes(notes: params.n_notes == 1 ? [notes.last!] : notes, duration: note_duration, chord: params.is_chord)
-        update_cacheData(answers:answers)
-        return seq_duration
-    }
-    
-    func update_cacheData(answers:[String]) {
-        for ans in answers{
-            if !cacheData.keys.contains(ans){
-                cacheData[ans] = 0
-            }
-            cacheData[ans]! += 1
-        }
-    }
-    
-    func resetState(params: Parameters) {
-        self.answers = []
-        self.answerVisible = 1
-        let note_size = (params.type == .interval) ? max(self.params.n_notes, 2) : self.params.n_notes
-        self.notes = [Int].init(repeating: 0, count: note_size)
     }
 }

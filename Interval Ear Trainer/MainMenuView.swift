@@ -28,15 +28,15 @@ struct MainMenu: View {
         NavigationStack{
             List{
                 Section(header: Text("Practice")) {
-                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP ).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP ).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Intervals").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, fixed_n_notes:true).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, fixed_n_notes:true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, chord_active: false).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Scale Degrees").font(.headline)
                         
                     }

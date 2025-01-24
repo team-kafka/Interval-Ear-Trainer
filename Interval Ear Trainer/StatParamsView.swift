@@ -15,9 +15,7 @@ struct StatParamsView: View {
     @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var triadData: [HistoricalData]
     @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var scaleDegreeData: [HistoricalData]
     @State private var showingConfirmation = false
-    
-    @Binding var useTestData: Bool
-    
+
     var body: some View {
         VStack{
         Text("Historical Data") // until the bug with nav stack inside tabs is fixed
@@ -47,6 +45,7 @@ struct StatParamsView: View {
                                     for hd in intervalData {
                                         modelContext.delete(hd)
                                     }
+                                    try! modelContext.save()
                                 }
                                 Button("No", role: .cancel) {}
                             }
@@ -59,6 +58,7 @@ struct StatParamsView: View {
                                     for hd in triadData {
                                         modelContext.delete(hd)
                                     }
+                                    try! modelContext.save()
                                 }
                                 Button("No", role: .cancel) {}
                             }
@@ -71,15 +71,16 @@ struct StatParamsView: View {
                                     for hd in scaleDegreeData {
                                         modelContext.delete(hd)
                                     }
+                                    try! modelContext.save()
                                 }
                                 Button("No", role: .cancel) {}
                             }
                     }
-                    Section(header: Text("Devs' corner")) {
-                        Toggle(isOn: $useTestData) {
-                            Text("Use sample data for testing")
-                        }
-                    }
+//                    Section(header: Text("Devs' corner")) {
+//                        Toggle(isOn: $useTestData) {
+//                            Text("Use sample data for testing")
+//                        }
+//                    }
                 }
             }
         }
@@ -87,11 +88,5 @@ struct StatParamsView: View {
 }
 
 #Preview {
-    struct Preview: View {
-        @State var useTestData: Bool = false
-        var body: some View {
-            StatParamsView(useTestData: $useTestData).modelContainer(for: HistoricalData.self)
-        }
-    }
-    return Preview()
+    StatParamsView().modelContainer(for: HistoricalData.self)
 }

@@ -63,7 +63,9 @@ struct QuizView: View {
                 }
                 Spacer()
                 answerView().opacity(player.answerVisible)
-                    .onChange(of: player.answerVisible) { if player.answerVisible == 0.0 { guesses = [] } }
+                    .onChange(of: player.answerVisible) {
+                        if player.answerVisible == 0.0 { guesses = [] }
+                        else { save_to_cache() } }
                     .onChange(of: guesses) { if guesses.count == player.answers.count { self.advanceState() } }
 
                 guessView()
@@ -83,6 +85,7 @@ struct QuizView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
+            player.clear_cacheData()
         }
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
@@ -149,16 +152,17 @@ struct QuizView: View {
     {
         let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
         for (res, ans) in zip(guess_eval, player.answers){
-            if !cacheData.keys.contains(ans){
-                cacheData[ans] = HistoricalData(date:Date(), type:ex_type_to_str(ex_type:params.type), id:short_answer(answer: ans))
+            let short = short_answer(answer: ans)
+            if !cacheData.keys.contains(short){
+                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
             }
             switch res{
                 case .correct:
-                    cacheData[ans]!.correct += 1
+                    cacheData[short]!.correct += 1
                 case .incorrect:
-                    cacheData[ans]!.incorrect += 1
+                    cacheData[short]!.incorrect += 1
                 case .timeout:
-                    cacheData[ans]!.timeout += 1
+                    cacheData[short]!.timeout += 1
             }
         }
     }

@@ -56,6 +56,7 @@ struct ListeningView: View {
     func start() {
         SequencePlayer.shared.setParameters(params)
         SequencePlayer.shared.setOwner(self.id)
+        SequencePlayer.shared.clear_cacheData()
         _ = SequencePlayer.shared.start()
     }
     
@@ -73,7 +74,7 @@ struct ListeningView: View {
     {
         let cd = SequencePlayer.shared.get_cacheData()
         for k in cd.keys {
-            let hd = HistoricalData(date: Date(), type:ex_type_to_str(ex_type:params.type), id:short_answer(answer: k), listening: cd[k]!)
+            let hd = HistoricalData(date: rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:k, listening: cd[k]!)
             modelContext.insert(hd)
         }
         try! modelContext.save()
