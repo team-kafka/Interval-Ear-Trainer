@@ -84,13 +84,11 @@ struct ListeningView: View {
             }
             cacheData[short]!.listening += 1
         }
-        print(cacheData)
     }
 
     func persist_cache()
     {
         for hd in cacheData.values{
-            print(hd.id, hd.listening)
             modelContext.insert(hd)
         }
         try! modelContext.save()

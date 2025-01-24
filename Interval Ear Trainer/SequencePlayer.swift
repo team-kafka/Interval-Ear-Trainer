@@ -8,10 +8,9 @@
 import Foundation
 import MediaPlayer
 import SwiftUI
-
+import AVFoundation
 
 let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to the next question
-
 
 @Observable class SequencePlayer{
     static let shared = SequencePlayer()
@@ -43,6 +42,10 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         setupNowPlaying()
         setupRemoteTransportControls()
         setupNotifications()
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
     func setParameters(_ params: Parameters) {
@@ -135,7 +138,9 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         self.notes = [Int].init(repeating: 0, count: note_size)
     }
     
+    // *************************
     // I/O management related
+    // *************************
     func setupRemoteTransportControls() {
         let commandCenter = MPRemoteCommandCenter.shared()
 
@@ -146,7 +151,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
             }
             return .commandFailed
         }
-
         commandCenter.pauseCommand.addTarget { [unowned self] event in
             if self.playing {
                 self.stop()
@@ -165,17 +169,15 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 return image
             }
         }
-
         if (seqGen != nil && params != nil) {
             var artist_info = switch (self.params.type) {
-                case .interval: "Intervals: "
-                case .triad: "Triads: "
-            case .scale_degree:  "Scale Degrees: "
+                case .interval      : "Intervals: "
+                case .triad         : "Triads: "
+                case .scale_degree  : "Scale Degrees: "
             }
             artist_info += params.generateLabelString()
             nowPlayingInfo[MPMediaItemPropertyArtist] = artist_info
         }
-        
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
     }
     
@@ -185,6 +187,10 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                                        selector: #selector(handleInterruption),
                                        name: AVAudioSession.interruptionNotification,
                                        object: nil)
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(handleRouteChange),
+                                               name: AVAudioSession.routeChangeNotification,
+                                               object: AVAudioSession.sharedInstance())
     }
 
     @objc func handleInterruption(notification: Notification) {
@@ -194,10 +200,31 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 return
         }
         if type == .began {
+            print("interrupted")
             self.stop()
         }
     }
     
+    @objc func handleRouteChange(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+            return
+        }
+
+        switch reason {
+        case .newDeviceAvailable:
+            print("new device available")
+        case .oldDeviceUnavailable:
+            print("old device unavailable")
+            stop()
+        case .override:
+            print("route change override")
+        default:
+            stop()
+        }
+    }
+
     func setAVSession(active:Bool){
         let session = AVAudioSession.sharedInstance()
         do {
