@@ -17,17 +17,17 @@ struct StatView: View {
         TabView(selection: $selectedIndex) {
             StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label("Inter", systemImage: "arrow.up.square")
+                    Label("Intervals", systemImage: "arrow.up.square")
                 }
                 .tag(0)
             StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label("Inter", systemImage: "arrow.down.square")
+                    Label("Intervals", systemImage: "arrow.down.square")
                 }
                 .tag(1)
             StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label("Inter", systemImage: "h.square")
+                    Label("Intervals", systemImage: "h.square")
                 }
                 .tag(2)
             StatsTriadView().modelContainer(for: HistoricalData.self)
@@ -41,19 +41,19 @@ struct StatView: View {
                 Image(systemName: "key")
             }
             .tag(4)
-            StatParamsView().modelContainer(for: HistoricalData.self)
-            .tabItem {
-                Text("Settings")
-                Image(systemName: "gearshape.fill")
-            }
-            .tag(5)
+//            StatParamsView().modelContainer(for: HistoricalData.self)
+//            .tabItem {
+//                Text("Settings")
+//                Image(systemName: "gearshape.fill")
+//            }
+//            .tag(5)
         }//.tabViewStyle()
         .tint(Color.gray.opacity(0.7))
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
             UITabBarItem.appearance().badgeColor = .systemGray
             UITabBar.appearance().backgroundColor = .systemGray4.withAlphaComponent(0.4)
-            UINavigationBar.appearance()//.largeTitleTextAttributes = [.foregroundColor: UIColor.systemGray]
+            UINavigationBar.appearance()
         })
     }
 }
@@ -80,7 +80,8 @@ struct StatsIntervalView: View {
 
     init(filter: String) {
         self.filter = filter
-        self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == "interval"})
+        let typeI = ex_type_to_str(ex_type:.interval)
+        self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == typeI})
     }
     var body: some View {
 
@@ -99,15 +100,20 @@ struct StatsIntervalView: View {
 struct StatsTriadView: View {
     
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<HistoricalData> {$0.type == "triad"})  var historicalData: [HistoricalData]
+    @Query var data: [HistoricalData]
 
+    init() {
+        let typeT = ex_type_to_str(ex_type:.triad)
+        self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeT})
+    }
+    
     var body: some View {
         VStack{
             Text("Triads").font(.title)
-            PracticeChart(histData:historicalData,
-                          detailledData: historicalData,
+            PracticeChart(histData:data,
+                          detailledData: data,
                           keys:TRIAD_KEYS)
-            QuizzChart(data: historicalData, keys: TRIAD_KEYS)
+            QuizzChart(data: data, keys: TRIAD_KEYS)
             Spacer()
         }
     }
@@ -116,15 +122,20 @@ struct StatsTriadView: View {
 struct StatsScaleDegreeView: View {
         
     @Environment(\.modelContext) private var modelContext
-    @Query(filter: #Predicate<HistoricalData> {$0.type == "scale_degree"})  var historicalData: [HistoricalData]
+    @Query var data: [HistoricalData]
+    
+    init() {
+        let typeS = ex_type_to_str(ex_type:.scale_degree)
+        self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeS})
+    }
     
     var body: some View {
         VStack{
             Text("Scale Degrees").font(.title)
-            PracticeChart(histData:historicalData,
-                          detailledData: historicalData,
+            PracticeChart(histData:data,
+                          detailledData: data,
                           keys:SCALE_DEGREE_KEYS_W_ALT)
-            QuizzChart(data: historicalData, keys: SCALE_DEGREE_KEYS_W_ALT)
+            QuizzChart(data: data, keys: SCALE_DEGREE_KEYS_W_ALT)
             Spacer()
         }
     }

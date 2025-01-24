@@ -22,6 +22,7 @@ func ex_type_to_str(ex_type:ExerciseType) -> String
         case .triad:         "triad"
     }
 }
+
 struct Parameters : Codable {
     var type: ExerciseType = ExerciseType.interval
     

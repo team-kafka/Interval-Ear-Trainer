@@ -60,12 +60,16 @@ struct MainMenu: View {
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, id:"LVI3").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, id:"LVT1").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, id:"LVS1").modelContainer(for: HistoricalData.self)
-            }
-                Section(header: Text("Stats")) {
-                    NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")
-                        Text("Statistics").font(.headline)
-                    }
                 }
+                Section(header: Text("Statistics")) {
+                        NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")
+                            Text("View").font(.headline)
+                        }
+                        NavigationLink(destination:
+                            StatParamsView().modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){Image(systemName: "gearshape.fill")
+                            Text("Settings").font(.headline)
+                        }
+                    }
             }
         }
     }
