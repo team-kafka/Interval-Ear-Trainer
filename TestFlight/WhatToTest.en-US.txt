@@ -1,4 +1,1 @@
-- Can now pause/resume from the lock screen
-- No longer crashes when another app plays sound (incoming call / music etc...)
-- Add option to opt-out of data usage stats
-- Fix jankiness in data usage saving
+- fix quizz with harmonic intervals
