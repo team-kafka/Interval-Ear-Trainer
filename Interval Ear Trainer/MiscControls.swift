@@ -127,11 +127,13 @@ struct NumberOfNotesView: View {
     var visible: Bool = true
 
     var body: some View {
-        let opacity:Double = (visible ? 1 : 0) * (active ? 1 : 0.5)
+        //let opacity:Double = (visible ? 1 : 0) * (active ? 1 : 0.5)
         Image(systemName: String(format:"%d.square", n_notes))
-            .foregroundColor(Color.secondary).opacity(opacity)
+            .foregroundColor(Color.secondary)//.opacity(opacity)
             .onTapGesture {
-                n_notes = n_notes + 1 > 4 ? 1 : n_notes + 1
+                if active{
+                    n_notes = n_notes + 1 > 4 ? 1 : n_notes + 1
+                }
             }
     }
 }

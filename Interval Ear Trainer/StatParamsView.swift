@@ -32,10 +32,12 @@ struct StatParamsView: View {
                         }.foregroundStyle(.red)
                             .confirmationDialog("Are you sure?", isPresented: $showingConfirmation) {
                                 Button("Delete data", role: .destructive) {
-                                    for hd in data {
-                                        modelContext.delete(hd)
+                                    do {
+                                        try modelContext.delete(model: HistoricalData.self)
+                                        try modelContext.save()
+                                    } catch {
+                                        print("Failed to delete data")
                                     }
-                                    try! modelContext.save()
                                 }
                                 Button("Cancel", role: .cancel) {}
                             }

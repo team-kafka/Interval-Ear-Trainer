@@ -41,7 +41,7 @@ struct ListeningView: View {
                         params.key = NOTE_KEYS.randomElement()!
                     }
                 }
-                // add number of notes
+                NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
             } else{
                 ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
             }
@@ -51,13 +51,17 @@ struct ListeningView: View {
                 }
             }){
             }.opacity(0)
-            Text(params.generateLabelString()).lineLimit(1)
+            Text(params.generateLabelString(harmonic: self.params.is_chord)).lineLimit(1)
             Image(systemName: "gearshape.fill")
         }.onAppear{
             save_dft_params(newParams: params)
         }.onChange(of: SequencePlayer.shared.answerVisible) {
             if (SequencePlayer.shared.answerVisible == 1.0 && self.id == SequencePlayer.shared.getOwner()) {
                 save_to_cache()
+            }
+        }.onChange(of: SequencePlayer.shared.playing) {
+            if (SequencePlayer.shared.playing == false) {
+                persist_cache()
             }
         }
     }
@@ -71,7 +75,6 @@ struct ListeningView: View {
     func stop(){
         SequencePlayer.shared.stop()
         SequencePlayer.shared.resetState(params: params)
-        persist_cache()
     }
 
     func save_dft_params(newParams: Parameters){

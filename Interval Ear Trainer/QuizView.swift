@@ -90,7 +90,10 @@ struct QuizView: View {
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()
-            persist_cache()
+        }.onChange(of: SequencePlayer.shared.playing) {
+            if (SequencePlayer.shared.playing == false) {
+                persist_cache()
+            }
         }
     }
     

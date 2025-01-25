@@ -68,10 +68,13 @@ struct PracticeView: View {
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()
-            persist_cache()
         }.onChange(of: SequencePlayer.shared.answerVisible) {
             if (SequencePlayer.shared.answerVisible == 1.0) {
                 save_to_cache()
+            }
+        }.onChange(of: SequencePlayer.shared.playing) {
+            if (SequencePlayer.shared.playing == false) {
+                persist_cache()
             }
         }
     }

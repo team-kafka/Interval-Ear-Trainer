@@ -61,9 +61,9 @@ struct Parameters : Codable {
         }
     }
     
-    func generateLabelString() -> String{
+    func generateLabelString(harmonic:Bool=false) -> String{
         if type == .interval{
-            return interval_filter_to_str(intervals: self.active_intervals)
+            return interval_filter_to_str(intervals: self.active_intervals, harmonic: harmonic)
         } else if type == .triad{
             return triad_qualities_to_str(active_qualities: self.active_qualities)
         } else if type == .scale_degree{
