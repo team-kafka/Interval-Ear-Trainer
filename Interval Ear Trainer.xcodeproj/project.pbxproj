@@ -28,6 +28,7 @@
 		376178B02D085FC900BF2F86 /* Interval Ear TrainerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Interval Ear TrainerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		376178BA2D085FC900BF2F86 /* Interval Ear TrainerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Interval Ear TrainerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		430AC16E2D420D1D00189C70 /* WhatToTest.en-US.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = "WhatToTest.en-US.txt"; sourceTree = "<group>"; };
+		4381D1512D44AB130098C9C4 /* WhatToTest.jpn.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = WhatToTest.jpn.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -97,6 +98,7 @@
 		430AC16D2D420CF100189C70 /* TestFlight */ = {
 			isa = PBXGroup;
 			children = (
+				4381D1512D44AB130098C9C4 /* WhatToTest.jpn.txt */,
 				430AC16E2D420D1D00189C70 /* WhatToTest.en-US.txt */,
 			);
 			path = TestFlight;
