@@ -24,7 +24,7 @@ struct Interval_Ear_TrainerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainMenu()
+            MainMenu().modelContainer(for: HistoricalData.self)
         }
     }
 }

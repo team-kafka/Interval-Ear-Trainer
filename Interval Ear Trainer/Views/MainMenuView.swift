@@ -9,6 +9,9 @@ import SwiftUI
 import SwiftData
 
 struct MainMenu: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query() private var usageData: [HistoricalData]
+    
     @AppStorage("saveUsageData") var saveUsageData: Bool = true
     
     @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
@@ -71,12 +74,53 @@ struct MainMenu: View {
                         }
                     }
             }
+        }.onAppear(){
+            compressPastData()
+        }
+    }
+    
+    func compressPastData()
+    {
+        let olderUD = usageData.filter({ $0.date < rounded_date(date:Date()) })
+        print("before compressing: \(olderUD.count) entries")
+        let allKeys = Array(Set(olderUD.map{usageDataKey(date:$0.date, type:$0.type, id:$0.id)}))
+        if allKeys.count < olderUD.count {
+            var newUsageData: [HistoricalData] = []
+            for key in allKeys {
+                let filteredData = olderUD.filter({$0.date == key.date && $0.type == key.type && $0.id == key.id})
+                if filteredData.count > 1 {
+                    let newUD = HistoricalData(date:key.date, type: key.type, id:key.id)
+                    for ud in filteredData {
+                        newUD.listening += ud.listening
+                        newUD.practice += ud.practice
+                        newUD.correct += ud.correct
+                        newUD.timeout += ud.timeout
+                        newUD.incorrect += ud.incorrect
+                    }
+                    newUsageData.append(newUD)
+                    
+                    modelContext.insert(newUD)
+                    for ud in filteredData {
+                        modelContext.delete(ud)
+                    }
+                } else {
+                    newUsageData.append(filteredData[0])
+                }
+            }
+            print("after: \(newUsageData.count) entries")
+            try! modelContext.save()
         }
     }
 }
 
 #Preview {
-    MainMenu()
+    MainMenu().modelContainer(for: HistoricalData.self)
+}
+
+struct usageDataKey: Hashable{
+    var date:Date
+    var type:String
+    var id:String
 }
 
 extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
@@ -84,7 +128,7 @@ extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
         super.viewDidLoad()
         interactivePopGestureRecognizer?.delegate = self
     }
-
+    
     public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
         return viewControllers.count > 1
     }

@@ -12,6 +12,7 @@ struct StatParamsView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query() private var data: [HistoricalData]
+    
     @State private var showingConfirmation = false
     @Binding var saveUsageData: Bool
 
