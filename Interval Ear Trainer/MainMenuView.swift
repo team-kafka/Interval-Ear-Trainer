@@ -9,6 +9,7 @@ import SwiftUI
 import SwiftData
 
 struct MainMenu: View {
+    @AppStorage("saveUsageData") var saveUsageData: Bool = true
     
     @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
     @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
@@ -28,45 +29,44 @@ struct MainMenu: View {
         NavigationStack{
             List{
                 Section(header: Text("Practice")) {
-                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP ).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Intervals").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, fixed_n_notes:true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, saveUsageData: $saveUsageData, fixed_n_notes:true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Scale Degrees").font(.headline)
-                        
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
             
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Intervals").font(.headline)
                     }
 
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, saveUsageData: $saveUsageData, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Triads").font(.headline)
                     }
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, saveUsageData: $saveUsageData, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
                         Text("Scale Degrees").font(.headline)
                     }
                 }
                 Section(header: Text("Listening")) {
-                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, id:"LVI1").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, id:"LVI2").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, id:"LVI3").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, id:"LVT1").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, id:"LVS1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1").modelContainer(for: HistoricalData.self)
                 }
                 Section(header: Text("Statistics")) {
                         NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")
                             Text("View").font(.headline)
                         }
                         NavigationLink(destination:
-                            StatParamsView().modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){Image(systemName: "gearshape.fill")
+                            StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){Image(systemName: "gearshape.fill")
                             Text("Settings").font(.headline)
                         }
                     }

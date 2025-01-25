@@ -25,11 +25,11 @@ struct QuizView: View {
     @State private var timer: Timer?
     
     @Binding private var dftParams: String
+    @Binding private var saveUsageData: Bool
 
     @State private var player: SequencePlayer
 
-    
-    init(params: Parameters, dftParams: Binding<String>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
@@ -37,6 +37,7 @@ struct QuizView: View {
         _guesses = .init(initialValue: [])
         _timer = .init(initialValue: nil)
         _dftParams = .init(projectedValue: dftParams)
+        _saveUsageData = .init(projectedValue: saveUsageData)
         _cacheData = .init(initialValue: [:])
         _player = .init(initialValue: SequencePlayer.shared)
     }
@@ -149,30 +150,33 @@ struct QuizView: View {
     
     func save_to_cache()
     {
-        let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
-        for (res, ans) in zip(guess_eval, player.answers){
-            let short = short_answer(answer: ans)
-            if !cacheData.keys.contains(short){
-                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
-            }
-            switch res{
+        if saveUsageData {
+            let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
+            for (res, ans) in zip(guess_eval, player.answers){
+                let short = short_answer(answer: ans)
+                if !cacheData.keys.contains(short){
+                    cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+                }
+                switch res{
                 case .correct:
                     cacheData[short]!.correct += 1
                 case .incorrect:
                     cacheData[short]!.incorrect += 1
                 case .timeout:
                     cacheData[short]!.timeout += 1
+                }
             }
         }
-        print(cacheData)
     }
     
     func persist_cache()
     {
-        for hd in cacheData.values{
-            modelContext.insert(hd)
+        if saveUsageData {
+            for hd in cacheData.values{
+                modelContext.insert(hd)
+            }
+            try! modelContext.save()
+            cacheData = [String:HistoricalData]()
         }
-        try! modelContext.save()
-        cacheData = [String:HistoricalData]()
     }
 }

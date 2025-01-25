@@ -17,15 +17,17 @@ struct PracticeView: View {
     @State private var cacheData: [String: HistoricalData]
 
     @Binding private var dftParams: String
+    @Binding private var saveUsageData: Bool
 
     @State private var player: SequencePlayer
     
-    init(params: Parameters, dftParams: Binding<String>, fixed_n_notes: Bool=false, chord_active: Bool=true){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, fixed_n_notes: Bool=false, chord_active: Bool=true){
         _params = .init(initialValue: params)
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)
         _dftParams = .init(projectedValue: dftParams)
+        _saveUsageData = .init(projectedValue: saveUsageData)
         _player = .init(initialValue: SequencePlayer.shared)
         _cacheData = .init(initialValue: [:])
     }
@@ -110,23 +112,25 @@ struct PracticeView: View {
 
     func save_to_cache()
     {
-        for ans in SequencePlayer.shared.answers {
-            let short = short_answer(answer: ans)
-            if !cacheData.keys.contains(short){
-                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+        if saveUsageData {
+            for ans in SequencePlayer.shared.answers {
+                let short = short_answer(answer: ans)
+                if !cacheData.keys.contains(short){
+                    cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+                }
+                cacheData[short]!.listening += 1
             }
-            cacheData[short]!.listening += 1
         }
-        print(cacheData)
     }
     
     func persist_cache()
     {
-        for hd in cacheData.values{
-            print(hd.id, hd.listening)
-            modelContext.insert(hd)
+        if saveUsageData {
+            for hd in cacheData.values{
+                modelContext.insert(hd)
+            }
+            try! modelContext.save()
+            cacheData = [String:HistoricalData]()
         }
-        try! modelContext.save()
-        cacheData = [String:HistoricalData]()
     }
 }

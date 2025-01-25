@@ -14,11 +14,14 @@ struct ListeningView: View {
 
     let id: String
     @State var params: Parameters
+    
     @Binding var dftParams: String
+    @Binding private var saveUsageData: Bool
 
-    init(params: Parameters, dftParams: Binding<String>, id: String){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String){
         _params = .init(initialValue: params)
         _dftParams = .init(projectedValue: dftParams)
+        _saveUsageData = .init(projectedValue: saveUsageData)
         _cacheData = .init(initialValue: [:])
         self.id = id
     }
@@ -77,21 +80,25 @@ struct ListeningView: View {
     
     func save_to_cache()
     {
-        for ans in SequencePlayer.shared.answers {
-            let short = short_answer(answer: ans)
-            if !cacheData.keys.contains(short){
-                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+        if saveUsageData {
+            for ans in SequencePlayer.shared.answers {
+                let short = short_answer(answer: ans)
+                if !cacheData.keys.contains(short){
+                    cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+                }
+                cacheData[short]!.listening += 1
             }
-            cacheData[short]!.listening += 1
         }
     }
 
     func persist_cache()
     {
-        for hd in cacheData.values{
-            modelContext.insert(hd)
+        if saveUsageData {
+            for hd in cacheData.values{
+                modelContext.insert(hd)
+            }
+            try! modelContext.save()
+            cacheData = [String:HistoricalData]()
         }
-        try! modelContext.save()
-        cacheData = [String:HistoricalData]()
     }
 }

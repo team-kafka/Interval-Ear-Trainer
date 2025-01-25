@@ -13,7 +13,7 @@ struct StatParamsView: View {
     @Environment(\.modelContext) private var modelContext
     @Query() private var data: [HistoricalData]
     @State private var showingConfirmation = false
-    @State private var saveHistoricalData = true
+    @Binding var saveUsageData: Bool
 
     
     var body: some View {
@@ -21,7 +21,7 @@ struct StatParamsView: View {
         Text("Statistics - Settings") // until the bug with nav stack inside tabs is fixed
             NavigationStack{
                 List{
-                    Toggle("Store Usage Statistics", isOn: $saveHistoricalData)
+                    Toggle("Store Usage Statistics", isOn: $saveUsageData)
                     Section(header: Text("Stored Data")) {
                         HStack{
                             Text("Data Size")
@@ -46,6 +46,3 @@ struct StatParamsView: View {
     }
 }
 
-#Preview {
-    StatParamsView().modelContainer(for: HistoricalData.self)
-}
