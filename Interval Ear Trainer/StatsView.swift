@@ -15,19 +15,24 @@ struct StatView: View {
 
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
+//            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
+//                .tabItem {
+//                    Label("Intervals", systemImage: "arrow.up.square")
+//                }
+//                .tag(0)
+//            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
+//                .tabItem {
+//                    Label("Intervals", systemImage: "arrow.down.square")
+//                }
+//                .tag(1)
+//            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
+//                .tabItem {
+//                    Label("Intervals", systemImage: "h.square")
+//                }
+//                .tag(2)
+            StatsIntervalTopView()
                 .tabItem {
-                    Label("Intervals", systemImage: "arrow.up.square")
-                }
-                .tag(0)
-            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
-                .tabItem {
-                    Label("Intervals", systemImage: "arrow.down.square")
-                }
-                .tag(1)
-            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
-                .tabItem {
-                    Label("Intervals", systemImage: "h.square")
+                    Label("Intervals", systemImage: "arrow.up.and.down.square.fill")
                 }
                 .tag(2)
             StatsTriadView().modelContainer(for: HistoricalData.self)
@@ -41,13 +46,7 @@ struct StatView: View {
                 Image(systemName: "key")
             }
             .tag(4)
-//            StatParamsView().modelContainer(for: HistoricalData.self)
-//            .tabItem {
-//                Text("Settings")
-//                Image(systemName: "gearshape.fill")
-//            }
-//            .tag(5)
-        }//.tabViewStyle()
+        }
         .tint(Color.gray.opacity(0.7))
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
@@ -57,18 +56,36 @@ struct StatView: View {
         })
     }
 }
-//extension UITabBarController {
-//    override open func viewDidLoad() {
-//        let standardAppearance = UITabBarAppearance()
-//        
-////        standardAppearance.st
-//        standardAppearance.stackedItemPositioning = .centered
-//        standardAppearance.stackedItemSpacing = 10
-//        standardAppearance.stackedItemWidth = 30
-//        
-//        tabBar.standardAppearance = standardAppearance
-//    }
-//}
+
+struct StatsIntervalTopView: View {
+    @State private var selectedIndex: Int = 0
+    
+    var body: some View {
+        TabView(selection: $selectedIndex) {
+            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("", systemImage: "arrow.up.square")
+                }
+                .tag(0)
+            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("", systemImage: "arrow.down.square")
+                }
+                .tag(1)
+            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
+                .tabItem {
+                    Label("", systemImage: "h.square")
+                }
+                .tag(2)
+        }.tint(Color.gray.opacity(0.7))
+            .onAppear(perform: {
+                UITabBar.appearance().unselectedItemTintColor = .systemGray
+                UITabBarItem.appearance().badgeColor = .systemGray
+                UITabBar.appearance().backgroundColor = .systemGray4.withAlphaComponent(0.4)
+                UINavigationBar.appearance()
+            })
+    }
+}
 
 struct StatsIntervalView: View {
     
