@@ -433,7 +433,14 @@ func short_answer(answer: String, oriented: Bool=true, abbreviate: Bool=false) -
     var rv: String
     rv = answer.contains("/") ? String(answer.split(separator: "/")[0]) : answer
     if !oriented {
-        rv = rv.replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "↓", with: "")
+        do {
+            let oriented_re = try Regex("[↑↓H][0-9]+")
+            if rv.contains(oriented_re){
+                rv = String(rv.suffix(rv.count-1))
+            }
+        } catch let error {
+            print(error.localizedDescription)
+        }
     }
     return abbreviate ? String(rv.prefix(3)) : rv
 }
