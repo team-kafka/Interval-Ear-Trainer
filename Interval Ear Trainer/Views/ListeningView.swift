@@ -35,7 +35,6 @@ struct ListeningView: View {
         VStack(alignment: .leading, spacing: 4){
             if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
             HStack{
-                //Text(" ")
                 ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
                     if (!SequencePlayer.shared.playing) {
                         start()
@@ -59,8 +58,6 @@ struct ListeningView: View {
                 Image(systemName: "gearshape.fill").onTapGesture { paramsPresented = true }
             }
             if divider { Divider() }
-        }.onAppear{
-            save_dft_params(newParams: params)
         }.onChange(of: SequencePlayer.shared.answerVisible) {
             if (SequencePlayer.shared.answerVisible == 1.0 && self.id == SequencePlayer.shared.getOwner()) {
                 save_to_cache()
@@ -68,6 +65,12 @@ struct ListeningView: View {
         }.onChange(of: SequencePlayer.shared.playing) {
             if (SequencePlayer.shared.playing == false) {
                 persist_cache()
+            }
+        }.onChange(of: paramsPresented) {
+            if (paramsPresented == true && self.id == SequencePlayer.shared.getOwner()) {
+                stop()
+            } else {
+                save_dft_params(newParams: params)
             }
         }
         .sheet(isPresented: $paramsPresented) { ParametersView(params: $params) }
