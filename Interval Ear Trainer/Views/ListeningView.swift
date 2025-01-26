@@ -10,49 +10,55 @@ import MediaPlayer
 
 struct ListeningView: View {
     @Environment(\.modelContext) var modelContext
-    @State private var cacheData: [String: HistoricalData]
-
-    let id: String
-    @State var params: Parameters
     
+    let id: String
+    @State private var cacheData: [String: HistoricalData]
+    @State var params: Parameters
+    @State private var paramsPresented: Bool
     @Binding var dftParams: String
     @Binding private var saveUsageData: Bool
+    private var label: String?
+    private var divider: Bool
 
-    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String, label: String? = nil, divider: Bool = false){
         _params = .init(initialValue: params)
+        _paramsPresented = .init(initialValue: false)
         _dftParams = .init(projectedValue: dftParams)
         _saveUsageData = .init(projectedValue: saveUsageData)
         _cacheData = .init(initialValue: [:])
         self.id = id
+        self.label = label
+        self.divider = divider
     }
     
     var body: some View {
-        HStack{
-            ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
-                if (!SequencePlayer.shared.playing) {
-                    start()
-                } else if self.id == SequencePlayer.shared.getOwner() {
-                    stop()
-                }
-            }
-            if (params.type == .scale_degree) {
-                Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
-                    if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())) {
-                        params.key = NOTE_KEYS.randomElement()!
+        VStack(alignment: .leading, spacing: 4){
+            if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
+            HStack{
+                //Text(" ")
+                ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
+                    if (!SequencePlayer.shared.playing) {
+                        start()
+                    } else if self.id == SequencePlayer.shared.getOwner() {
+                        stop()
                     }
                 }
-                NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
-            } else{
-                ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
-            }
-            NavigationLink(destination: ParametersView(params: $params).onAppear {
-                if (SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner() ) {
-                    stop()
+                if (params.type == .scale_degree) {
+                    Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
+                        if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())) {
+                            params.key = NOTE_KEYS.randomElement()!
+                        }
+                    }
+                    NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
+                } else{
+                    ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
+                    NumberOfNotesView(n_notes: $params.n_notes, active: false).opacity(0)
                 }
-            }){
-            }.opacity(0)
-            Text(params.generateLabelString(harmonic: self.params.is_chord)).lineLimit(1)
-            Image(systemName: "gearshape.fill")
+                Text(params.generateLabelString(harmonic: self.params.is_chord)).lineLimit(1)
+                Spacer()
+                Image(systemName: "gearshape.fill").onTapGesture { paramsPresented = true }
+            }
+            if divider { Divider() }
         }.onAppear{
             save_dft_params(newParams: params)
         }.onChange(of: SequencePlayer.shared.answerVisible) {
@@ -64,6 +70,7 @@ struct ListeningView: View {
                 persist_cache()
             }
         }
+        .sheet(isPresented: $paramsPresented) { ParametersView(params: $params) }
     }
     
     func start() {

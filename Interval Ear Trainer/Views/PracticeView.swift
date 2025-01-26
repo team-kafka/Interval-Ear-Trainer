@@ -11,7 +11,7 @@ struct PracticeView: View {
     @Environment(\.modelContext) var modelContext
     
     @State private var params: Parameters
-    @State private var paramsPresented: Bool = false
+    @State private var paramsPresented: Bool
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
@@ -24,6 +24,7 @@ struct PracticeView: View {
     
     init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, fixed_n_notes: Bool=false, chord_active: Bool=true){
         _params = .init(initialValue: params)
+        _paramsPresented = .init(initialValue: false)
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)

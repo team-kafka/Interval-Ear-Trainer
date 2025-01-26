@@ -12,12 +12,12 @@ import SwiftData
     var date: Date
     var type: String
     var id: String
-    var listening: Int
-    var correct: Int
-    var incorrect: Int
-    var timeout: Int
+    var listening: UInt16
+    var correct: UInt16
+    var incorrect: UInt16
+    var timeout: UInt16
     
-    init(date:Date, type: String, id: String, listening: Int=0, correct: Int=0, incorrect: Int=0, timeout: Int=0){
+    init(date:Date, type: String, id: String, listening: UInt16=0, correct: UInt16=0, incorrect: UInt16=0, timeout: UInt16=0){
         self.date = date
         self.type = type
         self.id = id

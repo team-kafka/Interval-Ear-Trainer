@@ -57,12 +57,12 @@ struct MainMenu: View {
                     }
                 }
                 Section(header: Text("Listening")) {
-                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1").modelContainer(for: HistoricalData.self)
-                }
+                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees").modelContainer(for: HistoricalData.self)
+                }//.listRowSeparator(.hidden)
                 Section(header: Text("Statistics")) {
                     NavigationLink(destination: StatView(saveUsageData: $saveUsageData))
                     {
@@ -79,9 +79,9 @@ struct MainMenu: View {
     func compressPastData()
     {
         let olderUD = usageData.filter({ $0.date < rounded_date(date:Date()) })
-        print("before compressing: \(olderUD.count) entries")
         let allKeys = Array(Set(olderUD.map{usageDataKey(date:$0.date, type:$0.type, id:$0.id)}))
         if allKeys.count < olderUD.count {
+            print("before compressing: \(olderUD.count) entries")
             var newUsageData: [HistoricalData] = []
             for key in allKeys {
                 let filteredData = olderUD.filter({$0.date == key.date && $0.type == key.type && $0.id == key.id})

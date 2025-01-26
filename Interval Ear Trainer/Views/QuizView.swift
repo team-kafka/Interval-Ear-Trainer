@@ -18,7 +18,7 @@ struct QuizView: View {
     @State var cacheData: [String: HistoricalData]
     
     @State private var params: Parameters
-    @State private var paramsPresented: Bool = false
+    @State private var paramsPresented: Bool
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
@@ -32,6 +32,7 @@ struct QuizView: View {
 
     init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
+        _paramsPresented = .init(initialValue: false)
         _fixed_n_notes = .init(initialValue: fixed_n_notes)
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)
