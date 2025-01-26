@@ -268,7 +268,7 @@ struct PracticeChart: View {
                 )
                 ForEach(histData, id: \.self) { d in
                     BarMark(x: .value("date", d.date, unit: .day),
-                            y: .value("practice+listening", d.practice + d.listening)
+                            y: .value("practice+listening", d.listening)
                     )
                 }
             }
@@ -279,7 +279,7 @@ struct PracticeChart: View {
                 }
                 ForEach(detailledData, id: \.self) { d in
                     BarMark(x: .value("id", d.id),
-                            y: .value("practice+listening", d.practice + d.listening)
+                            y: .value("practice+listening", d.listening)
                     )
                 }
             }

@@ -89,7 +89,6 @@ struct MainMenu: View {
                     let newUD = HistoricalData(date:key.date, type: key.type, id:key.id)
                     for ud in filteredData {
                         newUD.listening += ud.listening
-                        newUD.practice += ud.practice
                         newUD.correct += ud.correct
                         newUD.timeout += ud.timeout
                         newUD.incorrect += ud.incorrect
