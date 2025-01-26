@@ -65,14 +65,11 @@ struct PracticeView: View {
             }
         }
         .sheet(isPresented: $paramsPresented) {
-            NavigationStack{
                 ParametersView(params: $params)
-            }
         }
         .toolbarRole(.editor)
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            save_dft_params(newParams: params)
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
@@ -87,6 +84,10 @@ struct PracticeView: View {
         }.onChange(of: SequencePlayer.shared.playing) {
             if (SequencePlayer.shared.playing == false) {
                 persist_cache()
+            }
+        }.onChange(of: paramsPresented) {
+            if paramsPresented == false {
+                save_dft_params(newParams: params)
             }
         }
     }

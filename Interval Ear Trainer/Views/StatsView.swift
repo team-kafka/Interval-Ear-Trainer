@@ -47,9 +47,7 @@ struct StatView: View {
             }
         }
         .sheet(isPresented: $paramsPresented) {
-            NavigationStack{
-                StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)
-            }
+            StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)
         }
         .toolbarRole(.editor)
         .tint(Color.gray.opacity(0.7))
@@ -63,7 +61,11 @@ struct StatView: View {
 }
 
 struct StatsIntervalTopView: View {
-    @State private var selectedIndex: Int = 0
+    @State private var selectedIndex: Int
+    
+    init() {
+        _selectedIndex = .init(initialValue: 0)
+    }
     
     var body: some View {
         TabView(selection: $selectedIndex) {
@@ -160,9 +162,14 @@ struct QuizzChart: View {
    
     @State var data: [HistoricalData]
     @State var keys: [String]
-    
     @State var selectedIndex: String?
 
+    init(data: [HistoricalData], keys: [String]) {
+        _data = .init(initialValue: data)
+        _keys = .init(initialValue: keys)
+        _selectedIndex = .init(initialValue: nil)
+    }
+    
     var body: some View {
         GroupBox("Quiz") {
                 Chart {
@@ -193,22 +200,24 @@ struct QuizzChart: View {
                     ])
                     .chartOverlay { pr in
                         if selectedIndex != nil {
-                            let filtered_data = data.filter{ $0.id == selectedIndex }
-                            OverlayView(filtered_data: filtered_data)
+                            OverlayView(filteredData: data.filter{ $0.id == selectedIndex })
                         }
                     }
-            
         }
     }
 }
 
 struct OverlayView: View {
-    @State var filtered_data: [HistoricalData]
+    @State var filteredData: [HistoricalData]
+    
+    init(filteredData: [HistoricalData]) {
+        _filteredData = .init(initialValue: filteredData)
+    }
     
     var body: some View {
-        if !filtered_data.isEmpty{
+        if !filteredData.isEmpty{
             RoundedRectangle(cornerRadius: 5).foregroundStyle(Color(UIColor.secondarySystemBackground).opacity(0.95)).scaleEffect(1.1)
-            GroupBox(filtered_data[0].id) {
+            GroupBox(filteredData[0].id) {
                 Chart {
                     BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
                             y: .value("res", 0)
@@ -216,17 +225,17 @@ struct OverlayView: View {
                     BarMark(x: .value("date", rounded_date(date: Date()).addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
                             y: .value("res", 0)
                     )
-                    ForEach(filtered_data, id: \.self) { d in
+                    ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.correct)
                         ).foregroundStyle(answer_colors[.correct]!)
                     }
-                    ForEach(filtered_data, id: \.self) { d in
+                    ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.timeout)
                         ).foregroundStyle(answer_colors[.timeout]!)
                     }
-                    ForEach(filtered_data, id: \.self) { d in
+                    ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(answer_colors[.incorrect]!)
@@ -241,6 +250,12 @@ struct PracticeChart: View {
     @State var histData: [HistoricalData]
     @State var detailledData: [HistoricalData]
     @State var keys: [String]
+    
+    init(histData: [HistoricalData], detailledData: [HistoricalData], keys: [String]) {
+        _histData = .init(initialValue: histData)
+        _detailledData = .init(initialValue: detailledData)
+        _keys = .init(initialValue: keys)
+    }
     
     var body: some View {
         GroupBox("Practice and listening") {

@@ -83,7 +83,6 @@ struct QuizView: View {
         }
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
-            save_dft_params(newParams: params)
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
@@ -94,9 +93,7 @@ struct QuizView: View {
             }
         }
         .sheet(isPresented: $paramsPresented) {
-            NavigationStack{
                 ParametersView(params: $params)
-            }
         }
         .toolbarRole(.editor)
         .onDisappear {
@@ -105,6 +102,10 @@ struct QuizView: View {
         }.onChange(of: SequencePlayer.shared.playing) {
             if (SequencePlayer.shared.playing == false) {
                 persist_cache()
+            }
+        }.onChange(of: paramsPresented) {
+            if paramsPresented == false {
+                save_dft_params(newParams: params)
             }
         }
     }
