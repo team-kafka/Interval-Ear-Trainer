@@ -45,7 +45,7 @@ struct ListeningView: View {
             } else{
                 ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
             }
-            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true).onAppear {
+            NavigationLink(destination: ParametersView(params: $params).onAppear {
                 if (SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner() ) {
                     stop()
                 }

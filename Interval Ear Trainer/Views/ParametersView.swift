@@ -173,7 +173,7 @@ struct ParametersView: View {
                     }
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
-        }
+        }.toolbarRole(.editor)
     }
     
     func toggle_active_intervals(intervals:[Int]){
