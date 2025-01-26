@@ -11,6 +11,7 @@ struct PracticeView: View {
     @Environment(\.modelContext) var modelContext
     
     @State private var params: Parameters
+    @State private var paramsPresented: Bool = false
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
@@ -58,6 +59,17 @@ struct PracticeView: View {
                 Spacer()
             }
         }
+        .toolbar {
+            Button(action: {paramsPresented = true}){
+                Image(systemName: "gearshape.fill")
+            }
+        }
+        .sheet(isPresented: $paramsPresented) {
+            NavigationStack{
+                ParametersView(params: $params)
+            }
+        }
+        .toolbarRole(.editor)
         .onAppear {
             UIApplication.shared.isIdleTimerDisabled = true
             save_dft_params(newParams: params)

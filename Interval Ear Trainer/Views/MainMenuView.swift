@@ -32,28 +32,27 @@ struct MainMenu: View {
         NavigationStack{
             List{
                 Section(header: Text("Practice")) {
-                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
                         Text("Intervals").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, saveUsageData: $saveUsageData, fixed_n_notes:true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, saveUsageData: $saveUsageData, fixed_n_notes:true).modelContainer(for: HistoricalData.self)){
                         Text("Triads").font(.headline)
                     }
                     NavigationLink(destination:
-                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self)){
                         Text("Scale Degrees").font(.headline)
                     }
                 }.navigationTitle(Text("Interval Ear Trainer"))
             
                 Section(header: Text("Quiz")) {
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
                         Text("Intervals").font(.headline)
                     }
-
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, saveUsageData: $saveUsageData, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, saveUsageData: $saveUsageData, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self)){
                         Text("Triads").font(.headline)
                     }
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, saveUsageData: $saveUsageData, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){
+                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, saveUsageData: $saveUsageData, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self)){
                         Text("Scale Degrees").font(.headline)
                     }
                 }
@@ -65,16 +64,14 @@ struct MainMenu: View {
                     ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1").modelContainer(for: HistoricalData.self)
                 }
                 Section(header: Text("Statistics")) {
-                        NavigationLink(destination: StatView().navigationBarBackButtonHidden(true)){Image(systemName: "chart.line.uptrend.xyaxis")
-                            Text("View").font(.headline)
-                        }
-                        NavigationLink(destination:
-                            StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self).navigationBarBackButtonHidden(true)){Image(systemName: "gearshape.fill")
-                            Text("Settings").font(.headline)
-                        }
+                    NavigationLink(destination: StatView(saveUsageData: $saveUsageData))
+                    {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                        Text("View").font(.headline)
                     }
+                }
             }
-        }.onAppear(){
+        }.accentColor(.gray).onAppear(){
             compressPastData()
         }
     }
@@ -121,15 +118,4 @@ struct usageDataKey: Hashable{
     var date:Date
     var type:String
     var id:String
-}
-
-extension UINavigationController: @retroactive UIGestureRecognizerDelegate {
-    override open func viewDidLoad() {
-        super.viewDidLoad()
-        interactivePopGestureRecognizer?.delegate = self
-    }
-    
-    public func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
-        return viewControllers.count > 1
-    }
 }

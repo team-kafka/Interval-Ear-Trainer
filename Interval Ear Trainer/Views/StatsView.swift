@@ -11,42 +11,47 @@ import Charts
 import SwiftData
 
 struct StatView: View {
+    
+    @State private var paramsPresented: Bool = false
     @State private var selectedIndex: Int = 0
-
+    @Binding var saveUsageData: Bool
+    
+    init(saveUsageData: Binding<Bool>) {
+        _selectedIndex = .init(initialValue: 0)
+        _paramsPresented = .init(initialValue: false)
+        _saveUsageData = .init(projectedValue: saveUsageData)
+    }
+    
     var body: some View {
         TabView(selection: $selectedIndex) {
-//            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
-//                .tabItem {
-//                    Label("Intervals", systemImage: "arrow.up.square")
-//                }
-//                .tag(0)
-//            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
-//                .tabItem {
-//                    Label("Intervals", systemImage: "arrow.down.square")
-//                }
-//                .tag(1)
-//            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
-//                .tabItem {
-//                    Label("Intervals", systemImage: "h.square")
-//                }
-//                .tag(2)
             StatsIntervalTopView()
                 .tabItem {
                     Label("Intervals", systemImage: "arrow.up.and.down.square.fill")
                 }
                 .tag(2)
             StatsTriadView().modelContainer(for: HistoricalData.self)
-            .tabItem {
-                Label("Triads", systemImage: "music.quarternote.3")
-            }
-            .tag(3)
+                .tabItem {
+                    Label("Triads", systemImage: "music.quarternote.3")
+                }
+                .tag(3)
             StatsScaleDegreeView().modelContainer(for: HistoricalData.self)
-            .tabItem {
-                Text("Scale Degrees")
-                Image(systemName: "key")
-            }
-            .tag(4)
+                .tabItem {
+                    Text("Scale Degrees")
+                    Image(systemName: "key")
+                }
+                .tag(4)
         }
+        .toolbar {
+            Button(action: {paramsPresented = true}){
+                Image(systemName: "gearshape.fill")
+            }
+        }
+        .sheet(isPresented: $paramsPresented) {
+            NavigationStack{
+                StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)
+            }
+        }
+        .toolbarRole(.editor)
         .tint(Color.gray.opacity(0.7))
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
@@ -62,22 +67,13 @@ struct StatsIntervalTopView: View {
     
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
-                .tabItem {
-                    Label("", systemImage: "arrow.up.square")
-                }
-                .tag(0)
-            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
-                .tabItem {
-                    Label("", systemImage: "arrow.down.square")
-                }
-                .tag(1)
-            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
-                .tabItem {
-                    Label("", systemImage: "h.square")
-                }
-                .tag(2)
-        }.tint(Color.gray.opacity(0.7))
+            StatsIntervalView(filter:"↑", title: "Ascending Intervals").modelContainer(for: HistoricalData.self)
+                .tabItem {}.tag(0)
+            StatsIntervalView(filter:"↓", title:"Descending Intervals").modelContainer(for: HistoricalData.self)
+                .tabItem {}.tag(1)
+            StatsIntervalView(filter:"H", title:"Harmonic Intervals").modelContainer(for: HistoricalData.self)
+                .tabItem {}.tag(2)
+        }.tint(Color.gray.opacity(0.7)).tabViewStyle(.page(indexDisplayMode: .automatic))
             .onAppear(perform: {
                 UITabBar.appearance().unselectedItemTintColor = .systemGray
                 UITabBarItem.appearance().badgeColor = .systemGray
@@ -90,24 +86,26 @@ struct StatsIntervalTopView: View {
 struct StatsIntervalView: View {
     
     var filter: String
-    
+    var title: String
+
     @Environment(\.modelContext) private var modelContext
 
     @Query var data: [HistoricalData]
 
-    init(filter: String) {
+    init(filter: String, title:String) {
         self.filter = filter
+        self.title = title
         let typeI = ex_type_to_str(ex_type:.interval)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == typeI})
     }
     var body: some View {
 
         VStack{
-            Text("Intervals").font(.title)
+            Text(title).font(.title)
             PracticeChart(histData: data ,
                           detailledData: data,
                           keys:INTERVAL_KEYS.map{filter + $0})
-                       QuizzChart(data: data,
+            QuizzChart(data: data,
                        keys:INTERVAL_KEYS.map{filter + $0})
             Spacer()
         }
@@ -187,11 +185,11 @@ struct QuizzChart: View {
                                 y: .value("res", d.incorrect)
                         ).foregroundStyle(answer_colors[.incorrect]!)
                     }
-                }.chartXSelection(value: $selectedIndex)
+                }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
                     .chartForegroundStyleScale([
                         "correct" : answer_colors[.correct]!,
-                        "timeout": answer_colors[.timeout]!,
                         "error": answer_colors[.incorrect]!,
+                        "timeout": answer_colors[.timeout]!,
                     ])
                     .chartOverlay { pr in
                         if selectedIndex != nil {
@@ -199,6 +197,7 @@ struct QuizzChart: View {
                             OverlayView(filtered_data: filtered_data)
                         }
                     }
+            
         }
     }
 }
@@ -273,7 +272,3 @@ struct PracticeChart: View {
     }
 }
 
-
-#Preview {
-    StatView()
-}

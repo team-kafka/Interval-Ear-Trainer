@@ -19,7 +19,6 @@ struct StatParamsView: View {
     
     var body: some View {
         VStack{
-        Text("Statistics - Settings") // until the bug with nav stack inside tabs is fixed
             NavigationStack{
                 List{
                     Toggle("Store Usage Statistics", isOn: $saveUsageData)
@@ -43,9 +42,10 @@ struct StatParamsView: View {
                                 Button("Cancel", role: .cancel) {}
                             }
                         }
-                }
+                }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }
+        .toolbarRole(.editor)
     }
 }
 

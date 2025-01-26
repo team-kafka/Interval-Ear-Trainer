@@ -171,7 +171,7 @@ struct ParametersView: View {
                             HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.2...2.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
                         }
                     }
-                }.navigationTitle("Parameters").navigationBarTitleDisplayMode(.inline)
+                }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }
     }

@@ -18,6 +18,7 @@ struct QuizView: View {
     @State var cacheData: [String: HistoricalData]
     
     @State private var params: Parameters
+    @State private var paramsPresented: Bool = false
     @State private var use_timer: Bool
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
@@ -87,6 +88,17 @@ struct QuizView: View {
             player.setParameters(params)
             player.resetState(params:params)
         }
+        .toolbar {
+            Button(action: {paramsPresented = true}){
+                Image(systemName: "gearshape.fill")
+            }
+        }
+        .sheet(isPresented: $paramsPresented) {
+            NavigationStack{
+                ParametersView(params: $params)
+            }
+        }
+        .toolbarRole(.editor)
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()

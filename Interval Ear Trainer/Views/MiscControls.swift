@@ -280,12 +280,12 @@ struct QuickParamButtonsView: View {
     }
     
     var body: some View {
-        HStack{
-            Spacer()
-            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true)){
-                Image(systemName: "gearshape.fill")
-            }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
-        }
+//        HStack{
+//            Spacer()
+//            NavigationLink(destination: ParametersView(params: $params).navigationBarBackButtonHidden(true)){
+//                Image(systemName: "gearshape.fill")
+//            }.accentColor(Color(.systemGray)).padding([.trailing]).scaleEffect(1.5)
+//        }
         Spacer()
         HStack{
             NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
