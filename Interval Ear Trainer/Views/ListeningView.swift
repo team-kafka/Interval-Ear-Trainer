@@ -36,7 +36,7 @@ struct ListeningView: View {
             if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
             HStack{
                 Text("")
-                ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
+                Image(systemName: ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()) ?  "speaker.slash.fill" : "speaker.wave.2")).foregroundColor(.gray).onTapGesture {
                     if (!SequencePlayer.shared.playing) {
                         start()
                     } else if self.id == SequencePlayer.shared.getOwner() {
@@ -44,7 +44,7 @@ struct ListeningView: View {
                     }
                 }
                 if (params.type == .scale_degree) {
-                    Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).onTapGesture {
+                    Image(systemName: "die.face.5").foregroundColor(.gray).onTapGesture {
                         if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())) {
                             params.key = NOTE_KEYS.randomElement()!
                         }
@@ -56,7 +56,7 @@ struct ListeningView: View {
                 }
                 Text(params.generateLabelString(harmonic: self.params.is_chord)).lineLimit(1)
                 Spacer()
-                Image(systemName: "gearshape.fill").onTapGesture { paramsPresented = true }
+                Image(systemName: "gearshape.fill").foregroundStyle(.gray).onTapGesture { paramsPresented = true }
             }
             if divider { Divider() }
         }.onChange(of: SequencePlayer.shared.answerVisible) {
