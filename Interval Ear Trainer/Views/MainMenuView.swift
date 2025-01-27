@@ -23,8 +23,8 @@ struct MainMenu: View {
     @AppStorage("paramsSQ") var paramsSQ: String = Parameters(type:.scale_degree, n_notes:1).encode()
 
     @AppStorage("paramsIL1") var paramsIL1: String = Parameters(type:.interval, active_intervals:[3, 4]).encode()
-    @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[8, 9, 10]).encode()
-    @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8, -9, -10]).encode()
+    @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[-9]).encode()
+    @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8]).encode()
     @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
     
@@ -62,15 +62,16 @@ struct MainMenu: View {
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees").modelContainer(for: HistoricalData.self)
-                }//.listRowSeparator(.hidden)
-                Section(header: Text("Statistics")) {
-                    NavigationLink(destination: StatView(saveUsageData: $saveUsageData))
-                    {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                        Text("View").font(.headline)
-                    }
+                }
+            }.toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: StatView(saveUsageData: $saveUsageData)) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: InfoView()) { Image(systemName: "info.circle") }.padding()
                 }
             }
+            .toolbarRole(.editor)
         }.accentColor(.gray).onAppear(){
             compressPastData()
         }
