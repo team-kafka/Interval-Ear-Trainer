@@ -78,6 +78,7 @@ struct PracticeView: View {
         .onDisappear {
             UIApplication.shared.isIdleTimerDisabled = false
             player.stop()
+            save_dft_params(newParams: params)
         }.onChange(of: SequencePlayer.shared.answerVisible) {
             if (SequencePlayer.shared.answerVisible == 1.0) {
                 save_to_cache()

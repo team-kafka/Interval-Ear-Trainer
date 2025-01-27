@@ -35,6 +35,7 @@ struct ListeningView: View {
         VStack(alignment: .leading, spacing: 4){
             if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
             HStack{
+                Text("")
                 ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())  ? Image(systemName: "speaker.slash.fill") : Image(systemName: "speaker.wave.2")).onTapGesture {
                     if (!SequencePlayer.shared.playing) {
                         start()
@@ -72,6 +73,12 @@ struct ListeningView: View {
             } else {
                 save_dft_params(newParams: params)
             }
+        }.onChange(of: params.n_notes ) {
+            save_dft_params(newParams: params)
+        }.onChange(of: params.is_chord ) {
+            save_dft_params(newParams: params)
+        }.onChange(of: params.key ) {
+            save_dft_params(newParams: params)
         }
         .sheet(isPresented: $paramsPresented) { ParametersView(params: $params) }
     }

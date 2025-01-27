@@ -43,7 +43,7 @@ struct MainMenu: View {
                                     PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self)){
                         Text("Scale Degrees").font(.headline)
                     }
-                }.navigationTitle(Text("Interval Ear Trainer"))
+                }.navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
             
                 Section(header: Text("Quiz")) {
                     NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
@@ -81,29 +81,22 @@ struct MainMenu: View {
         let olderUD = usageData.filter({ $0.date < rounded_date(date:Date()) })
         let allKeys = Array(Set(olderUD.map{usageDataKey(date:$0.date, type:$0.type, id:$0.id)}))
         if allKeys.count < olderUD.count {
-            print("before compressing: \(olderUD.count) entries")
-            var newUsageData: [HistoricalData] = []
             for key in allKeys {
                 let filteredData = olderUD.filter({$0.date == key.date && $0.type == key.type && $0.id == key.id})
                 if filteredData.count > 1 {
                     let newUD = HistoricalData(date:key.date, type: key.type, id:key.id)
                     for ud in filteredData {
                         newUD.listening += ud.listening
-                        newUD.correct += ud.correct
-                        newUD.timeout += ud.timeout
+                        newUD.correct   += ud.correct
+                        newUD.timeout   += ud.timeout
                         newUD.incorrect += ud.incorrect
                     }
-                    newUsageData.append(newUD)
-                    
                     modelContext.insert(newUD)
                     for ud in filteredData {
                         modelContext.delete(ud)
                     }
-                } else {
-                    newUsageData.append(filteredData[0])
                 }
             }
-            print("after: \(newUsageData.count) entries")
             try! modelContext.save()
         }
     }

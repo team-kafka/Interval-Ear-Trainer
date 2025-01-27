@@ -168,7 +168,7 @@ struct ParametersView: View {
                         }
                         VStack{
                             HStack{Text("Sequence speed (seconds)");Spacer()}
-                            HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.2...2.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
+                            HStack{ParamSlider(value: $params.delay_sequence, valueRange: 0.1...1.0);Text("\(params.delay_sequence, specifier:"%0.1f")")}
                         }
                     }
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
