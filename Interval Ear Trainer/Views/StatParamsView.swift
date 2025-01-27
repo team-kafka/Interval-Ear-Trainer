@@ -45,6 +45,7 @@ struct StatParamsView: View {
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }
+        .tint(.green)
         .toolbarRole(.editor)
     }
 }

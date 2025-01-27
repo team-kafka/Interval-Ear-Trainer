@@ -72,7 +72,9 @@ struct MainMenu: View {
                 }
             }
             .toolbarRole(.editor)
-        }.accentColor(.gray).onAppear(){
+        }
+        .tint(.gray)
+        .onAppear(){
             compressPastData()
         }
     }

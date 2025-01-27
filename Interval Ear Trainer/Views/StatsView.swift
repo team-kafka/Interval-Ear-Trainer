@@ -50,11 +50,11 @@ struct StatView: View {
             StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)
         }
         .toolbarRole(.editor)
-        .tint(Color.gray.opacity(0.7))
+        .tint(Color.gray)//.opacity(0.7))
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
             UITabBarItem.appearance().badgeColor = .systemGray
-            UITabBar.appearance().backgroundColor = .systemGray4.withAlphaComponent(0.4)
+            UITabBar.appearance().backgroundColor = .systemGray4.withAlphaComponent(0.7)
             UINavigationBar.appearance()
         })
     }
