@@ -1,2 +1,0 @@
-- fix quizz with harmonic intervals
-
