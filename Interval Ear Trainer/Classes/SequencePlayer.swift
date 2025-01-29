@@ -161,21 +161,22 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
             return .commandFailed
         }
         commandCenter.nextTrackCommand.addTarget { [unowned self] event in
-            self.changeTrack(delta: 1)
-            return .success
+            return self.changeTrack(delta: 1)
         }
         commandCenter.previousTrackCommand.addTarget { [unowned self] event in
-            self.changeTrack(delta: -1)
-            return .success
+            return self.changeTrack(delta: -1)
         }
     }
 
-    func changeTrack(delta: Int){
+    func changeTrack(delta: Int) -> MPRemoteCommandHandlerStatus {
         let idx = INTERVAL_LISTENING_IDS.firstIndex(of: self.owner ?? "")
         if idx != nil {
             let nextIdx = (idx! + delta) % INTERVAL_LISTENING_IDS.count
             let nextIdxPos = nextIdx < 0 ? INTERVAL_LISTENING_IDS.count + nextIdx : nextIdx
             self.setOwner(INTERVAL_LISTENING_IDS[nextIdxPos])
+            return MPRemoteCommandHandlerStatus.success
+        } else {
+            return MPRemoteCommandHandlerStatus.commandFailed
         }
     }
     
