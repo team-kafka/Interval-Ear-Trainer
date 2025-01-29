@@ -22,9 +22,8 @@ struct InfoView: View {
                     HStack{
                         Text("Feedback:")
                         Spacer()
-                        Text("team_kafka@gmail.com")
+                        Text("dev@team_kafka")
                     }
-                    
                 }
             }
         }.toolbarRole(.editor)

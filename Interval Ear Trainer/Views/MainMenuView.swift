@@ -58,7 +58,7 @@ struct MainMenu: View {
                         Text("Scale Degrees").font(.headline)
                     }
                 }
-                Section(header: Text("Listening")) {
+                Section(header: HStack{Text("Listening");HelpMark()}) {
                     ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
