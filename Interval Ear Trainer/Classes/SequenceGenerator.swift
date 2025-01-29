@@ -12,14 +12,6 @@ class SequenceGenerator {
     func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         return ([], 0, 0, [], 0)
     }
-    
-//    func generateFilterString(params: Parameters) -> String{
-//       return ""
-//    }
-//    
-//    func generateLabelString(params: Parameters) -> String{
-//        return ""
-//    }
 }
 
 class IntervalGenerator : SequenceGenerator{

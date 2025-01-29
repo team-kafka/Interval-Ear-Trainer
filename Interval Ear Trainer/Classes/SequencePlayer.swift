@@ -14,19 +14,19 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
 
 @Observable class SequencePlayer{
     static let shared = SequencePlayer()
-    
+        
     // State variables
     var playing: Bool
     var notes: [Int]
     var answers: [String]
     var answerVisible: Double
     var rootNote: Int
-    
+    var owner: String?
+
     @ObservationIgnored() private var timer: Timer?
     @ObservationIgnored() private var timerAnswer: Timer?
     @ObservationIgnored() private var seqGen: SequenceGenerator!
     @ObservationIgnored() private var params: Parameters!
-    @ObservationIgnored() private var owner: String?
 
     private init() {
         self.timer = nil
@@ -57,11 +57,13 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         } else {
             self.seqGen = ScaleDegreeGenerator()
         }
+        setupNowPlaying()
     }
     func setOwner(_ id: String) { self.owner = id }
-    func getOwner() -> String? { return self.owner }
     
+    // *************************
     // Main interface
+    // *************************
     func start() -> Bool {
         if (seqGen != nil && params != nil) {
             setAVSession(active: true)
@@ -158,8 +160,25 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
             }
             return .commandFailed
         }
+        commandCenter.nextTrackCommand.addTarget { [unowned self] event in
+            self.changeTrack(delta: 1)
+            return .success
+        }
+        commandCenter.previousTrackCommand.addTarget { [unowned self] event in
+            self.changeTrack(delta: -1)
+            return .success
+        }
     }
 
+    func changeTrack(delta: Int){
+        let idx = INTERVAL_LISTENING_IDS.firstIndex(of: self.owner ?? "")
+        if idx != nil {
+            let nextIdx = (idx! + delta) % INTERVAL_LISTENING_IDS.count
+            let nextIdxPos = nextIdx < 0 ? INTERVAL_LISTENING_IDS.count + nextIdx : nextIdx
+            self.setOwner(INTERVAL_LISTENING_IDS[nextIdxPos])
+        }
+    }
+    
     func setupNowPlaying() {
         var nowPlayingInfo = [String : Any]()
         nowPlayingInfo[MPMediaItemPropertyTitle] = short_answer(answer:answers.joined(separator: " "))

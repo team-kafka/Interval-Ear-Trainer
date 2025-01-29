@@ -36,22 +36,22 @@ struct ListeningView: View {
             if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
             HStack{
                 Text("")
-                Image(systemName: ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()) ?  "speaker.slash.fill" : "speaker.wave.2")).foregroundColor(.gray).onTapGesture {
+                Image(systemName: ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner) ?  "pause.circle" : "play.circle")).foregroundColor(.gray).onTapGesture {
                     if (!SequencePlayer.shared.playing) {
                         start()
-                    } else if self.id == SequencePlayer.shared.getOwner() {
+                    } else if self.id == SequencePlayer.shared.owner {
                         stop()
                     }
                 }
                 if (params.type == .scale_degree) {
                     Image(systemName: "die.face.5").foregroundColor(.gray).onTapGesture {
-                        if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner())) {
+                        if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner)) {
                             params.key = NOTE_KEYS.randomElement()!
                         }
                     }
-                    NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
+                    NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
                 } else{
-                    ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.getOwner()))
+                    ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
                     NumberOfNotesView(n_notes: $params.n_notes, active: false).opacity(0)
                 }
                 Text(params.generateLabelString(harmonic: self.params.is_chord)).lineLimit(1)
@@ -60,7 +60,7 @@ struct ListeningView: View {
             }
             if divider { Divider() }
         }.onChange(of: SequencePlayer.shared.answerVisible) {
-            if (SequencePlayer.shared.answerVisible == 1.0 && self.id == SequencePlayer.shared.getOwner()) {
+            if (SequencePlayer.shared.answerVisible == 1.0 && self.id == SequencePlayer.shared.owner) {
                 save_to_cache()
             }
         }.onChange(of: SequencePlayer.shared.playing) {
@@ -68,17 +68,21 @@ struct ListeningView: View {
                 persist_cache()
             }
         }.onChange(of: paramsPresented) {
-            if (paramsPresented == true && self.id == SequencePlayer.shared.getOwner()) {
+            if (paramsPresented == true && self.id == SequencePlayer.shared.owner) {
                 stop()
             } else {
                 save_dft_params(newParams: params)
             }
-        }.onChange(of: params.n_notes ) {
+        }.onChange(of: params.n_notes) {
             save_dft_params(newParams: params)
-        }.onChange(of: params.is_chord ) {
+        }.onChange(of: params.is_chord) {
             save_dft_params(newParams: params)
-        }.onChange(of: params.key ) {
+        }.onChange(of: params.key) {
             save_dft_params(newParams: params)
+        }.onChange(of: SequencePlayer.shared.owner) {
+            if (SequencePlayer.shared.owner == self.id) {
+                SequencePlayer.shared.setParameters(params)
+            }
         }
         .sheet(isPresented: $paramsPresented) { ParametersView(params: $params) }
     }

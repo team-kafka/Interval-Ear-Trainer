@@ -8,6 +8,8 @@
 import SwiftUI
 import SwiftData
 
+let INTERVAL_LISTENING_IDS = ["LVI1", "LVI2", "LVI3"]
+
 struct MainMenu: View {
     @Environment(\.modelContext) private var modelContext
     @Query() private var usageData: [HistoricalData]
