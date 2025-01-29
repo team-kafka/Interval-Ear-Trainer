@@ -25,11 +25,12 @@ struct HelpPopoverMessage: View {
     var body: some View {
         VStack(alignment: .leading)
         {
-            Text("Use device's controls to pause/resume")
+            Text("Use device controls to pause/resume").textCase(.none)
             HStack{
-                Text("Use")
+                Text("and").textCase(.none)
+                Image(systemName: "backward")
                 Image(systemName: "forward")
-                Text("to cycle interval players")
+                Text("to cycle interval players").textCase(.none)
             }
         }.padding()
     }

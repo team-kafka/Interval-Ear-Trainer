@@ -47,7 +47,7 @@ struct PracticeView: View {
                     VStack{
                         (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding()
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
                         NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                         if (params.type == .scale_degree) {
                             ScaleChooserView(params: $params, running:player.playing)
@@ -70,6 +70,7 @@ struct PracticeView: View {
                     NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                 }
                 answerView(portrait: orientation.isPortrait).opacity(player.answerVisible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
+                Spacer()
             }.onRotate { newOrientation in
                 if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) {
                     orientation = newOrientation
