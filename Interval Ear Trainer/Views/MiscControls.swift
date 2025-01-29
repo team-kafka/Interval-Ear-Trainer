@@ -127,11 +127,11 @@ struct NumberOfNotesView: View {
     var visible: Bool = true
 
     var body: some View {
-        //let opacity:Double = (visible ? 1 : 0) * (active ? 1 : 0.5)
+        let opacity:Double = (visible ? 1 : 0)
         Image(systemName: String(format:"%d.square", n_notes))
-            .foregroundColor(Color.secondary)//.opacity(opacity)
+            .foregroundColor(Color.secondary).opacity(opacity)
             .onTapGesture {
-                if active{
+                if active {
                     n_notes = n_notes + 1 > 4 ? 1 : n_notes + 1
                 }
             }
@@ -212,12 +212,10 @@ struct NoteStepperView: View {
 struct ScaleChooserView: View {
     @Binding var params: Parameters
     var running: Bool
-    //var reset_state: () -> Void
 
 init(params: Binding<Parameters>, running: Bool) {
     _params = .init(projectedValue: params)
     self.running = running
-    //self.reset_state = reset_state
 }
 
 var body: some View {
@@ -234,7 +232,7 @@ var body: some View {
                     ForEach(NOTE_KEYS, id: \.self) {
                         Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
                     }
-                }//.onChange(of: params.key) {reset_state()}
+                }
             } label: {
                 Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray))
             }

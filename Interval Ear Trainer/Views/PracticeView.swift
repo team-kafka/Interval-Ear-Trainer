@@ -9,7 +9,8 @@ import SwiftUI
 
 struct PracticeView: View {
     @Environment(\.modelContext) var modelContext
-    
+    @State private var orientation = UIDeviceOrientation.portrait
+
     @State private var params: Parameters
     @State private var paramsPresented: Bool
     @State private var use_timer: Bool
@@ -42,22 +43,37 @@ struct PracticeView: View {
                     .onChange(of: params.n_notes) { player.setParameters(params) ; player.resetState(params:params) }
                     .onChange(of: params.is_chord) { player.setParameters(params) }
                     .onChange(of: use_timer) { player.stop(); player.setParameters(params) ; player.resetState(params:params) }
-                HStack {
-                    Spacer()
-                    (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
-                        toggle_start_stop()
-                    }.foregroundColor(Color(.systemGray))
-                    Spacer()
+                if orientation.isPortrait {
+                    VStack{
+                        (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
+                            toggle_start_stop()
+                        }.foregroundColor(Color(.systemGray)).padding()
+                        NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
+                        if (params.type == .scale_degree) {
+                            ScaleChooserView(params: $params, running:player.playing)
+                                .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
+                                .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
+                        }
+                    }
+                } else {
+                    HStack{
+                        if (params.type == .scale_degree) {
+                            ScaleChooserView(params: $params, running:player.playing)
+                                .padding([.leading, .trailing])
+                                .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
+                                .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
+                        }
+                        Image(systemName: player.playing ? "pause.circle" : "play.circle").resizable().scaledToFit().onTapGesture {
+                            toggle_start_stop()
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
+                    }
+                    NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                 }
-                NoteButtonsView(params: params, notes: $player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: $player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
-                if (params.type == .scale_degree) {
-                    ScaleChooserView(params: $params, running:player.playing)
-                        .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
-                        .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
+                answerView(portrait: orientation.isPortrait).opacity(player.answerVisible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
+            }.onRotate { newOrientation in
+                if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) {
+                    orientation = newOrientation
                 }
-                Spacer()
-                answerView().opacity(player.answerVisible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
-                Spacer()
             }
         }
         .toolbar {
@@ -94,17 +110,26 @@ struct PracticeView: View {
         }
     }
     
-    func answerView() -> AnyView {
+    func answerView(portrait: Bool) -> AnyView {
         let answerArray = player.answers.joined(separator: " ").split(separator: "/")
         if answerArray.count == 1{
             return AnyView(VStack{Text(answerArray[0]).font(.system(size: 45))})
         } else if answerArray.count > 1 {
-            return AnyView(VStack{
-                Text(answerArray[0]).font(.system(size: 40))
-                ForEach(Array(answerArray[1...].enumerated()), id: \.offset){_, ans in
-                    Text(ans).font(.system(size: 30))
-                }
-            })
+            if orientation.isPortrait {
+                return AnyView(VStack{
+                    Text(answerArray[0]).font(.system(size: 40))
+                    ForEach(Array(answerArray[1...].enumerated()), id: \.offset){_, ans in
+                        Text(ans).font(.system(size: 30))
+                    }
+                })
+            } else {
+                return AnyView(HStack(alignment: .firstTextBaseline){
+                    Text(answerArray[0]).font(.system(size: 40))
+                    ForEach(Array(answerArray[1...].enumerated()), id: \.offset){_, ans in
+                        Text(ans).font(.system(size: 30))
+                    }
+                })
+            }
         } else {
             return AnyView(VStack{Text(" ").font(.system(size: 45))})
         }
