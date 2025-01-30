@@ -12,14 +12,10 @@ import SwiftData
 
 struct StatView: View {
     
-    @State private var paramsPresented: Bool = false
     @State private var selectedIndex: Int = 0
-    @Binding var saveUsageData: Bool
     
-    init(saveUsageData: Binding<Bool>) {
+    init() {
         _selectedIndex = .init(initialValue: 0)
-        _paramsPresented = .init(initialValue: false)
-        _saveUsageData = .init(projectedValue: saveUsageData)
     }
     
     var body: some View {
@@ -40,17 +36,8 @@ struct StatView: View {
                     Image(systemName: "key")
                 }
                 .tag(4)
-        }
-        .toolbar {
-            Button(action: {paramsPresented = true}){
-                Image(systemName: "gearshape.fill")
-            }
-        }
-        .sheet(isPresented: $paramsPresented) {
-            StatParamsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)
-        }
-        .toolbarRole(.editor)
-        .tint(Color.gray)//.opacity(0.7))
+        }.toolbarRole(.editor)
+        .tint(Color.gray)
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
             UITabBarItem.appearance().badgeColor = .systemGray

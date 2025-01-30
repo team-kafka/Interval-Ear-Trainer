@@ -30,8 +30,8 @@ class IntervalGenerator : SequenceGenerator{
                 (notes[1], answers[0]) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 note_duration = params.delay_sequence
                 seq_duration = params.delay_sequence
-            }
-            else {
+                print(notes)
+            } else {
                 notes.append(0)
                 notes[0] = prev_note
                 answers.append("")

@@ -114,7 +114,8 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
         (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
         setupNowPlaying()
-        MidiPlayer.shared.playNotes(notes: params.n_notes == 1 ? [notes.last!] : notes, duration: note_duration, chord: params.is_chord)
+        let notesToPlay = (params.n_notes == 1 && prev_note != 0) ? [notes.last!] : notes
+        MidiPlayer.shared.playNotes(notes: notesToPlay, duration: note_duration, chord: params.is_chord)
         return seq_duration
     }
     

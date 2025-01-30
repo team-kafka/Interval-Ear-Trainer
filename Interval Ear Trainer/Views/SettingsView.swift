@@ -8,22 +8,27 @@
 import SwiftUI
 import SwiftData
 
-struct StatParamsView: View {
+struct SettingsView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query() private var data: [HistoricalData]
     
     @State private var showingConfirmation = false
     @Binding var saveUsageData: Bool
-
+    @Binding var showHelp: Bool
+    
+    init(saveUsageData: Binding<Bool>, showHelp: Binding<Bool>) {
+        _saveUsageData = .init(projectedValue: saveUsageData)
+        _showHelp = .init(projectedValue: showHelp)
+    }
     
     var body: some View {
         VStack{
             NavigationStack{
                 List{
-                    Toggle("Store Usage Statistics", isOn: $saveUsageData)
                     Section(header: Text("Stored Data")) {
-                        HStack{
+                        Toggle("Store Usage Statistics", isOn: $saveUsageData)
+                            HStack{
                             Text("Data Size")
                             Spacer()
                             Text("\(Double(data.count * class_getInstanceSize(HistoricalData.self)) / 1024.0, specifier: "%.1f") Kb")}
@@ -42,6 +47,21 @@ struct StatParamsView: View {
                                 Button("Cancel", role: .cancel) {}
                             }
                         }
+                    Section(header: Text("Help")) {
+                        Toggle("Show Help", isOn: $showHelp)
+                    }
+                    Section(header: Text("Info")) {
+                        HStack{
+                            Text("App Version:")
+                            Spacer()
+                            Text(appVersion!)
+                        }
+                        HStack{
+                            Text("Feedback:")
+                            Spacer()
+                            Text("dev@team_kafka")
+                        }
+                    }
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }

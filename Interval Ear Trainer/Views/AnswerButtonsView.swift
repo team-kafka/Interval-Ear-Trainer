@@ -20,15 +20,43 @@ struct IntervalAnswerButtonsView: View {
         let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
         let fontSize: Double = 30
         if portrait {
-            HStack{
-                ForEach(0..<4, id: \.self){ i in
-                    VStack{
-                        ForEach(0..<3, id: \.self){ j in
-                            let thisInt = j*4+i+1
-                            let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
-                            IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
-                        }
-                    }.fixedSize(horizontal: false, vertical: true)
+//            HStack{
+//                ForEach(0..<4, id: \.self){ i in
+//                    VStack{
+//                        ForEach(0..<3, id: \.self){ j in
+//                            let thisInt = j*4+i+1
+//                            let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
+//                            IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
+//                        }
+//                    }.fixedSize(horizontal: false, vertical: true)
+//                }
+//            }.padding([.leading, .trailing, .bottom])
+            Grid {
+                GridRow{
+                    ForEach([1, 2, 3, 4], id: \.self){ thisInt in
+                        let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
+                        IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
+                    }
+                }
+                GridRow{
+                    ForEach([5, 6, 7], id: \.self){ thisInt in
+                        let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
+                        IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
+                    }
+                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(1)
+                }
+                GridRow{
+                    ForEach([8, 9, 10, 11], id: \.self){ thisInt in
+                        let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
+                        IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
+                    }
+                }
+                GridRow{
+                    ForEach([12], id: \.self){ thisInt in
+                        let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
+                        IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
+                    }
+                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(3)
                 }
             }.padding([.leading, .trailing, .bottom])
         } else {
@@ -44,10 +72,10 @@ struct IntervalAnswerButtonsView: View {
                         let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
                         IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes).gridCellColumns(2)
                     }
-                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(1)
+                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(3)
                 }
                 GridRow{
-                    ForEach(Array([12, 2, 4, 5, 7, 9, 11].enumerated()), id: \.offset){ _, thisInt in
+                    ForEach(Array([12, 2, 4, 5, 7, 9, 11, 12].enumerated()), id: \.offset){ _, thisInt in
                         let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
                         IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes).gridCellColumns(2)
                     }

@@ -20,12 +20,13 @@ struct CheckBoxView: View {
     }
 }
 
-struct ChordButton : View{
+struct ChordButton : View {
     var running : Bool
     var duration : Double
     var notes : [Int]
     var chord : Bool
     var chord_delay: Double
+    
     var body: some View {
         Image(systemName: "music.quarternote.3").foregroundColor(Color(.systemGray)).padding().overlay(
             RoundedRectangle(cornerRadius: 10)
@@ -37,7 +38,7 @@ struct ChordButton : View{
     }
 }
 
-struct NoteButton : View{
+struct NoteButton : View {
     var running : Bool
     var note : Int
     var duration : Double
@@ -55,21 +56,21 @@ struct NoteButton : View{
 
 struct NoteButtonsView: View {
     var params: Parameters
-    @Binding var notes: [Int]
+    var notes: [Int]
     var root_note: Int
     var running: Bool
     var chord: Bool
-    @Binding var answer_visible: Double
+    var answer_visible: Double
     var fixed_n_notes: Bool
     
-    init(params: Parameters, notes: Binding<[Int]>, root_note: Int, chord: Bool, running: Bool, answer_visible: Binding<Double>, fixed_n_notes: Bool, chord_active: Bool) {
+    init(params: Parameters, notes: [Int], root_note: Int, chord: Bool, running: Bool, answer_visible: Double, fixed_n_notes: Bool, chord_active: Bool) {
         self.params =  params
-        _notes = .init(projectedValue: notes)
+        self.notes = notes
         self.root_note = root_note
         self.running = running
         self.chord = chord
         self.fixed_n_notes = fixed_n_notes
-        _answer_visible = .init(projectedValue: answer_visible)
+        self.answer_visible = answer_visible
     }
     
     var body: some View {
@@ -213,63 +214,62 @@ struct ScaleChooserView: View {
     @Binding var params: Parameters
     var running: Bool
 
-init(params: Binding<Parameters>, running: Bool) {
-    _params = .init(projectedValue: params)
-    self.running = running
-}
+    init(params: Binding<Parameters>, running: Bool) {
+        _params = .init(projectedValue: params)
+        self.running = running
+    }
 
-var body: some View {
+    var body: some View {
 
-    Grid{
-        GridRow{
-            Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
-                if !running {
-                    params.key = NOTE_KEYS.randomElement()!
-                }
-            }.scaleEffect(1.5)
-            Menu{
-                Picker("key", selection: $params.key) {
-                    ForEach(NOTE_KEYS, id: \.self) {
-                        Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+        Grid{
+            GridRow{
+                Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
+                    if !running {
+                        params.key = NOTE_KEYS.randomElement()!
                     }
+                }.scaleEffect(1.5)
+                Menu{
+                    Picker("key", selection: $params.key) {
+                        ForEach(NOTE_KEYS, id: \.self) {
+                            Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                        }
+                    }
+                } label: {
+                    Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray))
                 }
-            } label: {
-                Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray))
             }
-        }
-        GridRow{
-            Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                if !running {
-                    play_scale(params:params)
-                }
-            }.scaleEffect(1.5)
-            Menu{
-                Picker("Scale", selection: $params.scale) {
-                    ForEach(SCALE_KEYS, id: \.self) {
-                        Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
+            GridRow{
+                Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
+                    if !running {
+                        play_scale(params:params)
                     }
-                }.accentColor(Color(.systemGray))//.onChange(of: params.scale) {reset_state()}
-            } label: {
-                Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray))
+                }.scaleEffect(1.5)
+                Menu{
+                    Picker("Scale", selection: $params.scale) {
+                        ForEach(SCALE_KEYS, id: \.self) {
+                            Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
+                        }
+                    }.accentColor(Color(.systemGray))//.onChange(of: params.scale) {reset_state()}
+                } label: {
+                    Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray))
+                }
             }
         }
     }
-}
+    
     func play_scale(params:Parameters){
         MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration: SCALE_DELAY)
     }
 }
 
 struct QuickParamButtonsView: View {
-    @Binding var params: Parameters
     @Binding var n_notes: Int
     @Binding var chord: Bool
     @Binding var use_timer: Bool
     @Binding var fixed_n_notes: Bool
     @Binding var chord_active: Bool
     
-    init(params: Binding<Parameters>, n_notes: Binding<Int>, chord: Binding<Bool>, use_timer: Binding<Bool>, fixed_n_notes: Binding<Bool>, chord_active: Binding<Bool>) {
-        _params = .init(projectedValue: params)
+    init(n_notes: Binding<Int>, chord: Binding<Bool>, use_timer: Binding<Bool>, fixed_n_notes: Binding<Bool>, chord_active: Binding<Bool>) {
         _n_notes = .init(projectedValue: n_notes)
         _chord = .init(projectedValue: chord)
         _use_timer = .init(projectedValue: use_timer)
@@ -279,11 +279,9 @@ struct QuickParamButtonsView: View {
     
     var body: some View {
         HStack{
-            NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding().onChange(of: n_notes){
-                if (n_notes == 1) {chord = false}
-            }
+            NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding()
             TimerView(active: $use_timer).padding()
-            ChordArpSwitchView(chord: $chord, active: (chord_active && (n_notes>1)), visible: chord_active).padding()
+            ChordArpSwitchView(chord: $chord, active: chord_active, visible: chord_active).padding()
         }.scaleEffect(2.0)
     }
 }

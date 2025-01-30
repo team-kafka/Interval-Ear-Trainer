@@ -51,7 +51,7 @@ struct QuizView: View {
 
         NavigationStack{
             VStack {
-                QuickParamButtonsView(params: $params, n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
+                QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
                     .onChange(of: params.n_notes) { player.setParameters(params) ; player.resetState(params:params) }
                     .onChange(of: params.is_chord) { player.setParameters(params) }
                     .onChange(of: use_timer) { player.stop(); player.setParameters(params) ; player.resetState(params:params) }
@@ -80,8 +80,6 @@ struct QuizView: View {
                         }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
                     }
                 }
-                
-                
                 if orientation.isPortrait {
                     VStack{
                         answerView().opacity(player.answerVisible)

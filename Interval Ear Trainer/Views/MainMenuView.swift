@@ -15,7 +15,8 @@ struct MainMenu: View {
     @Query() private var usageData: [HistoricalData]
     
     @AppStorage("saveUsageData") var saveUsageData: Bool = true
-    
+    @AppStorage("showHelp") var showHelp: Bool = true
+
     @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
     @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSP") var paramsSP: String = Parameters(type:.scale_degree, n_notes:1).encode()
@@ -58,7 +59,10 @@ struct MainMenu: View {
                         Text("Scale Degrees").font(.headline)
                     }
                 }
-                Section(header: HStack{Text("Listening");HelpMark()}) {
+                Section(header: HStack{
+                    Text("Listening")
+                    if showHelp {HelpMark()}
+                }) {
                     ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
@@ -67,10 +71,10 @@ struct MainMenu: View {
                 }
             }.toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: StatView(saveUsageData: $saveUsageData)) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
+                    NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: InfoView()) { Image(systemName: "info.circle") }.padding()
+                    NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData, showHelp: $showHelp).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding()
                 }
             }
             .toolbarRole(.editor)
