@@ -16,7 +16,6 @@ struct Interval_Ear_TrainerApp: App {
         let session = AVAudioSession.sharedInstance()
         do {
             try session.setCategory(AVAudioSession.Category.playback, mode: AVAudioSession.Mode.default)
-            try session.setActive(true)
         } catch let error as NSError {
             print("Failed to set the audio session category and mode: \(error.localizedDescription)")
         }

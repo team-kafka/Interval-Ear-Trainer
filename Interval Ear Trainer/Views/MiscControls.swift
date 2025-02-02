@@ -55,6 +55,8 @@ struct NoteButton : View {
 }
 
 struct NoteButtonsView: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
+    
     var params: Parameters
     var notes: [Int]
     var root_note: Int
@@ -75,19 +77,19 @@ struct NoteButtonsView: View {
     
     var body: some View {
         Grid{
-            GridRow{
-                if chord{
-                    VStack{
-                        ChordButton(running: running, duration: params.delay * 0.5, notes: notes, chord: chord, chord_delay: params.delay_sequence)
-                        Text(" ").opacity(0.0)
-                    }
-                }
+            GridRow(alignment: .center){
+                if chord{ ChordButton(running: running, duration: params.delay * 0.5, notes: notes, chord: chord, chord_delay: params.delay_sequence) }
                 ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
-                    VStack{
-                        NoteButton(running: running, note: note, duration: params.delay_sequence)
-                        Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
-                    }
+                    NoteButton(running: running, note: note, duration: params.delay_sequence)
                 }
+                if showHelp{ HelpMarkView{ HelpNotesPOView() } }
+            }
+            GridRow(alignment: .center){
+                if chord{ Text(" ").opacity(0.0) }
+                ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
+                    Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
+                }
+                if showHelp{ Text(" ").opacity(0) }
             }
         }
     }
@@ -211,6 +213,7 @@ struct NoteStepperView: View {
 }
 
 struct ScaleChooserView: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
     @Binding var params: Parameters
     var running: Bool
 
@@ -220,14 +223,16 @@ struct ScaleChooserView: View {
     }
 
     var body: some View {
-
         Grid{
             GridRow{
-                Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading, .trailing]).onTapGesture {
-                    if !running {
-                        params.key = NOTE_KEYS.randomElement()!
-                    }
-                }.scaleEffect(1.5)
+                HStack(alignment: .center){
+                    Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading]).onTapGesture {
+                        if !running {
+                            params.key = NOTE_KEYS.randomElement()!
+                        }
+                    }.scaleEffect(1.5)
+                    if showHelp {HelpMarkView(){HelpTextView(text:"Select random key")}.padding(4)}
+                }
                 Menu{
                     Picker("key", selection: $params.key) {
                         ForEach(NOTE_KEYS, id: \.self) {
@@ -249,7 +254,7 @@ struct ScaleChooserView: View {
                         ForEach(SCALE_KEYS, id: \.self) {
                             Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
                         }
-                    }.accentColor(Color(.systemGray))//.onChange(of: params.scale) {reset_state()}
+                    }.accentColor(Color(.systemGray))
                 } label: {
                     Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray))
                 }
@@ -263,6 +268,8 @@ struct ScaleChooserView: View {
 }
 
 struct QuickParamButtonsView: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
+    
     @Binding var n_notes: Int
     @Binding var chord: Bool
     @Binding var use_timer: Bool
@@ -279,9 +286,16 @@ struct QuickParamButtonsView: View {
     
     var body: some View {
         HStack{
-            NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).padding()
-            TimerView(active: $use_timer).padding()
-            ChordArpSwitchView(chord: $chord, active: chord_active, visible: chord_active).padding()
-        }.scaleEffect(2.0)
+            Spacer()
+            NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).scaleEffect(2.0)
+            if (showHelp && !fixed_n_notes) { HelpMarkView{HelpNNotesPOView()}.padding(4) }
+            Spacer()
+            TimerView(active: $use_timer).scaleEffect(2.0)
+            if showHelp { HelpMarkView{HelpTimerPOView()}.padding(4) }
+            Spacer()
+            ChordArpSwitchView(chord: $chord, active: chord_active, visible: chord_active).scaleEffect(2.0)
+            if (showHelp && chord_active) { HelpMarkView{HelpChordPOView()}.padding(4) }
+            Spacer()
+        }
     }
 }

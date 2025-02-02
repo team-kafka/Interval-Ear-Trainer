@@ -9,7 +9,7 @@ import SwiftUI
 
 let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
 
-struct InfoView: View {
+struct AppInfoView: View {
     var body: some View {
         NavigationView{
             List{

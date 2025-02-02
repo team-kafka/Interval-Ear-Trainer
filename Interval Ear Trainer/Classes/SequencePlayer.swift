@@ -65,6 +65,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     // Main interface
     // *************************
     func start() -> Bool {
+        print("Started")
         if (seqGen != nil && params != nil) {
             setAVSession(active: true)
             playing = true
@@ -85,15 +86,17 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     }
 
     func stop(){
+        print("stopped")
+        timer?.invalidate()
+        timerAnswer?.invalidate()
         MidiPlayer.shared.stop()
         self.setAVSession(active: false)
         self.playing = false
         setupNowPlaying()
-        timer?.invalidate()
-        timerAnswer?.invalidate()
     }
  
     func loopFunction() {
+        print("loop fn playing")
         timer?.invalidate()
         if answerVisible == 1.0 {
             answerVisible = 0.0
@@ -148,6 +151,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         let commandCenter = MPRemoteCommandCenter.shared()
 
         commandCenter.playCommand.addTarget { [unowned self] event in
+            print(event)
             if !self.playing {
                 let success = self.start()
                 return success ? .success : .commandFailed
@@ -208,43 +212,53 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                                        selector: #selector(handleInterruption),
                                        name: AVAudioSession.interruptionNotification,
                                        object: nil)
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(handleRouteChange),
-                                               name: AVAudioSession.routeChangeNotification,
-                                               object: AVAudioSession.sharedInstance())
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(handleRouteChange),
+//                                               name: AVAudioSession.routeChangeNotification,
+//                                               object: AVAudioSession.sharedInstance())
     }
 
     @objc func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
-            let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let reasonValue = userInfo[AVAudioSessionInterruptionReasonKey] as? UInt,
+              let reason = AVAudioSession.InterruptionReason(rawValue: reasonValue),
+              let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
             let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
                 return
         }
+        print("interruption")
+        print(reasonValue)
+        print(typeValue)
         if type == .began {
-            print("interrupted")
+            print("interruption began")
+            print(reason)
+            self.stop()
+        } else if type == .ended {
+            print("interruption ended")
             self.stop()
         }
     }
-    
-    @objc func handleRouteChange(notification: Notification) {
-        guard let userInfo = notification.userInfo,
-              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
-              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
-            return
-        }
-
-        switch reason {
-        case .newDeviceAvailable:
-            print("new device available")
-        case .oldDeviceUnavailable:
-            print("old device unavailable")
-            stop()
-        case .override:
-            print("route change override")
-        default:
-            stop()
-        }
-    }
+//    
+//    @objc func handleRouteChange(notification: Notification) {
+//        guard let userInfo = notification.userInfo,
+//              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+//              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+//            return
+//        }
+//
+//        switch reason {
+//        case .newDeviceAvailable:
+//            print("new device available")
+//        case .oldDeviceUnavailable:
+//            print("old device unavailable")
+//            //self.stop()
+//        case .override:
+//            print("route change override")
+//        default:
+//            print("default route change")
+//            //self.stop()
+//        }
+//    }
 
     func setAVSession(active:Bool){
         let session = AVAudioSession.sharedInstance()

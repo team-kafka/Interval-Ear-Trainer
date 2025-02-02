@@ -47,7 +47,7 @@ struct PracticeView: View {
                     VStack{
                         (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
+                        }.foregroundColor(Color(.systemGray)).padding()
                         NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                         if (params.type == .scale_degree) {
                             ScaleChooserView(params: $params, running:player.playing)
@@ -65,7 +65,7 @@ struct PracticeView: View {
                         }
                         Image(systemName: player.playing ? "pause.circle" : "play.circle").resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                     }
                     NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
                 }

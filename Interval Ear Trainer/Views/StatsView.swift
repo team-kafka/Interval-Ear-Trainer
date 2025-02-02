@@ -245,7 +245,7 @@ struct PracticeChart: View {
     }
     
     var body: some View {
-        GroupBox("Practice and listening") {
+        GroupBox("Listening") {
             Chart {
                 BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
                         y: .value("practice+listening", 0)

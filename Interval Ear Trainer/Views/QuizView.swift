@@ -47,14 +47,12 @@ struct QuizView: View {
     }
     
     var body: some View {
-        //let HVStack = orientation.isPortrait ? AnyLayout(VStackLayout()) : AnyLayout(HStackLayout())
-
         NavigationStack{
             VStack {
                 QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
-                    .onChange(of: params.n_notes) { player.setParameters(params) ; player.resetState(params:params) }
-                    .onChange(of: params.is_chord) { player.setParameters(params) }
-                    .onChange(of: use_timer) { player.stop(); player.setParameters(params) ; player.resetState(params:params) }
+                    .onChange(of: params.n_notes) { guesses = []; player.setParameters(params) ; player.resetState(params:params) }
+                    .onChange(of: params.is_chord) { guesses = []; player.setParameters(params) }
+                    .onChange(of: use_timer) { guesses = []; player.stop(); player.setParameters(params) ; player.resetState(params:params) }
 
                 if orientation.isPortrait {
                     VStack{
@@ -77,7 +75,7 @@ struct QuizView: View {
                         }
                         Image(systemName: player.playing ? "pause.circle" : "play.circle").resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing])
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                     }
                 }
                 if orientation.isPortrait {
@@ -100,7 +98,7 @@ struct QuizView: View {
                     }
                 }
                 if (params.type == .interval) {
-                    IntervalAnswerButtonsView(activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: player.notes, guesses: $guesses, use_timer: use_timer, portrait: orientation.isPortrait)
+                    IntervalAnswerButtonsView(activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: $player.notes, guesses: $guesses, use_timer: use_timer, portrait: orientation.isPortrait)
                 } else if (params.type == .triad) {
                     TriadAnswerButtonsView(params: params, active: (player.playing && (player.answerVisible==0.0)), guesses: $guesses, use_timer: use_timer, notes: player.notes, portrait: orientation.isPortrait)
                 } else if (params.type == .scale_degree) {
@@ -116,6 +114,12 @@ struct QuizView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
+            if UIDevice.current.orientation.isLandscape {
+                orientation = UIDeviceOrientation.landscapeLeft
+            }
+            else {
+                orientation = UIDeviceOrientation.portrait
+            }
         }
         .toolbar {
             Button(action: {paramsPresented = true}){
@@ -155,7 +159,7 @@ struct QuizView: View {
         return AnyView(
             HStack{
                 Text(" ").font(.system(size: 40))
-                ForEach(Array(guesses), id: \.self) { g in
+                ForEach(Array(guesses.enumerated()), id: \.offset) { _, g in
                     Text(short_answer(answer: g)).foregroundColor(Color(.systemGray)).font(.system(size: 40))
                 }
             })

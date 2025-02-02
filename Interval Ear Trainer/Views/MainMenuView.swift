@@ -15,7 +15,7 @@ struct MainMenu: View {
     @Query() private var usageData: [HistoricalData]
     
     @AppStorage("saveUsageData") var saveUsageData: Bool = true
-    @AppStorage("showHelp") var showHelp: Bool = true
+    @AppStorage("showHelp") var showHelp: Bool = false
 
     @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
     @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
@@ -34,7 +34,10 @@ struct MainMenu: View {
     var body: some View {
         NavigationStack{
             List{
-                Section(header: Text("Practice")) {
+                Section(header: HStack{
+                    Text("Practice")
+                    if showHelp {HelpMarkView(opacity:0.7){HelpTextView(text:"")}}
+                }) {
                     NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
                         Text("Intervals").font(.headline)
                     }
@@ -46,9 +49,12 @@ struct MainMenu: View {
                                     PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self)){
                         Text("Scale Degrees").font(.headline)
                     }
-                }.navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
-            
-                Section(header: Text("Quiz")) {
+                }
+
+                Section(header: HStack{
+                    Text("Quiz")
+                    if showHelp {HelpMarkView(opacity:0.7){HelpQuizPOView()}}
+                }) {
                     NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
                         Text("Intervals").font(.headline)
                     }
@@ -61,14 +67,14 @@ struct MainMenu: View {
                 }
                 Section(header: HStack{
                     Text("Listening")
-                    if showHelp {HelpMark()}
+                    if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
                 }) {
                     ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees").modelContainer(for: HistoricalData.self)
-                }
+                }.navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
             }.toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
@@ -82,6 +88,7 @@ struct MainMenu: View {
         .tint(.gray)
         .onAppear(){
             compressPastData()
+            showHelp = false
         }
     }
     

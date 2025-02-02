@@ -59,7 +59,7 @@ struct SettingsView: View {
                         HStack{
                             Text("Feedback:")
                             Spacer()
-                            Text("dev@team_kafka")
+                            Text("dev@team_kafka.com")
                         }
                     }
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)

@@ -47,13 +47,9 @@ enum AnswerType{
 func evaluate_guess(guess:[String], answer:[String]) -> [AnswerType]
 {
     var rv = [AnswerType].init(repeating: .timeout, count: answer.count)
-    
+    if answer.count < guess.count {return rv}
     for (i, g) in guess.enumerated(){
-        if g == short_answer(answer:answer[i], oriented: false){
-            rv[i] = .correct
-        } else {
-            rv[i] = .incorrect
-        }
+        rv[i] = g == short_answer(answer:answer[i], oriented: false) ? .correct : .incorrect
     }
     return rv
 }

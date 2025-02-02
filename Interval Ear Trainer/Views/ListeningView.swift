@@ -10,6 +10,7 @@ import MediaPlayer
 
 struct ListeningView: View {
     @Environment(\.modelContext) var modelContext
+    @AppStorage("showHelp") var showHelp: Bool = false
     
     let id: String
     @State private var cacheData: [String: HistoricalData]
@@ -19,8 +20,9 @@ struct ListeningView: View {
     @Binding private var saveUsageData: Bool
     private var label: String?
     private var divider: Bool
+    private var helpText: String
 
-    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String, label: String? = nil, divider: Bool = false){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String, label: String? = nil, divider: Bool = false, helpText: String = ""){
         _params = .init(initialValue: params)
         _paramsPresented = .init(initialValue: false)
         _dftParams = .init(projectedValue: dftParams)
@@ -29,11 +31,17 @@ struct ListeningView: View {
         self.id = id
         self.label = label
         self.divider = divider
+        self.helpText = helpText
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4){
-            if label != nil { Text(label!).font(.footnote).bold().padding(.bottom, 5) }
+            if label != nil {
+                HStack(alignment: .center, spacing: 4){
+                    Text(label!).font(.footnote).bold().padding(.bottom, 5)
+                    if (showHelp && helpText != "") {HelpMarkView(){HelpTextView(text:helpText)}.font(.footnote).padding(.bottom, 5)}
+                }
+            }
             HStack{
                 Text("")
                 Image(systemName: ((SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner) ?  "pause.circle" : "play.circle")).foregroundColor(.gray).onTapGesture {

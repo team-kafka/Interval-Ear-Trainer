@@ -11,7 +11,7 @@ struct IntervalAnswerButtonsView: View {
     
     var activeIntervals: Set<Int>
     var active: Bool
-    var notes: [Int]
+    @Binding var notes: [Int]
     @Binding var guesses: [String]
     var use_timer: Bool
     var portrait: Bool
@@ -20,17 +20,6 @@ struct IntervalAnswerButtonsView: View {
         let activeIntAbs = activeIntervals.map{$0 > 0 ? $0 : -$0}
         let fontSize: Double = 30
         if portrait {
-//            HStack{
-//                ForEach(0..<4, id: \.self){ i in
-//                    VStack{
-//                        ForEach(0..<3, id: \.self){ j in
-//                            let thisInt = j*4+i+1
-//                            let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
-//                            IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
-//                        }
-//                    }.fixedSize(horizontal: false, vertical: true)
-//                }
-//            }.padding([.leading, .trailing, .bottom])
             Grid {
                 GridRow{
                     ForEach([1, 2, 3, 4], id: \.self){ thisInt in
@@ -56,7 +45,8 @@ struct IntervalAnswerButtonsView: View {
                         let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
                         IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes)
                     }
-                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(3)
+                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(2)
+                    DeleteButtonView(guesses: $guesses, fontSize: fontSize, answerSize: notes.count-1)
                 }
             }.padding([.leading, .trailing, .bottom])
         } else {
@@ -72,7 +62,8 @@ struct IntervalAnswerButtonsView: View {
                         let reallyActive = activeIntAbs.contains(thisInt) && (active || (!use_timer && notes[0] != 0))
                         IntervalAnswerButtonView(intervalInt: thisInt, active: reallyActive, fontSize: fontSize, guesses: $guesses, notes: notes).gridCellColumns(2)
                     }
-                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(3)
+                    IntervalAnswerButtonView(intervalInt: 12, active: false, fontSize: fontSize, guesses: $guesses, notes: notes, visible: 0.0).gridCellColumns(1)
+                    DeleteButtonView(guesses: $guesses, fontSize: fontSize, answerSize: notes.count-1).gridCellColumns(2)
                 }
                 GridRow{
                     ForEach(Array([12, 2, 4, 5, 7, 9, 11, 12].enumerated()), id: \.offset){ _, thisInt in
@@ -85,6 +76,46 @@ struct IntervalAnswerButtonsView: View {
     }
 }
 
+struct ButtonTextView: View {
+    var label: String
+    var fontSize: CGFloat
+    
+    var body: some View {
+        Text(label)
+            .bold()
+            .foregroundColor(Color(.systemGray))
+            .font(.system(size: fontSize))
+            .lineLimit(1)
+            .scaledToFill()
+            .minimumScaleFactor(0.5)
+            .gridColumnAlignment(.leading)
+            .padding().frame(maxWidth: .infinity, maxHeight: fontSize * 1.7)
+            .overlay(RoundedRectangle(cornerRadius: 10)
+                .stroke(.gray, lineWidth: 4))
+    }
+}
+    
+struct DeleteButtonView: View {
+    @Binding var guesses: [String]
+    var fontSize: Double
+    var answerSize: Int
+    
+    init(guesses: Binding<[String]>, fontSize: Double, answerSize: Int) {
+        _guesses = .init(projectedValue: guesses)
+        self.fontSize = fontSize
+        self.answerSize = answerSize
+    }
+    
+    var body: some View {
+        let active = guesses.count > 0 && guesses.count < answerSize
+        ButtonTextView(label:"X", fontSize: fontSize)
+            .opacity(active ? 1 : 0.5).onTapGesture{
+                    if active { guesses.removeLast() }
+                }
+    }
+}
+
+    
 struct IntervalAnswerButtonView: View {
     
     var intervalInt: Int
@@ -95,17 +126,8 @@ struct IntervalAnswerButtonView: View {
     var visible: Double = 1.0
     
     var body: some View {
-        Text(interval_name(interval_int: intervalInt, oriented: false))
-            .bold()
-            .foregroundColor(Color(.systemGray))
-            .font(.system(size: fontSize))
-            .lineLimit(1)
-            .scaledToFill()
-            .minimumScaleFactor(0.5)
-            .gridColumnAlignment(.leading)
-            .padding().frame(maxWidth: .infinity, maxHeight: fontSize * 1.7)
-            .overlay(RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 4)).opacity(active ? visible: 0.5 * visible).onTapGesture{
+        ButtonTextView(label:interval_name(interval_int: intervalInt, oriented: false), fontSize: fontSize)
+            .opacity(active ? visible: 0.5 * visible).onTapGesture{
                     if (active) {
                         if (guesses.count < notes.count-1){
                             guesses.append(interval_name(interval_int: intervalInt, oriented: false))
@@ -167,8 +189,12 @@ struct ScaleDegreeAnswerButtonsView: View {
     var portrait: Bool
     
     var body: some View {
+        Grid {
+            GridRow{
+            }
+        }
         let nLines = portrait ? 2 : 1
-        let nCol = Int(ceil(Double(SCALE_DEGREES.values.count) / Double(nLines)))
+        let nCol = Int(ceil(Double(SCALE_DEGREES.values.count+1) / Double(nLines)))
         HStack{
             ForEach(0..<nCol, id: \.self){ i in
                 VStack{
@@ -176,22 +202,18 @@ struct ScaleDegreeAnswerButtonsView: View {
                         let idx = j*nCol+i
                         if (idx < SCALE_DEGREES.values.count) {
                             let thisDegree = SCALE_DEGREES.values.sorted()[idx]
-                            let active = activeDegrees.contains(thisDegree) && (active || (!use_timer && notes[0] != 0))
-                            Text(scale_degree_answer_str(degrees: [thisDegree], scale:scale)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5)
+                            let reallyActive = activeDegrees.contains(thisDegree) && (active || (!use_timer && notes[0] != 0))
+                            ButtonTextView(label:scale_degree_answer_str(degrees: [thisDegree], scale:scale), fontSize: 30).opacity(reallyActive ? 1: 0.5)
                             .onTapGesture{
-                                    if (active) {
-                                        if (guesses.count < notes.count){
-                                            guesses.append(scale_degree_answer_str(degrees: [thisDegree], scale:scale))
-                                        }
+                                if (reallyActive) {
+                                    if (guesses.count < notes.count){
+                                        guesses.append(scale_degree_answer_str(degrees: [thisDegree], scale:scale))
                                     }
+                                }
                             }
                         }
                         else{
-                            Text("0").bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.gray, lineWidth: 4)).opacity(0)
+                            DeleteButtonView(guesses: $guesses, fontSize: 30, answerSize: notes.count)
                         }
                     }
                 }.fixedSize(horizontal: false, vertical: true)
@@ -199,4 +221,3 @@ struct ScaleDegreeAnswerButtonsView: View {
         }.padding([.leading, .trailing, .bottom])
     }
 }
-
