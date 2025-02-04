@@ -48,7 +48,7 @@ struct PracticeView: View {
                         (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
                         }.foregroundColor(Color(.systemGray)).padding()
-                        NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
+                        NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing, answer_visible: player.answerVisible, hasChord:chord_active)
                         if (params.type == .scale_degree) {
                             ScaleChooserView(params: $params, running:player.playing)
                                 .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
@@ -67,7 +67,7 @@ struct PracticeView: View {
                             toggle_start_stop()
                         }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                     }
-                    NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, running: player.playing, answer_visible: player.answerVisible, fixed_n_notes: fixed_n_notes, chord_active:chord_active)
+                    NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing, answer_visible: player.answerVisible, hasChord:chord_active)
                 }
                 answerView(portrait: orientation.isPortrait).opacity(player.answerVisible).font(.system(size: 45)).foregroundStyle(Color(.systemGray))
                 Spacer()

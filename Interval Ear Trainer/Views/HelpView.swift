@@ -100,20 +100,37 @@ struct HelpTimerPOView: View {
             VStack(alignment: .leading){
                 HStack{
                     Image(systemName:"clock")
-                    
-                    Text("Play a new sequence after a set")
+                    Text("Test mode:")
                 }
                 HStack{
                     Image(systemName:"clock").opacity(0.0)
-                    Text("time interval (in settings)")
+                    Text("- limited time to answer")
                 }
-            }
-            HStack{
-               // Text("Delay can be adjusted in settings").textCase(.none)
-            }
-            HStack{
-                Image(systemName:"infinity.circle")
-                Text("Wait for user input").textCase(.none)
+                HStack{
+                    Image(systemName:"clock").opacity(0.0)
+                    Text("(adjustable in settings)")
+                }
+                HStack{
+                    Image(systemName:"clock").opacity(0.0)
+                    Text("- results are saved to usage stats")
+                }
+
+                HStack{
+                    Image(systemName:"infinity.circle")
+                    Text("Practice mode:").textCase(.none)
+                }
+                HStack{
+                    Image(systemName:"figure.walk.treadmill.circle").opacity(0.0)
+                    Text("- infinite time to answer").textCase(.none)
+                }
+                HStack{
+                    Image(systemName:"figure.walk.treadmill.circle").opacity(0.0)
+                    Text("- sequences can be replayed").textCase(.none)
+                }
+                HStack{
+                    Image(systemName:"figure.walk.treadmill.circle").opacity(0.0)
+                    Text("- results are not saved to usage stats").textCase(.none)
+                }
             }
         }.padding()
     }
@@ -124,7 +141,7 @@ struct HelpNotesPOView: View {
         VStack(alignment: .leading)
         {
             HStack{
-                Text("replay notes of the previous sequence")
+                Text("replay the current sequence")
             }
         }.padding()
     }

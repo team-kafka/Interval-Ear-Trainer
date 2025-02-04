@@ -167,23 +167,23 @@ struct QuizzChart: View {
                     ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.correct)
-                        ).foregroundStyle(answer_colors[.correct]!)
+                        ).foregroundStyle(ANSWER_COLORS[.correct]!)
                     }
                     ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.timeout)
-                        ).foregroundStyle(answer_colors[.timeout]!)
+                        ).foregroundStyle(ANSWER_COLORS[.timeout]!)
                     }
                     ForEach(data, id: \.self) { d in
                         BarMark(x: .value("Id", d.id),
                                 y: .value("res", d.incorrect)
-                        ).foregroundStyle(answer_colors[.incorrect]!)
+                        ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
                     }
                 }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
                     .chartForegroundStyleScale([
-                        "correct" : answer_colors[.correct]!,
-                        "error": answer_colors[.incorrect]!,
-                        "timeout": answer_colors[.timeout]!,
+                        "correct" : ANSWER_COLORS[.correct]!,
+                        "error": ANSWER_COLORS[.incorrect]!,
+                        "timeout": ANSWER_COLORS[.timeout]!,
                     ])
                     .chartOverlay { pr in
                         if selectedIndex != nil {
@@ -215,17 +215,17 @@ struct OverlayView: View {
                     ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.correct)
-                        ).foregroundStyle(answer_colors[.correct]!)
+                        ).foregroundStyle(ANSWER_COLORS[.correct]!)
                     }
                     ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.timeout)
-                        ).foregroundStyle(answer_colors[.timeout]!)
+                        ).foregroundStyle(ANSWER_COLORS[.timeout]!)
                     }
                     ForEach(filteredData, id: \.self) { d in
                         BarMark(x: .value("date", d.date, unit: .day),
                                 y: .value("res", d.incorrect)
-                        ).foregroundStyle(answer_colors[.incorrect]!)
+                        ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
                     }
                 }
             }

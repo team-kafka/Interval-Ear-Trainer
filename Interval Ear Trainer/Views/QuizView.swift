@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-let answer_colors: [AnswerType: Color] = [
+let ANSWER_COLORS: [AnswerType: Color] = [
     .correct: Color.green,
     .incorrect: Color.red,
     .timeout: Color.orange
@@ -50,52 +50,49 @@ struct QuizView: View {
         NavigationStack{
             VStack {
                 QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
-                    .onChange(of: params.n_notes) { guesses = []; player.setParameters(params) ; player.resetState(params:params) }
-                    .onChange(of: params.is_chord) { guesses = []; player.setParameters(params) }
-                    .onChange(of: use_timer) { guesses = []; player.stop(); player.setParameters(params) ; player.resetState(params:params) }
-
                 if orientation.isPortrait {
-                    VStack{
+                    VStack(alignment: .center){
                         (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
                             toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding()
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                         if (params.type == .scale_degree) {
-                            ScaleChooserView(params: $params, running:player.playing)
+                            ScaleChooserView(params: $params, running:player.playing).padding([.top])
                                 .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
                                 .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
                         }
+                        NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0).padding([.top, .bottom])
+                        HStack{
+                            Spacer()
+                            let gridSize = switch params.type {
+                            case .scale_degree : params.n_notes
+                            case .interval : max(1, params.n_notes - 1)
+                            case .triad : 1
+                            }
+                            IntervalResultView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord).padding([.leading, .trailing])
+                            Spacer()
+                        }.padding([.bottom])
                     }
                 } else {
-                    HStack{
-                        if (params.type == .scale_degree) {
-                            ScaleChooserView(params: $params, running:player.playing)
+                    if (params.type == .scale_degree) {
+                        HStack{
+                            ScaleChooserView(params: $params, running:player.playing, fontSize: 25)
                                 .padding([.leading, .trailing])
                                 .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
                                 .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
+                            Spacer()
                         }
-                        Image(systemName: player.playing ? "pause.circle" : "play.circle").resizable().scaledToFit().onTapGesture {
-                            toggle_start_stop()
-                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                     }
-                }
-                if orientation.isPortrait {
-                    VStack{
-                        answerView().opacity(player.answerVisible)
-                            .onChange(of: player.answerVisible) {
-                                if player.answerVisible == 0.0 { guesses = [] }
-                                else { save_to_cache() } }
-                            .onChange(of: guesses) { if guesses.count == player.answers.count { self.advanceState() } }
-                        guessView()
-                    }
-                } else {
                     HStack{
-                        guessView()
-                        answerView().opacity(player.answerVisible)
-                            .onChange(of: player.answerVisible) {
-                                if player.answerVisible == 0.0 { guesses = [] }
-                                else { save_to_cache() } }
-                            .onChange(of: guesses) { if guesses.count == player.answers.count { self.advanceState() } }
-                    }
+                        Image(systemName: player.playing ? "pause.circle" : "play.circle").resizable().frame(width: 100, height: 100).onTapGesture {
+                            toggle_start_stop()
+                        }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .bottom])
+                        NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0)
+                        
+                        IntervalResultView(fontSize: 30, gridSize: params.type == .scale_degree ? 4 : 3, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord).padding([.leading, .trailing])
+                        Spacer()
+                    }.padding([.top])
+
+                    Spacer()
                 }
                 if (params.type == .interval) {
                     IntervalAnswerButtonsView(activeIntervals: params.active_intervals, active: (player.playing && (player.answerVisible==0.0)), notes: $player.notes, guesses: $guesses, use_timer: use_timer, portrait: orientation.isPortrait)
@@ -114,6 +111,7 @@ struct QuizView: View {
             player.stop()
             player.setParameters(params)
             player.resetState(params:params)
+            player.releaseNowPlaying()
             if UIDevice.current.orientation.isLandscape {
                 orientation = UIDeviceOrientation.landscapeLeft
             }
@@ -132,7 +130,6 @@ struct QuizView: View {
         .toolbarRole(.editor)
         .onDisappear {
             player.stop()
-            save_dft_params(newParams: params)
         }.onChange(of: SequencePlayer.shared.playing) {
             if (SequencePlayer.shared.playing == false) {
                 persist_cache()
@@ -141,7 +138,24 @@ struct QuizView: View {
             if paramsPresented == false {
                 save_dft_params(newParams: params)
             }
+        }.onChange(of: player.answerVisible) {
+            if player.answerVisible == 0.0 { guesses = [] }
+            else { save_to_cache() }
         }
+        .onChange(of: guesses){
+            if (guesses.count == player.answers.count && guesses.count > 0) {
+                self.advanceState()
+                if !use_timer {
+                    let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
+                    if guess_eval.reduce(true, { x, y in x && y == .correct}) {
+                        timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { _ in self.advanceState() }
+                    }
+                }
+            }
+        }
+        .onChange(of: params.n_notes) { resetState() }
+        .onChange(of: params.is_chord) { resetState() }
+        .onChange(of: use_timer) { resetState() }
     }
     
     func answerView() -> AnyView {
@@ -150,7 +164,7 @@ struct QuizView: View {
             HStack{
                 Text(" ").font(.system(size: 40))
                 ForEach(Array(player.answers.enumerated()), id: \.offset) { i, ans in
-                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(answer_colors[guess_eval[i]]!)
+                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(ANSWER_COLORS[guess_eval[i]]!)
                 }
             })
     }
@@ -176,11 +190,6 @@ struct QuizView: View {
             }
         } else { // Give up
             player.step()
-            if player.answerVisible == 1.0 {
-                timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { t in
-                    player.step()
-                }
-            }
         }
     }
 
@@ -188,11 +197,17 @@ struct QuizView: View {
         dftParams = newParams.encode()
     }
     
+    func resetState(){
+        guesses = []
+        player.stop()
+        player.setParameters(params)
+        player.resetState(params:params)
+    }
+    
     func advanceState()
     {
         if !use_timer {
             player.step()
-            timer = Timer.scheduledTimer(withTimeInterval:ANSWER_TIME, repeats: false) { t in player.step() }
         } else {
             player.loopFunction()
         }

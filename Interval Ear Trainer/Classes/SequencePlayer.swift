@@ -38,10 +38,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         self.params = nil
         self.answers = []
         self.answerVisible = 1
-
-        setupNowPlaying()
-        setupRemoteTransportControls()
-        setupNotifications()
     }
 
     deinit {
@@ -67,6 +63,9 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     func start() -> Bool {
         print("Started")
         if (seqGen != nil && params != nil) {
+            setupNowPlaying()
+            setupRemoteTransportControls()
+            setupNotifications()
             setAVSession(active: true)
             playing = true
             setupNowPlaying()
@@ -126,11 +125,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         if (seqGen != nil && params != nil && !playing) {
             if answerVisible == 1.0 {
                 answerVisible = 0.0
-                setAVSession(active: true)
-                let seq_duration = play_sequence()
-                timer = Timer.scheduledTimer(withTimeInterval:seq_duration + params.delay_sequence + 0.1, repeats: false) { t in
-                    self.setAVSession(active: false)
-                }
+                _ = play_sequence()
             } else {
                 answerVisible = 1.0
             }
@@ -204,6 +199,10 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
             nowPlayingInfo[MPMediaItemPropertyArtist] = artist_info
         }
         MPNowPlayingInfoCenter.default().nowPlayingInfo = nowPlayingInfo
+    }
+    
+    func releaseNowPlaying() {
+        MPNowPlayingInfoCenter.default().nowPlayingInfo = nil
     }
     
     func setupNotifications() {

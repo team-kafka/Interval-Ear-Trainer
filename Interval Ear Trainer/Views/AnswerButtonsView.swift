@@ -79,11 +79,13 @@ struct IntervalAnswerButtonsView: View {
 struct ButtonTextView: View {
     var label: String
     var fontSize: CGFloat
+    var color: Color = Color(.systemGray)
+    var hasBox: Bool = true
     
     var body: some View {
         Text(label)
             .bold()
-            .foregroundColor(Color(.systemGray))
+            .foregroundColor(color)
             .font(.system(size: fontSize))
             .lineLimit(1)
             .scaledToFill()
@@ -91,7 +93,7 @@ struct ButtonTextView: View {
             .gridColumnAlignment(.leading)
             .padding().frame(maxWidth: .infinity, maxHeight: fontSize * 1.7)
             .overlay(RoundedRectangle(cornerRadius: 10)
-                .stroke(.gray, lineWidth: 4))
+                .stroke(color, lineWidth: hasBox ? 4 : 0))
     }
 }
     
@@ -115,7 +117,52 @@ struct DeleteButtonView: View {
     }
 }
 
+
+struct IntervalResultView: View {
     
+    var fontSize: Double
+    var gridSize: Int
+    @Binding var guesses: [String]
+    @Binding var answers: [String]
+    @Binding var answerVisible: Double
+    var oriented: Bool
+    
+    var body: some View {
+        let guess_eval = evaluate_guess(guess: guesses, answer: answers)
+        Grid(horizontalSpacing: 1, verticalSpacing: 1){
+            GridRow {
+                ForEach(0...gridSize-1, id: \.self) { i in
+                    let ans = i < answers.count ? answers[i] : " "
+                    let color = i < guess_eval.count ? ANSWER_COLORS[guess_eval[i]]! : Color(.systemGray)
+                    Text(short_answer(answer: ans, oriented: oriented))
+                        .bold()
+                        .foregroundColor(color)
+                        .font(.system(size: fontSize))
+                        .lineLimit(1)
+                        .scaledToFill()
+                        .minimumScaleFactor(0.5)
+                        .gridColumnAlignment(.leading)
+                        .frame(maxWidth: fontSize * 1.7, maxHeight: fontSize * 1.3)
+                }
+            }.opacity(answerVisible)
+            GridRow {
+                ForEach(0...gridSize-1, id: \.self) { i in
+                    let guess = i < guesses.count ? guesses[i] : " "
+                    Text(guess)
+                        .bold()
+                        .foregroundColor(Color(.systemGray))
+                        .font(.system(size: fontSize))
+                        .lineLimit(1)
+                        .scaledToFill()
+                        .minimumScaleFactor(0.5)
+                        .gridColumnAlignment(.leading)
+                        .frame(maxWidth: fontSize * 1.7, maxHeight: fontSize * 1.3)
+                }
+            }
+        }
+    }
+}
+
 struct IntervalAnswerButtonView: View {
     
     var intervalInt: Int

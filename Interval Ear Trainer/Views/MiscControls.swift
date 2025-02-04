@@ -21,7 +21,8 @@ struct CheckBoxView: View {
 }
 
 struct ChordButton : View {
-    var running : Bool
+    var active : Bool
+    var visible : Double
     var duration : Double
     var notes : [Int]
     var chord : Bool
@@ -31,15 +32,16 @@ struct ChordButton : View {
         Image(systemName: "music.quarternote.3").foregroundColor(Color(.systemGray)).padding().overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 4)).onTapGesture {
-                  if ((notes[0] != 0) && !running){
+                  if ((notes[0] != 0) && !active){
                       MidiPlayer.shared.playNotes(notes: notes, duration: chord ? duration : chord_delay, chord: chord)
                     }
-                }.opacity(((notes[0] != 0) && !running) ? 1.0 : 0.5)
+                }.opacity(((notes[0] != 0) && !active) ? visible : 0.5 * visible)
     }
 }
 
 struct NoteButton : View {
-    var running : Bool
+    var active : Bool
+    var visible : Double
     var note : Int
     var duration : Double
 
@@ -47,10 +49,10 @@ struct NoteButton : View {
         Image(systemName: "music.note").foregroundColor(Color(.systemGray)).padding().overlay(
             RoundedRectangle(cornerRadius: 10)
                 .stroke(.gray, lineWidth: 4)).onTapGesture {
-                  if ((note != 0) && !running){
+                  if ((note != 0) && !active){
                       MidiPlayer.shared.playNotes(notes: [note], duration: duration)
                     }
-                }.opacity(((note != 0) && !running) ? 1.0 : 0.5)
+                }.opacity(((note != 0) && !active) ? visible : 0.5 * visible)
     }
 }
 
@@ -60,36 +62,40 @@ struct NoteButtonsView: View {
     var params: Parameters
     var notes: [Int]
     var root_note: Int
-    var running: Bool
+    var active: Bool
     var chord: Bool
     var answer_visible: Double
-    var fixed_n_notes: Bool
+    var hasChord: Bool
+    var visible: Double
     
-    init(params: Parameters, notes: [Int], root_note: Int, chord: Bool, running: Bool, answer_visible: Double, fixed_n_notes: Bool, chord_active: Bool) {
+    init(params: Parameters, notes: [Int], root_note: Int, chord: Bool, active: Bool, answer_visible: Double, hasChord: Bool, visible: Double = 1.0) {
         self.params =  params
         self.notes = notes
         self.root_note = root_note
-        self.running = running
+        self.active = active
         self.chord = chord
-        self.fixed_n_notes = fixed_n_notes
+        self.hasChord = hasChord
         self.answer_visible = answer_visible
+        self.visible = visible
     }
     
     var body: some View {
         Grid{
             GridRow(alignment: .center){
-                if chord{ ChordButton(running: running, duration: params.delay * 0.5, notes: notes, chord: chord, chord_delay: params.delay_sequence) }
-                ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
-                    NoteButton(running: running, note: note, duration: params.delay_sequence)
+                if hasChord { ChordButton(active: active, visible: chord ? visible : 0.0, duration: params.delay * 0.5, notes: notes, chord: chord, chord_delay: params.delay_sequence) }
+                ForEach(0...3, id: \.self) { i in
+                    let note = i < notes.count ? notes[i] : 0
+                    NoteButton(active: active, visible: i < notes.count ? visible : 0.0, note: note, duration: params.delay_sequence)
                 }
-                if showHelp{ HelpMarkView{ HelpNotesPOView() } }
+                if showHelp{ HelpMarkView(opacity: visible * 0.3){ HelpNotesPOView() } }
             }
             GridRow(alignment: .center){
-                if chord{ Text(" ").opacity(0.0) }
-                ForEach(Array(notes.enumerated()), id: \.offset) { _, note in
-                    Text(midi_note_to_name(note_int: note)).opacity(answer_visible).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
+                if hasChord { Text(" ").opacity(0.0) }
+                ForEach(0...3, id: \.self) { i in
+                    let note = i < notes.count ? notes[i] : 0
+                    let opacity = i < notes.count ? answer_visible * visible : 0.0
+                    Text(midi_note_to_name(note_int: note)).opacity(opacity).foregroundStyle(Color(.systemGray)).fontWeight((note == root_note) ? .bold : .regular)
                 }
-                if showHelp{ Text(" ").opacity(0) }
             }
         }
     }
@@ -97,9 +103,9 @@ struct NoteButtonsView: View {
 
 struct TimerView: View {
     @Binding var active: Bool
-    
+
     var body: some View {
-        Image(systemName: active ? "clock" : "infinity.circle")
+        Image(systemName: active ? "clock" : "infinity.circle")//"figure.cooldown.circle")//"figure.walk.treadmill.circle")//"graduationcap.circle"
             .foregroundColor(Color.secondary)
             .onTapGesture {
                 active.toggle()
@@ -216,47 +222,52 @@ struct ScaleChooserView: View {
     @AppStorage("showHelp") var showHelp: Bool = false
     @Binding var params: Parameters
     var running: Bool
+    var fontSize: CGFloat
 
-    init(params: Binding<Parameters>, running: Bool) {
+    init(params: Binding<Parameters>, running: Bool, fontSize: CGFloat = 30) {
         _params = .init(projectedValue: params)
         self.running = running
+        self.fontSize = fontSize
     }
 
     var body: some View {
-        Grid{
+        Grid(alignment: .leading) {
             GridRow{
                 HStack(alignment: .center){
-                    Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.leading]).onTapGesture {
+                    if showHelp {HelpMarkView(){HelpTextView(text:"Select a random key")}.padding(4)}
+                    Image(systemName: "die.face.5").foregroundColor(Color(.systemGray)).padding([.trailing]).onTapGesture {
                         if !running {
                             params.key = NOTE_KEYS.randomElement()!
                         }
                     }.scaleEffect(1.5)
-                    if showHelp {HelpMarkView(){HelpTextView(text:"Select random key")}.padding(4)}
                 }
                 Menu{
                     Picker("key", selection: $params.key) {
                         ForEach(NOTE_KEYS, id: \.self) {
-                            Text($0).font(.system(size: 35)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
+                            Text($0).font(.system(size: fontSize)).accentColor(Color(.systemGray)).gridColumnAlignment(.leading)
                         }
                     }
                 } label: {
-                    Text(params.key).font(.system(size: 35)).accentColor(Color(.systemGray))
+                    Text(params.key).font(.system(size: fontSize)).accentColor(Color(.systemGray))
                 }
             }
             GridRow{
-                Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing, .leading]).onTapGesture {
-                    if !running {
-                        play_scale(params:params)
-                    }
-                }.scaleEffect(1.5)
+                HStack(alignment: .center){
+                    if showHelp {HelpMarkView(){HelpTextView(text:"Play the scale")}.padding(4)}
+                    Image(systemName:"speaker.wave.2.fill").foregroundColor(Color(.systemGray)).padding([.trailing]).onTapGesture {
+                        if !running {
+                            play_scale(params:params)
+                        }
+                    }.scaleEffect(1.5)
+                }
                 Menu{
                     Picker("Scale", selection: $params.scale) {
                         ForEach(SCALE_KEYS, id: \.self) {
-                            Text($0).font(.system(size: 35)).gridColumnAlignment(.leading)
+                            Text($0).font(.system(size: fontSize)).gridColumnAlignment(.leading).lineLimit(1)
                         }
                     }.accentColor(Color(.systemGray))
                 } label: {
-                    Text(params.scale).font(.system(size: 35)).accentColor(Color(.systemGray))
+                    Text(params.scale).font(.system(size: fontSize)).accentColor(Color(.systemGray))
                 }
             }
         }
@@ -290,11 +301,11 @@ struct QuickParamButtonsView: View {
             NumberOfNotesView(n_notes: $n_notes, active: !fixed_n_notes, visible: !fixed_n_notes).scaleEffect(2.0)
             if (showHelp && !fixed_n_notes) { HelpMarkView{HelpNNotesPOView()}.padding(4) }
             Spacer()
-            TimerView(active: $use_timer).scaleEffect(2.0)
-            if showHelp { HelpMarkView{HelpTimerPOView()}.padding(4) }
-            Spacer()
             ChordArpSwitchView(chord: $chord, active: chord_active, visible: chord_active).scaleEffect(2.0)
             if (showHelp && chord_active) { HelpMarkView{HelpChordPOView()}.padding(4) }
+            Spacer()
+            TimerView(active: $use_timer).scaleEffect(2.0)
+            if showHelp { HelpMarkView{HelpTimerPOView()}.padding(4) }
             Spacer()
         }
     }
