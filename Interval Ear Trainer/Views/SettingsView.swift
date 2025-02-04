@@ -8,6 +8,8 @@
 import SwiftUI
 import SwiftData
 
+let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+
 struct SettingsView: View {
     
     @Environment(\.modelContext) private var modelContext
@@ -65,7 +67,7 @@ struct SettingsView: View {
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }
-        .tint(.green)
+        .tint(.gray)
         .toolbarRole(.editor)
     }
 }
