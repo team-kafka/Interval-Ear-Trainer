@@ -57,8 +57,6 @@ struct QuizView: View {
                         }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .top])
                         if (params.type == .scale_degree) {
                             ScaleChooserView(params: $params, running:player.playing).padding([.top])
-                                .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
-                                .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
                         }
                         NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0).padding([.top, .bottom])
                         HStack{
@@ -77,8 +75,6 @@ struct QuizView: View {
                         HStack{
                             ScaleChooserView(params: $params, running:player.playing, fontSize: 25)
                                 .padding([.leading, .trailing])
-                                .onChange(of: params.scale) { player.setParameters(params) ; player.resetState(params:params) }
-                                .onChange(of: params.key) { player.setParameters(params) ; player.resetState(params:params) }
                             Spacer()
                         }
                     }
@@ -156,6 +152,8 @@ struct QuizView: View {
         .onChange(of: params.n_notes) { resetState() }
         .onChange(of: params.is_chord) { resetState() }
         .onChange(of: use_timer) { resetState() }
+        .onChange(of: params.scale) { resetState() }
+        .onChange(of: params.key) { resetState() }
     }
     
     func answerView() -> AnyView {
