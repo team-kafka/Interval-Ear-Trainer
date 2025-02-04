@@ -34,24 +34,6 @@ struct MainMenu: View {
     var body: some View {
         NavigationStack{
             List{
-//                Section(header: HStack{
-//                    Text("Practice")
-//                    if showHelp {HelpMarkView(opacity:0.7){HelpTextView(text:"")}}
-//                }) {
-//                    NavigationLink(destination: PracticeView(params: Parameters.decode(paramsIP), dftParams: $paramsIP, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
-//                        Text("Intervals").font(.headline)
-//                    }
-//                    NavigationLink(destination:
-//                                    PracticeView(params: Parameters.decode(paramsTP), dftParams: $paramsTP, saveUsageData: $saveUsageData, fixed_n_notes:true).modelContainer(for: HistoricalData.self)){
-//                        Text("Triads").font(.headline)
-//                    }
-//                    NavigationLink(destination:
-//                                    PracticeView(params: Parameters.decode(paramsSP), dftParams: $paramsSP, saveUsageData: $saveUsageData, chord_active: false).modelContainer(for: HistoricalData.self)){
-//                        Text("Scale Degrees").font(.headline)
-//                    }
-//                }
-
-               
                 Section(header: HStack{
                     Text("Listening")
                     if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
