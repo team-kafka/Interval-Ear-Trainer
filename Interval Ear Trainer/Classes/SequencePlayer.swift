@@ -38,6 +38,8 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         self.params = nil
         self.answers = []
         self.answerVisible = 1
+        setupRemoteTransportControls()
+        setupNotifications()
     }
 
     deinit {
@@ -45,15 +47,17 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     }
     
     func setParameters(_ params: Parameters) {
-        self.params = params
-        if (params.type == .interval) {
-            self.seqGen = IntervalGenerator()
-        } else if (params.type == .triad){
-            self.seqGen = TriadGenerator()
-        } else {
-            self.seqGen = ScaleDegreeGenerator()
+        if (self.params == nil) || (params.type != self.params.type) {
+            if (params.type == .interval) {
+                self.seqGen = IntervalGenerator()
+            } else if (params.type == .triad){
+                self.seqGen = TriadGenerator()
+            } else {
+                self.seqGen = ScaleDegreeGenerator()
+            }
         }
-        setupNowPlaying()
+        self.params = params
+        updateNowPlaying()
     }
     func setOwner(_ id: String) { self.owner = id }
     
@@ -63,12 +67,10 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     func start() -> Bool {
         print("Started")
         if (seqGen != nil && params != nil) {
-            setupNowPlaying()
-            setupRemoteTransportControls()
-            setupNotifications()
             setAVSession(active: true)
+            updateNowPlaying()
             playing = true
-            setupNowPlaying()
+            updateNowPlaying()
             timer?.invalidate()
             if (params.type == .scale_degree && notes[0] == 0) {
                 MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration:SCALE_DELAY)
@@ -91,7 +93,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         MidiPlayer.shared.stop()
         self.setAVSession(active: false)
         self.playing = false
-        setupNowPlaying()
+        updateNowPlaying()
     }
  
     func loopFunction() {
@@ -115,7 +117,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         var note_duration: Double
         let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
         (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
-        setupNowPlaying()
+        updateNowPlaying()
         let notesToPlay = (params.n_notes == 1 && prev_note != 0) ? [notes.last!] : notes
         MidiPlayer.shared.playNotes(notes: notesToPlay, duration: note_duration, chord: params.is_chord)
         return seq_duration
@@ -180,7 +182,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         }
     }
     
-    func setupNowPlaying() {
+    func updateNowPlaying() {
         var nowPlayingInfo = [String : Any]()
         nowPlayingInfo[MPMediaItemPropertyTitle] = short_answer(answer:answers.joined(separator: " "))
 
@@ -211,53 +213,48 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                                        selector: #selector(handleInterruption),
                                        name: AVAudioSession.interruptionNotification,
                                        object: nil)
-//        NotificationCenter.default.addObserver(self,
-//                                               selector: #selector(handleRouteChange),
-//                                               name: AVAudioSession.routeChangeNotification,
-//                                               object: AVAudioSession.sharedInstance())
+        notificationCenter.addObserver(self,
+                                           selector: #selector(handleRouteChange),
+                                           name: AVAudioSession.routeChangeNotification,
+                                           object: AVAudioSession.sharedInstance())
     }
 
     @objc func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
               let reasonValue = userInfo[AVAudioSessionInterruptionReasonKey] as? UInt,
-              let reason = AVAudioSession.InterruptionReason(rawValue: reasonValue),
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
             let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
                 return
         }
         print("interruption")
-        print(reasonValue)
-        print(typeValue)
+        print(reasonValue) // 4 = routeDisconnected, 0 = default
         if type == .began {
             print("interruption began")
-            print(reason)
             self.stop()
         } else if type == .ended {
             print("interruption ended")
-            self.stop()
         }
     }
-//    
-//    @objc func handleRouteChange(notification: Notification) {
-//        guard let userInfo = notification.userInfo,
-//              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
-//              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
-//            return
-//        }
-//
-//        switch reason {
-//        case .newDeviceAvailable:
-//            print("new device available")
-//        case .oldDeviceUnavailable:
-//            print("old device unavailable")
-//            //self.stop()
-//        case .override:
-//            print("route change override")
-//        default:
-//            print("default route change")
-//            //self.stop()
-//        }
-//    }
+    
+    @objc func handleRouteChange(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+              let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+            return
+        }
+
+        switch reason {
+        case .newDeviceAvailable:
+            print("new device available")
+        case .oldDeviceUnavailable:
+            print("old device unavailable")
+            self.stop()
+        case .override:
+            print("route change override")
+        default:
+            print("default route change")
+        }
+    }
 
     func setAVSession(active:Bool){
         let session = AVAudioSession.sharedInstance()

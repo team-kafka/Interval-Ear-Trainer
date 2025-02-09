@@ -59,7 +59,7 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
     return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
 }
 
-func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0) -> ([Int], [String])
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0, first_note_in:Int=0) -> ([Int], [String])
 {
     var intervals = [Int]()
     for _ in (1...n_notes-1) {
@@ -73,14 +73,18 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     let lb2 = lower_bound - min(0, running_sum.min()!)
     
     var first_note: Int
-    if lb2 < ub2 {
-        var draw_set = Set(lb2...ub2)
-        if (draw_set.count > 1 && draw_set.contains(prev_note)){
-            draw_set.remove(prev_note)
+    if first_note_in == 0 {
+        if lb2 < ub2 {
+            var draw_set = Set(lb2...ub2)
+            if (draw_set.count > 1 && draw_set.contains(prev_note)){
+                draw_set.remove(prev_note)
+            }
+            first_note = draw_set.randomElement()!
+        } else {
+            first_note = Int(floor(Double(lb2 + ub2) / 2))
         }
-        first_note = draw_set.randomElement()!
     } else {
-        first_note = Int(floor(Double(lb2 + ub2) / 2))
+        first_note = first_note_in
     }
 
     return ([first_note] + running_sum.map{first_note + $0},

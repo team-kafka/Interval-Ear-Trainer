@@ -37,7 +37,9 @@ struct Parameters : Codable {
     // Interval related
     var active_intervals: Set<Int> = [-1, -2, -3, -4, -5, -6, -7, -8, -9, -10, -11, -12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
     var largeIntevalsProba: Double = 0.0
-    
+    var compare_intervals: Bool? = false
+    var compare_intervals_shuffled: Bool? = true
+
     // Triad related
     var active_qualities:  Set<String> = Set<String>(TRIADS.keys)
     var active_inversions: Set<String> = Set<String>(TRIAD_INVERSIONS.keys)
@@ -75,6 +77,14 @@ struct Parameters : Codable {
 }
 
 extension Parameters {
+    
+//    init(from decoder: Decoder) throws {
+//        let container = try decoder.container(keyedBy: CodingKeys.self)
+//        if let compare_intervals = try container.decodeIfPresent(Bool.self, forKey: .compare_intervals) {
+//            self.compare_intervals = compare_intervals
+//        }
+//    }
+    
     func encode() -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted

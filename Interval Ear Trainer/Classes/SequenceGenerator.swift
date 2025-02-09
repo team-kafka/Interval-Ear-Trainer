@@ -16,11 +16,17 @@ class SequenceGenerator {
 
 class IntervalGenerator : SequenceGenerator{
     
+    var active_to_play : [Int] = []
+    
     override func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         var notes = [Int].init(repeating: 0, count: n_notes)
         var note_duration : Double = params.delay_sequence
         var seq_duration: Double = 0.0
         var answers = [String]()
+        
+        if params.compare_intervals ?? false {
+            return generateSequenceComparison(params: params, chord:chord, prev_note:prev_note)
+        }
         
         if (n_notes == 1) {
             if (prev_note == 0) {
@@ -51,7 +57,31 @@ class IntervalGenerator : SequenceGenerator{
         }
         return (notes, note_duration, seq_duration, answers, 0)
     }
+    
+    func generateSequenceComparison(params: Parameters, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
+        var first_note = prev_note
+        var notes = [Int].init(repeating: 0, count: 2)
+        var answers = [String]()
+        var note_duration : Double
+        var seq_duration: Double
+        
+        if active_to_play.isEmpty{
+            active_to_play = (params.compare_intervals_shuffled ?? false) ? Array(params.active_intervals).shuffled() : Array(params.active_intervals).sorted()
+            first_note = 0
+        }
+        let this_int = active_to_play.removeLast()
+        (notes, answers) = draw_notes(n_notes: 2, active_intervals: Set<Int>([this_int]), upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note, first_note_in: first_note)
+        note_duration = params.delay_sequence
+        seq_duration = params.delay_sequence
+        if chord{
+            answers = answers.map { "H" + $0 }
+            note_duration = params.delay * 0.5
+            seq_duration = 0.0
+        }
+        return (notes, note_duration, seq_duration, answers, 0)
+    }
 }
+
 
 class TriadGenerator : SequenceGenerator{
     

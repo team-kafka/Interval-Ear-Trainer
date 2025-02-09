@@ -116,8 +116,16 @@ struct QuizView: View {
             }
         }
         .toolbar {
-            Button(action: {paramsPresented = true}){
-                Image(systemName: "gearshape.fill")
+            let visible = params.delay == 0.2 && params.delay_sequence == 2.0 && params.active_intervals == [-12]
+            if visible {
+                ToolbarItem(placement: .topBarTrailing) {
+                    NavigationLink(destination: SecretView()) { Image(systemName: "star.square").foregroundColor(Color(.systemGray))}
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button(action: {paramsPresented = true}){
+                    Image(systemName: "gearshape.fill")
+                }
             }
         }
         .sheet(isPresented: $paramsPresented) {
@@ -149,11 +157,11 @@ struct QuizView: View {
                 }
             }
         }
-        .onChange(of: params.n_notes) { resetState() }
-        .onChange(of: params.is_chord) { resetState() }
+        .onChange(of: params.n_notes) { resetState(); save_dft_params(newParams: params) }
+        .onChange(of: params.is_chord) { resetState(); save_dft_params(newParams: params) }
         .onChange(of: use_timer) { resetState() }
-        .onChange(of: params.scale) { resetState() }
-        .onChange(of: params.key) { resetState() }
+        .onChange(of: params.scale) { resetState(); save_dft_params(newParams: params) }
+        .onChange(of: params.key) { resetState(); save_dft_params(newParams: params) }
     }
     
     func answerView() -> AnyView {
@@ -191,19 +199,18 @@ struct QuizView: View {
         }
     }
 
-    func save_dft_params(newParams: Parameters){
+    func save_dft_params(newParams: Parameters) {
         dftParams = newParams.encode()
     }
     
-    func resetState(){
+    func resetState() {
         guesses = []
         player.stop()
         player.setParameters(params)
         player.resetState(params:params)
     }
     
-    func advanceState()
-    {
+    func advanceState() {
         if !use_timer {
             player.step()
         } else {
@@ -211,8 +218,7 @@ struct QuizView: View {
         }
     }
     
-    func save_to_cache()
-    {
+    func save_to_cache() {
         if saveUsageData {
             let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
             for (res, ans) in zip(guess_eval, player.answers){
@@ -232,8 +238,7 @@ struct QuizView: View {
         }
     }
     
-    func persist_cache()
-    {
+    func persist_cache() {
         if saveUsageData {
             for hd in cacheData.values{
                 modelContext.insert(hd)

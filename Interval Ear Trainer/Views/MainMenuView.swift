@@ -28,6 +28,7 @@ struct MainMenu: View {
     @AppStorage("paramsIL1") var paramsIL1: String = Parameters(type:.interval, active_intervals:[3, 4]).encode()
     @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[-9]).encode()
     @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8]).encode()
+    @AppStorage("paramsILC") var paramsILC: String = Parameters(type:.interval, active_intervals:[-8, -9], compare_intervals:true).encode()
     @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
     
@@ -38,11 +39,12 @@ struct MainMenu: View {
                     Text("Listening")
                     if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
                 }) {
-                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:"Play a stream of random intervals, starting from random notes").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
                     ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:"Select a random starting note\nPlay all selected intervals starting with that note\nRepeat with a new random starting note\nIntervals are played in order or shuffled").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:"Play a stream of random triads, with random root notes and voicings").modelContainer(for: HistoricalData.self)
+                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:"For a given scale and key, play sequences of N diatonic notes").modelContainer(for: HistoricalData.self)
                 }.navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
                 Section(header: HStack{
                     Text("Quiz")

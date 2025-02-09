@@ -51,7 +51,18 @@ struct ListeningView: View {
                         stop()
                     }
                 }
-                if (params.type == .scale_degree) {
+                if (params.compare_intervals ?? false) {
+                    Image(systemName: (params.compare_intervals_shuffled ?? false) ? "shuffle.circle.fill" : "shuffle.circle").foregroundColor(.gray).onTapGesture {
+                        if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner)) {
+                            if params.compare_intervals_shuffled == nil {
+                                params.compare_intervals_shuffled = true
+                            } else {
+                                params.compare_intervals_shuffled!.toggle()
+                            }
+                        }
+                    }
+                    ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
+                } else if (params.type == .scale_degree) {
                     Image(systemName: "die.face.5").foregroundColor(.gray).onTapGesture {
                         if (!(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner)) {
                             params.key = NOTE_KEYS.randomElement()!
