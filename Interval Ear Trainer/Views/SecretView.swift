@@ -12,15 +12,12 @@ struct SecretView: View {
     
     var body: some View {
         VStack {
-            //Color.teal.ignoresSafeArea()
             Image( displayMgr.show2 ? "ETP2" :"ETP").resizable().scaledToFit().padding(.top, 100)
             Spacer()
         }.background(Color.teal)
             .onAppear {
             }
     }
-
-
 }
 
 @Observable class DisplayMgr : ObservableObject{
@@ -31,6 +28,7 @@ struct SecretView: View {
         self.timer = Timer.scheduledTimer(withTimeInterval: 1.7, repeats: true) { _ in self.show2.toggle() }
     }
 }
+
 #Preview {
     SecretView()
 }

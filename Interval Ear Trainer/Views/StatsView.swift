@@ -37,8 +37,9 @@ struct StatView: View {
                     Label(LABELS[selectedIndex], systemImage: "key")
                 }
                 .tag(2)
-        }.toolbarRole(.editor)
-            .navigationTitle(LABELS[selectedIndex]).navigationBarTitleDisplayMode(.inline)
+        }
+        .toolbarRole(.editor)
+        .navigationTitle(LABELS[selectedIndex]).navigationBarTitleDisplayMode(.inline)
         .tint(Color.gray)
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
@@ -87,12 +88,7 @@ struct StatsIntervalView: View {
         self.filter = filter
         let typeI = ex_type_to_str(ex_type:.interval)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == typeI})
-        if UIDevice.current.orientation.isLandscape {
-            self.orientation = UIDeviceOrientation.landscapeLeft
-        }
-        else {
-            self.orientation = UIDeviceOrientation.portrait
-        }
+        self.orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
     }
     
     var body: some View {
@@ -118,7 +114,11 @@ struct StatsIntervalView: View {
                     }.scrollTargetBehavior(.paging)
                 }.scrollTargetLayout()
             }
-        }.onRotate { newOrientation in
+        }
+        .onAppear {
+            orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
+        }
+        .onRotate { newOrientation in
             if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
             }
     }
@@ -134,12 +134,7 @@ struct StatsTriadView: View {
     init() {
         let typeT = ex_type_to_str(ex_type:.triad)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeT})
-        if UIDevice.current.orientation.isLandscape {
-            self.orientation = UIDeviceOrientation.landscapeLeft
-        }
-        else {
-            self.orientation = UIDeviceOrientation.portrait
-        }
+        self.orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
     }
     
     var body: some View {
@@ -164,6 +159,9 @@ struct StatsTriadView: View {
                 }.scrollTargetLayout()
             }
         }
+        .onAppear {
+            orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
+        }
         .onRotate { newOrientation in
         if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
         }
@@ -180,12 +178,7 @@ struct StatsScaleDegreeView: View {
     init() {
         let typeS = ex_type_to_str(ex_type:.scale_degree)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeS})
-        if UIDevice.current.orientation.isLandscape {
-            self.orientation = UIDeviceOrientation.landscapeLeft
-        }
-        else {
-            self.orientation = UIDeviceOrientation.portrait
-        }
+        self.orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
     }
     
     var body: some View {
@@ -209,7 +202,11 @@ struct StatsScaleDegreeView: View {
                     }.scrollTargetBehavior(.paging)
                 }.scrollTargetLayout()
             }
-        }.onRotate { newOrientation in
+        }
+        .onAppear {
+            orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
+        }
+        .onRotate { newOrientation in
             if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
             }
     }

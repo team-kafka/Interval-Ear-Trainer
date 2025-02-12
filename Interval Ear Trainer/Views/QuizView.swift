@@ -108,12 +108,7 @@ struct QuizView: View {
             player.setParameters(params)
             player.resetState(params:params)
             player.releaseNowPlaying()
-            if UIDevice.current.orientation.isLandscape {
-                orientation = UIDeviceOrientation.landscapeLeft
-            }
-            else {
-                orientation = UIDeviceOrientation.portrait
-            }
+            orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
         }
         .toolbar {
             let visible = params.delay == 0.2 && params.delay_sequence == 2.0 && params.active_intervals == [-12]

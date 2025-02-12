@@ -13,62 +13,24 @@ let INTERVAL_LISTENING_IDS = ["LVI1", "LVI2", "LVI3"]
 struct MainMenu: View {
     @Environment(\.modelContext) private var modelContext
     @Query() private var usageData: [HistoricalData]
-    
     @AppStorage("saveUsageData") var saveUsageData: Bool = true
     @AppStorage("showHelp") var showHelp: Bool = false
 
-    @AppStorage("paramsIP") var paramsIP: String = Parameters(type:.interval).encode()
-    @AppStorage("paramsTP") var paramsTP: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
-    @AppStorage("paramsSP") var paramsSP: String = Parameters(type:.scale_degree, n_notes:1).encode()
-
-    @AppStorage("paramsIQ") var paramsIQ: String = Parameters(type:.interval).encode()
-    @AppStorage("paramsTQ") var paramsTQ: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
-    @AppStorage("paramsSQ") var paramsSQ: String = Parameters(type:.scale_degree, n_notes:1).encode()
-
-    @AppStorage("paramsIL1") var paramsIL1: String = Parameters(type:.interval, active_intervals:[3, 4]).encode()
-    @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[-9]).encode()
-    @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8]).encode()
-    @AppStorage("paramsILC") var paramsILC: String = Parameters(type:.interval, active_intervals:[-8, -9], compare_intervals:true).encode()
-    @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
-    @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
-    
     var body: some View {
-        NavigationStack{
-            List{
-                Section(header: HStack{
-                    Text("Listening")
-                    if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
-                }) {
-                    ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:"Play a stream of random intervals, starting from random notes").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:"Select a random starting note\nPlay all selected intervals starting with that note\nRepeat with a new random starting note\nIntervals are played in order or shuffled").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:"Play a stream of random triads, with random root notes and voicings").modelContainer(for: HistoricalData.self)
-                    ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:"For a given scale and key, play sequences of N diatonic notes").modelContainer(for: HistoricalData.self)
-                }.navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
-                Section(header: HStack{
-                    Text("Quiz")
-                    if showHelp {HelpMarkView(opacity:0.7){HelpQuizPOView()}}
-                }) {
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
-                        Text("Intervals").font(.headline)
+        Group{
+            NavigationStack{
+                List{
+                    MainMenuListeningView()
+                    MainMenuQuizView().navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
+                }.toolbar {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
                     }
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, saveUsageData: $saveUsageData, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self)){
-                        Text("Triads").font(.headline)
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData, showHelp: $showHelp).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding()
                     }
-                    NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, saveUsageData: $saveUsageData, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self)){
-                        Text("Scale Degrees").font(.headline)
-                    }
-                }
-            }.toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
-                }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData, showHelp: $showHelp).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding()
                 }
             }
-            .toolbarRole(.editor)
         }
         .tint(.gray)
         .onAppear(){
@@ -76,7 +38,7 @@ struct MainMenu: View {
             showHelp = false
         }
     }
-    
+
     func compressPastData()
     {
         let olderUD = usageData.filter({ $0.date < rounded_date(date:Date()) })
@@ -99,6 +61,65 @@ struct MainMenu: View {
                 }
             }
             try! modelContext.save()
+        }
+    }
+}
+
+struct MainMenuListeningView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query() private var usageData: [HistoricalData]
+    
+    @AppStorage("saveUsageData") var saveUsageData: Bool = true
+    @AppStorage("showHelp") var showHelp: Bool = false
+    
+    @AppStorage("paramsIL1") var paramsIL1: String = Parameters(type:.interval, active_intervals:[3, 4]).encode()
+    @AppStorage("paramsIL2") var paramsIL2: String = Parameters(type:.interval, active_intervals:[-9]).encode()
+    @AppStorage("paramsIL3") var paramsIL3: String = Parameters(type:.interval, active_intervals:[-8]).encode()
+    @AppStorage("paramsILC") var paramsILC: String = Parameters(type:.interval, active_intervals:[-8, -9], compare_intervals:true).encode()
+    @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
+    @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
+    
+    var body: some View {
+        Section(header: HStack{
+            Text("Listening")
+            if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
+        }) {
+            ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:"Play a stream of random intervals, starting from random notes").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:"Select a random starting note\nPlay all selected intervals starting with that note\nRepeat with a new random starting note\nIntervals are played in order or shuffled").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:"Play a stream of random triads, with random root notes and voicings").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:"For a given scale and key, play sequences of N diatonic notes").modelContainer(for: HistoricalData.self)
+        }
+    }
+}
+
+struct MainMenuQuizView: View {
+    @Environment(\.modelContext) private var modelContext
+    @Query() private var usageData: [HistoricalData]
+    
+    @AppStorage("saveUsageData") var saveUsageData: Bool = true
+    @AppStorage("showHelp") var showHelp: Bool = false
+
+    @AppStorage("paramsIQ") var paramsIQ: String = Parameters(type:.interval).encode()
+    @AppStorage("paramsTQ") var paramsTQ: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
+    @AppStorage("paramsSQ") var paramsSQ: String = Parameters(type:.scale_degree, n_notes:1).encode()
+
+    
+    var body: some View {
+        Section(header: HStack{
+            Text("Quiz")
+            if showHelp {HelpMarkView(opacity:0.7){HelpQuizPOView()}}
+        }) {
+            NavigationLink(destination: QuizView(params: Parameters.decode(paramsIQ), dftParams: $paramsIQ, saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)){
+                Text("Intervals").font(.headline)
+            }
+            NavigationLink(destination: QuizView(params: Parameters.decode(paramsTQ), dftParams: $paramsTQ, saveUsageData: $saveUsageData, n_notes:3, fixed_n_notes:true, chord: true).modelContainer(for: HistoricalData.self)){
+                Text("Triads").font(.headline)
+            }
+            NavigationLink(destination: QuizView(params: Parameters.decode(paramsSQ), dftParams: $paramsSQ, saveUsageData: $saveUsageData, n_notes:1, chord_active: false).modelContainer(for: HistoricalData.self)){
+                Text("Scale Degrees").font(.headline)
+            }
         }
     }
 }
