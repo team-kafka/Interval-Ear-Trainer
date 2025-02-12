@@ -10,6 +10,8 @@ import TabularData
 import Charts
 import SwiftData
 
+let LABELS = ["Intervals", "Triads", "Scale degrees"]
+
 struct StatView: View {
     
     @State private var selectedIndex: Int = 0
@@ -22,21 +24,21 @@ struct StatView: View {
         TabView(selection: $selectedIndex) {
             StatsIntervalTopView()
                 .tabItem {
-                    Label("Intervals", systemImage: "arrow.up.and.down.square.fill")
+                    Label(LABELS[selectedIndex], systemImage: "arrow.up.and.down.square.fill")
                 }
-                .tag(2)
+                .tag(0)
             StatsTriadView().modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label("Triads", systemImage: "music.quarternote.3")
+                    Label(LABELS[selectedIndex], systemImage: "music.quarternote.3")
                 }
-                .tag(3)
+                .tag(1)
             StatsScaleDegreeView().modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Text("Scale Degrees")
-                    Image(systemName: "key")
+                    Label(LABELS[selectedIndex], systemImage: "key")
                 }
-                .tag(4)
+                .tag(2)
         }.toolbarRole(.editor)
+            .navigationTitle(LABELS[selectedIndex]).navigationBarTitleDisplayMode(.inline)
         .tint(Color.gray)
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
@@ -56,11 +58,11 @@ struct StatsIntervalTopView: View {
     
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalView(filter:"↑", title: "Ascending Intervals").modelContainer(for: HistoricalData.self)
+            StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
                 .tabItem {}.tag(0)
-            StatsIntervalView(filter:"↓", title:"Descending Intervals").modelContainer(for: HistoricalData.self)
+            StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
                 .tabItem {}.tag(1)
-            StatsIntervalView(filter:"H", title:"Harmonic Intervals").modelContainer(for: HistoricalData.self)
+            StatsIntervalView(filter:"H").modelContainer(for: HistoricalData.self)
                 .tabItem {}.tag(2)
         }.tint(Color.gray.opacity(0.7)).tabViewStyle(.page(indexDisplayMode: .automatic))
             .onAppear(perform: {
@@ -75,29 +77,50 @@ struct StatsIntervalTopView: View {
 struct StatsIntervalView: View {
     
     var filter: String
-    var title: String
 
     @Environment(\.modelContext) private var modelContext
-
     @Query var data: [HistoricalData]
 
-    init(filter: String, title:String) {
+    @State private var orientation: UIDeviceOrientation
+
+    init(filter: String) {
         self.filter = filter
-        self.title = title
         let typeI = ex_type_to_str(ex_type:.interval)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.id.contains(filter) && $0.type == typeI})
-    }
-    var body: some View {
-
-        VStack{
-            Text(title).font(.title)
-            PracticeChart(histData: data ,
-                          detailledData: data,
-                          keys:INTERVAL_KEYS.map{filter + $0})
-            QuizzChart(data: data,
-                       keys:INTERVAL_KEYS.map{filter + $0})
-            Spacer()
+        if UIDevice.current.orientation.isLandscape {
+            self.orientation = UIDeviceOrientation.landscapeLeft
         }
+        else {
+            self.orientation = UIDeviceOrientation.portrait
+        }
+    }
+    
+    var body: some View {
+        Group {
+            if orientation.isPortrait {
+                VStack{
+                    PracticeChart(histData: data ,
+                                  detailledData: data,
+                                  keys:INTERVAL_KEYS.map{filter + $0})
+                    QuizzChart(data: data,
+                               keys:INTERVAL_KEYS.map{filter + $0})
+                    Spacer()
+                }
+            } else {
+                VStack{
+                    ScrollView(.vertical) {
+                        PracticeChart(histData: data ,
+                                      detailledData: data,
+                                      keys:INTERVAL_KEYS.map{filter + $0}).containerRelativeFrame(.vertical)
+                        QuizzChart(data: data,
+                                   keys:INTERVAL_KEYS.map{filter + $0}).containerRelativeFrame(.vertical)
+                        Spacer()
+                    }.scrollTargetBehavior(.paging)
+                }.scrollTargetLayout()
+            }
+        }.onRotate { newOrientation in
+            if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
+            }
     }
 }
 
@@ -105,55 +128,102 @@ struct StatsTriadView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query var data: [HistoricalData]
-
+    
+    @State private var orientation: UIDeviceOrientation
+    
     init() {
         let typeT = ex_type_to_str(ex_type:.triad)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeT})
+        if UIDevice.current.orientation.isLandscape {
+            self.orientation = UIDeviceOrientation.landscapeLeft
+        }
+        else {
+            self.orientation = UIDeviceOrientation.portrait
+        }
     }
     
     var body: some View {
-        VStack{
-            Text("Triads").font(.title)
-            PracticeChart(histData:data,
-                          detailledData: data,
-                          keys:TRIAD_KEYS)
-            QuizzChart(data: data, keys: TRIAD_KEYS)
-            Spacer()
+        Group {
+            if orientation.isPortrait {
+                VStack{
+                    PracticeChart(histData:data,
+                                  detailledData: data,
+                                  keys:TRIAD_KEYS)
+                    QuizzChart(data: data, keys: TRIAD_KEYS)
+                    Spacer()
+                }
+            } else {
+                VStack{
+                    ScrollView(.vertical) {
+                        PracticeChart(histData:data,
+                                      detailledData: data,
+                                      keys:TRIAD_KEYS).containerRelativeFrame(.vertical)
+                        QuizzChart(data: data, keys: TRIAD_KEYS).containerRelativeFrame(.vertical)
+                        Spacer()
+                    }.scrollTargetBehavior(.paging)
+                }.scrollTargetLayout()
+            }
+        }
+        .onRotate { newOrientation in
+        if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
         }
     }
 }
+
 
 struct StatsScaleDegreeView: View {
         
     @Environment(\.modelContext) private var modelContext
     @Query var data: [HistoricalData]
-    
+    @State private var orientation: UIDeviceOrientation
+
     init() {
         let typeS = ex_type_to_str(ex_type:.scale_degree)
         self._data = Query(filter: #Predicate<HistoricalData> {$0.type == typeS})
+        if UIDevice.current.orientation.isLandscape {
+            self.orientation = UIDeviceOrientation.landscapeLeft
+        }
+        else {
+            self.orientation = UIDeviceOrientation.portrait
+        }
     }
     
     var body: some View {
-        VStack{
-            Text("Scale Degrees").font(.title)
-            PracticeChart(histData:data,
-                          detailledData: data,
-                          keys:SCALE_DEGREE_KEYS_W_ALT)
-            QuizzChart(data: data, keys: SCALE_DEGREE_KEYS_W_ALT)
-            Spacer()
-        }
+        Group {
+            if orientation.isPortrait {
+                VStack{
+                    PracticeChart(histData:data,
+                                  detailledData: data,
+                                  keys:SCALE_DEGREE_KEYS_W_ALT)
+                    QuizzChart(data: data, keys: SCALE_DEGREE_KEYS_W_ALT)
+                    Spacer()
+                }
+            } else {
+                VStack{
+                    ScrollView(.vertical) {
+                        PracticeChart(histData:data,
+                                      detailledData: data,
+                                      keys:SCALE_DEGREE_KEYS_W_ALT).containerRelativeFrame(.vertical)
+                        QuizzChart(data: data, keys: SCALE_DEGREE_KEYS_W_ALT).containerRelativeFrame(.vertical)
+                        Spacer()
+                    }.scrollTargetBehavior(.paging)
+                }.scrollTargetLayout()
+            }
+        }.onRotate { newOrientation in
+            if (newOrientation == UIDeviceOrientation.portrait || newOrientation == UIDeviceOrientation.landscapeLeft || newOrientation == UIDeviceOrientation.landscapeRight) { orientation = newOrientation }
+            }
     }
 }
 
 struct QuizzChart: View {
    
-    @State var data: [HistoricalData]
-    @State var keys: [String]
+    var data: [HistoricalData]
+    var keys: [String]
     @State var selectedIndex: String?
 
     init(data: [HistoricalData], keys: [String]) {
-        _data = .init(initialValue: data)
-        _keys = .init(initialValue: keys)
+        self.data = data
+        self.keys = keys
         _selectedIndex = .init(initialValue: nil)
     }
     
@@ -165,19 +235,25 @@ struct QuizzChart: View {
                                 y: .value("res",0))
                     }
                     ForEach(data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.correct)
-                        ).foregroundStyle(ANSWER_COLORS[.correct]!)
+                        if keys.contains(d.id) {
+                            BarMark(x: .value("Id", d.id),
+                                    y: .value("res", d.correct)
+                            ).foregroundStyle(ANSWER_COLORS[.correct]!)
+                        }
                     }
                     ForEach(data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.timeout)
-                        ).foregroundStyle(ANSWER_COLORS[.timeout]!)
+                        if keys.contains(d.id) {
+                            BarMark(x: .value("Id", d.id),
+                                    y: .value("res", d.timeout)
+                            ).foregroundStyle(ANSWER_COLORS[.timeout]!)
+                        }
                     }
                     ForEach(data, id: \.self) { d in
-                        BarMark(x: .value("Id", d.id),
-                                y: .value("res", d.incorrect)
-                        ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
+                        if keys.contains(d.id) {
+                            BarMark(x: .value("Id", d.id),
+                                    y: .value("res", d.incorrect)
+                            ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
+                        }
                     }
                 }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
                     .chartForegroundStyleScale([
@@ -195,15 +271,15 @@ struct QuizzChart: View {
 }
 
 struct OverlayView: View {
-    @State var filteredData: [HistoricalData]
+    var filteredData: [HistoricalData]
     
     init(filteredData: [HistoricalData]) {
-        _filteredData = .init(initialValue: filteredData)
+        self.filteredData = filteredData
     }
     
     var body: some View {
         if !filteredData.isEmpty{
-            RoundedRectangle(cornerRadius: 5).foregroundStyle(Color(UIColor.secondarySystemBackground).opacity(0.95)).scaleEffect(1.1)
+            RoundedRectangle(cornerRadius: 5).foregroundStyle(Color(UIColor.secondarySystemBackground).opacity(0.95)).scaleEffect(1.05)
             GroupBox(filteredData[0].id) {
                 Chart {
                     BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
@@ -248,26 +324,28 @@ struct PracticeChart: View {
         GroupBox("Listening") {
             Chart {
                 BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
-                        y: .value("practice+listening", 0)
-                )
+                        y: .value("practice+listening", 0))
                 BarMark(x: .value("date", rounded_date(date: Date().addingTimeInterval(TimeInterval(-86400*7))), unit: .day),
-                        y: .value("practice+listening", 0)
-                )
+                        y: .value("practice+listening", 0))
                 ForEach(histData, id: \.self) { d in
                     BarMark(x: .value("date", d.date, unit: .day),
                             y: .value("practice+listening", d.listening)
                     )
                 }
             }
+//            .chartScrollableAxes(.horizontal)
+//            .chartScrollPosition(initialX: Date())
+//            .chartXVisibleDomain(length: 86400*20)
             Chart {
                 ForEach(keys, id: \.self) { k in
                     BarMark(x: .value("Id", short_answer(answer:k)),
                             y: .value("res",0))
                 }
                 ForEach(detailledData, id: \.self) { d in
-                    BarMark(x: .value("id", d.id),
-                            y: .value("practice+listening", d.listening)
-                    )
+                    if keys.contains(d.id) {
+                        BarMark(x: .value("id", d.id),
+                                y: .value("practice+listening", d.listening))
+                    }
                 }
             }
         }

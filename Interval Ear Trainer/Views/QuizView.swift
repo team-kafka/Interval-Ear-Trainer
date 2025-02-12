@@ -141,6 +141,7 @@ struct QuizView: View {
         }.onChange(of: paramsPresented) {
             if paramsPresented == false {
                 save_dft_params(newParams: params)
+                resetState()
             }
         }.onChange(of: player.answerVisible) {
             if player.answerVisible == 0.0 { guesses = [] }
