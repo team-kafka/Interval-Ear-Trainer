@@ -186,7 +186,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         var nowPlayingInfo = [String : Any]()
         nowPlayingInfo[MPMediaItemPropertyTitle] = short_answer(answer:answers.joined(separator: " "))
 
-        if let image = UIImage(named: AppIconProvider.appIcon()) {
+        if let image = UIImage(named: "icon_hires") {
             nowPlayingInfo[MPMediaItemPropertyArtwork] = MPMediaItemArtwork(boundsSize: image.size) { size in
                 return image
             }

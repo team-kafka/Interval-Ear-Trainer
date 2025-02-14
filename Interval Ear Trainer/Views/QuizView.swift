@@ -25,6 +25,9 @@ struct QuizView: View {
     @State private var fixed_n_notes: Bool
     @State private var chord_active: Bool
     @State private var guesses: [String]
+    @State private var streak_c: Int
+    @State private var streak_i: Int
+    @State private var streak_t: Int
     @State private var timer: Timer?
     
     @Binding private var dftParams: String
@@ -39,6 +42,9 @@ struct QuizView: View {
         _chord_active = .init(initialValue: chord_active)
         _use_timer = .init(initialValue: true)
         _guesses = .init(initialValue: [])
+        _streak_c = .init(initialValue: 0)
+        _streak_i = .init(initialValue: 0)
+        _streak_t = .init(initialValue: 0)
         _timer = .init(initialValue: nil)
         _dftParams = .init(projectedValue: dftParams)
         _saveUsageData = .init(projectedValue: saveUsageData)
@@ -47,9 +53,9 @@ struct QuizView: View {
     }
     
     var body: some View {
+        QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active).padding([.top])
         NavigationStack{
             VStack {
-                QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active)
                 if orientation.isPortrait {
                     VStack(alignment: .center){
                         (player.playing ? Image(systemName: "pause.circle") : Image(systemName: "play.circle")).resizable().scaledToFit().onTapGesture {
@@ -111,16 +117,13 @@ struct QuizView: View {
             orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
         }
         .toolbar {
-            let visible = params.delay == 0.2 && params.delay_sequence == 2.0 && params.active_intervals == [-12]
-            if visible {
-                ToolbarItem(placement: .topBarTrailing) {
-                    NavigationLink(destination: SecretView()) { Image(systemName: "star.square").foregroundColor(Color(.systemGray))}
-                }
-            }
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {paramsPresented = true}){
                     Image(systemName: "gearshape.fill")
                 }
+            }
+            ToolbarItem(placement: .navigationBarLeading) {
+                StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
             }
         }
         .sheet(isPresented: $paramsPresented) {
@@ -215,25 +218,27 @@ struct QuizView: View {
     }
     
     func save_to_cache() {
-        if saveUsageData {
-            let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
-            for (res, ans) in zip(guess_eval, player.answers){
-                let short = short_answer(answer: ans)
-                if !cacheData.keys.contains(short){
-                    cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
-                }
-                switch res{
-                case .correct:
-                    cacheData[short]!.correct += 1
-                case .incorrect:
-                    cacheData[short]!.incorrect += 1
-                case .timeout:
-                    cacheData[short]!.timeout += 1
-                }
+        let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
+        for (res, ans) in zip(guess_eval, player.answers){
+            let short = short_answer(answer: ans)
+            if !cacheData.keys.contains(short){
+                cacheData[short] = HistoricalData(date:rounded_date(date: Date()), type:ex_type_to_str(ex_type:params.type), id:short)
+            }
+            switch res{
+            case .correct:
+                cacheData[short]!.correct += 1
+                streak_c += 1
+            case .incorrect:
+                cacheData[short]!.incorrect += 1
+                streak_i += 1
+            case .timeout:
+                cacheData[short]!.timeout += 1
+                streak_t += 1
             }
         }
     }
-    
+
+
     func persist_cache() {
         if saveUsageData {
             for hd in cacheData.values{

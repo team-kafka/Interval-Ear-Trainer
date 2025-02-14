@@ -105,7 +105,7 @@ struct TimerView: View {
     @Binding var active: Bool
 
     var body: some View {
-        Image(systemName: active ? "clock" : "infinity.circle")//"figure.cooldown.circle")//"figure.walk.treadmill.circle")//"graduationcap.circle"
+        Image(systemName: active ? "clock" : "infinity.circle")
             .foregroundColor(Color.secondary)
             .onTapGesture {
                 active.toggle()
@@ -307,6 +307,33 @@ struct QuickParamButtonsView: View {
             TimerView(active: $use_timer).scaleEffect(2.0)
             if showHelp { HelpMarkView{HelpTimerPOView()}.padding(4) }
             Spacer()
+        }
+    }
+}
+
+struct StreakView: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
+    
+    @Binding var streak_c: Int
+    @Binding var streak_i: Int
+    @Binding var streak_t: Int
+
+    init(streak_c: Binding<Int>, streak_i: Binding<Int>, streak_t: Binding<Int>) {
+        _streak_c = .init(projectedValue: streak_c)
+        _streak_i = .init(projectedValue: streak_i)
+        _streak_t = .init(projectedValue: streak_t)
+    }
+    
+    var body: some View {
+        HStack{
+            Text("\(streak_c)").foregroundStyle(ANSWER_COLORS[.correct]!).font(.footnote)
+            Text("\(streak_i)").foregroundStyle(ANSWER_COLORS[.incorrect]!).font(.footnote)
+            Text("\(streak_t)").foregroundStyle(ANSWER_COLORS[.timeout]!).font(.footnote)
+            Text("\(streak_c + streak_i + streak_t)").foregroundStyle(.secondary).font(.footnote)
+        }.onTapGesture {
+            streak_c = 0
+            streak_i = 0
+            streak_t = 0
         }
     }
 }
