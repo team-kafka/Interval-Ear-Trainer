@@ -36,17 +36,16 @@ struct HelpListeningPOView: View {
                 Image(systemName: "forward")
                 Text("to cycle interval players").textCase(.none)
             }
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
 struct HelpTextView: View {
     var text: String = "Help text"
     var body: some View {
-        VStack(alignment: .leading)
-        {
+        VStack(alignment: .leading){
             Text(text).textCase(.none)
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
@@ -62,7 +61,7 @@ struct HelpQuizPOView: View {
             }
             
 
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
@@ -78,7 +77,7 @@ struct HelpChordPOView: View {
                 Image(systemName:"00.square.hi").rotationEffect(Angle(degrees: 90))
                 Text("Play notes as a chord").textCase(.none)
             }
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
@@ -89,7 +88,7 @@ struct HelpNNotesPOView: View {
             HStack{
                 Text("Play sequences of"); Image(systemName: "n.square"); Text("notes").textCase(.none)
             }
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
@@ -132,7 +131,7 @@ struct HelpTimerPOView: View {
                     Text("- results are not saved to usage stats").textCase(.none)
                 }
             }
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
@@ -141,13 +140,13 @@ struct HelpNotesPOView: View {
         VStack(alignment: .leading)
         {
             HStack{
-                Text("replay the current sequence")
+                Text("replay the current sequence").foregroundStyle(.black)
             }
-        }.padding()
+        }.padding().foregroundStyle(.black)
     }
 }
 
 
 #Preview {
-    HelpMarkView{ HelpTimerPOView() }
+    HelpMarkView{ HelpTimerPOView() }.environment(\.colorScheme, .dark)
 }

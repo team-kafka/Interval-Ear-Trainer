@@ -330,6 +330,7 @@ struct StreakView: View {
             Text("\(streak_i)").foregroundStyle(ANSWER_COLORS[.incorrect]!).font(.footnote)
             Text("\(streak_t)").foregroundStyle(ANSWER_COLORS[.timeout]!).font(.footnote)
             Text("\(streak_c + streak_i + streak_t)").foregroundStyle(.secondary).font(.footnote)
+            if showHelp {HelpMarkView(){HelpTextView(text:"Current streak. Tap to reset")}.padding(4).scaleEffect(0.8)}
         }.onTapGesture {
             streak_c = 0
             streak_i = 0

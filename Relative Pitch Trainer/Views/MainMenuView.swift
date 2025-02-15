@@ -27,7 +27,14 @@ struct MainMenu: View {
                         NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData, showHelp: $showHelp).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding()
+                        if showHelp {
+                            Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).onTapGesture { showHelp.toggle() }
+                        } else {
+                            Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).onTapGesture { showHelp.toggle() }
+                        }
+                    }
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
                     }
                 }
             }
