@@ -24,17 +24,17 @@ struct StatView: View {
         TabView(selection: $selectedIndex) {
             StatsIntervalTopView()
                 .tabItem {
-                    Label(LABELS[selectedIndex], systemImage: "arrow.up.and.down.square.fill")
+                    Label(LABELS[0], systemImage: "arrow.up.and.down.square.fill")
                 }
                 .tag(0)
             StatsTriadView().modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label(LABELS[selectedIndex], systemImage: "music.quarternote.3")
+                    Label(LABELS[1], systemImage: "music.quarternote.3")
                 }
                 .tag(1)
             StatsScaleDegreeView().modelContainer(for: HistoricalData.self)
                 .tabItem {
-                    Label(LABELS[selectedIndex], systemImage: "key")
+                    Label(LABELS[2], systemImage: "key")
                 }
                 .tag(2)
         }
