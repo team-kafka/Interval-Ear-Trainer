@@ -10,7 +10,7 @@ import SwiftData
 import AVFoundation
 
 @main
-struct Interval_Ear_TrainerApp: App {
+struct Relative_Pitch_TrainerApp: App {
     
     init () {
         let session = AVAudioSession.sharedInstance()

@@ -30,9 +30,9 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		376178A22D085FC700BF2F86 /* Interval Ear Trainer */ = {
+		376178A22D085FC700BF2F86 /* Relative Pitch Trainer */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Interval Ear Trainer";
+			path = "Relative Pitch Trainer";
 			sourceTree = "<group>";
 		};
 		376178B32D085FC900BF2F86 /* Interval Ear TrainerTests */ = {
@@ -75,7 +75,7 @@
 		376178972D085FC700BF2F86 = {
 			isa = PBXGroup;
 			children = (
-				376178A22D085FC700BF2F86 /* Interval Ear Trainer */,
+				376178A22D085FC700BF2F86 /* Relative Pitch Trainer */,
 				376178B32D085FC900BF2F86 /* Interval Ear TrainerTests */,
 				376178BD2D085FC900BF2F86 /* Interval Ear TrainerUITests */,
 				376178A12D085FC700BF2F86 /* Products */,
@@ -108,7 +108,7 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				376178A22D085FC700BF2F86 /* Interval Ear Trainer */,
+				376178A22D085FC700BF2F86 /* Relative Pitch Trainer */,
 			);
 			name = "Interval Ear Trainer";
 			packageProductDependencies = (
@@ -395,7 +395,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Interval Ear Trainer/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Relative Pitch Trainer/Preview Content\"";
 				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -432,7 +432,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_ASSET_PATHS = "\"Interval Ear Trainer/Preview Content\"";
+				DEVELOPMENT_ASSET_PATHS = "\"Relative Pitch Trainer/Preview Content\"";
 				DEVELOPMENT_TEAM = 8K8NZ9PA7K;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
