@@ -58,11 +58,11 @@ struct SettingsView: View {
                             Spacer()
                             Text(appVersion!)
                         }
-                        HStack{
-                            Text("Feedback:")
-                            Spacer()
-                            Text("dev@team_kafka.com")
-                        }
+//                        HStack{
+//                            Text("Feedback:")
+//                            Spacer()
+//                            Text("dev@team_kafka.com")
+//                        }
                     }
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }

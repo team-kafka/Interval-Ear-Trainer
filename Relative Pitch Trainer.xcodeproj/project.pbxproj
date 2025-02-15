@@ -186,7 +186,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Interval Ear Trainer" */;
+			buildConfigurationList = 3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Relative Pitch Trainer" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -400,7 +400,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Interval-Ear-Trainer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Interval Ear Trainer";
+				INFOPLIST_KEY_CFBundleDisplayName = "Relative Pitch";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -437,7 +437,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Interval-Ear-Trainer-Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Interval Ear Trainer";
+				INFOPLIST_KEY_CFBundleDisplayName = "Relative Pitch";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -537,7 +537,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Interval Ear Trainer" */ = {
+		3761789B2D085FC700BF2F86 /* Build configuration list for PBXProject "Relative Pitch Trainer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				376178C22D085FC900BF2F86 /* Debug */,

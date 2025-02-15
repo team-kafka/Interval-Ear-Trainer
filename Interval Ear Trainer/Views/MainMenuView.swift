@@ -21,7 +21,7 @@ struct MainMenu: View {
             NavigationStack{
                 List{
                     MainMenuListeningView()
-                    MainMenuQuizView().navigationTitle(Text("Interval Ear Trainer")).navigationBarTitleDisplayMode(.inline)
+                    MainMenuQuizView().navigationTitle(Text("Relative Pitch Trainer")).navigationBarTitleDisplayMode(.inline)
                 }.toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
                         NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
