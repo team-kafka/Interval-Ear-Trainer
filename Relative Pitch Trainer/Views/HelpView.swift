@@ -18,7 +18,7 @@ struct HelpMarkView<Content: View>: View {
             self.showingPopover.toggle()
         }
         .popover(isPresented: $showingPopover) {
-            content.presentationCompactAdaptation(.none)
+            content.presentationCompactAdaptation(.none).preferredColorScheme(.dark)
         }
     }
 }

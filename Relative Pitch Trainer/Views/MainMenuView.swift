@@ -17,25 +17,23 @@ struct MainMenu: View {
     @AppStorage("showHelp") var showHelp: Bool = false
 
     var body: some View {
-        Group{
-            NavigationStack{
-                List{
-                    MainMenuListeningView()
-                    MainMenuQuizView().navigationTitle(Text("Relative Pitch Trainer")).navigationBarTitleDisplayMode(.inline)
-                }.toolbar {
-                    ToolbarItem(placement: .navigationBarLeading) {
-                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
+        NavigationStack{
+            List{
+                MainMenuListeningView()
+                MainMenuQuizView().navigationTitle(Text("Relative Pitch Trainer")).navigationBarTitleDisplayMode(.inline)
+            }.toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    if showHelp {
+                        Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
+                    } else {
+                        Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
                     }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        if showHelp {
-                            Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
-                        } else {
-                            Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
-                        }
-                    }
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
-                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
                 }
             }
         }
@@ -89,7 +87,7 @@ struct MainMenuListeningView: View {
     var body: some View {
         Section(header: HStack{
             Text("Listening")
-            if showHelp {HelpMarkView(opacity:0.7){HelpListeningPOView()}}
+            if showHelp { HelpMarkView(opacity:0.7){HelpListeningPOView()} }
         }) {
             ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:"Play a stream of random intervals, starting from random notes").modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
