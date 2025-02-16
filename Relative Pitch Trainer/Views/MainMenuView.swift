@@ -24,13 +24,13 @@ struct MainMenu: View {
                     MainMenuQuizView().navigationTitle(Text("Relative Pitch Trainer")).navigationBarTitleDisplayMode(.inline)
                 }.toolbar {
                     ToolbarItem(placement: .navigationBarLeading) {
-                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding()
+                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
                         if showHelp {
-                            Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).onTapGesture { showHelp.toggle() }
+                            Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
                         } else {
-                            Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).onTapGesture { showHelp.toggle() }
+                            Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
                         }
                     }
                     ToolbarItem(placement: .navigationBarTrailing) {
@@ -43,7 +43,6 @@ struct MainMenu: View {
         .tint(.gray)
         .onAppear(){
             compressPastData()
-            showHelp = false
         }
     }
 

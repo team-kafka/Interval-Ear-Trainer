@@ -36,7 +36,7 @@ struct HelpListeningPOView: View {
                 Image(systemName: "forward")
                 Text("to cycle interval players").textCase(.none)
             }
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -45,7 +45,7 @@ struct HelpTextView: View {
     var body: some View {
         VStack(alignment: .leading){
             Text(text).textCase(.none)
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -61,7 +61,7 @@ struct HelpQuizPOView: View {
             }
             
 
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -77,7 +77,7 @@ struct HelpChordPOView: View {
                 Image(systemName:"00.square.hi").rotationEffect(Angle(degrees: 90))
                 Text("Play notes as a chord").textCase(.none)
             }
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -88,7 +88,7 @@ struct HelpNNotesPOView: View {
             HStack{
                 Text("Play sequences of"); Image(systemName: "n.square"); Text("notes").textCase(.none)
             }
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -131,7 +131,7 @@ struct HelpTimerPOView: View {
                     Text("- results are not saved to usage stats").textCase(.none)
                 }
             }
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
@@ -140,9 +140,9 @@ struct HelpNotesPOView: View {
         VStack(alignment: .leading)
         {
             HStack{
-                Text("replay the current sequence").foregroundStyle(.black)
+                Text("replay the current sequence")
             }
-        }.padding().foregroundStyle(.black)
+        }.padding()
     }
 }
 
