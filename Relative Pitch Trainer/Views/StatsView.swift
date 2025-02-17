@@ -213,43 +213,41 @@ struct StatsScaleDegreeView: View {
 }
 
 struct QuizzChart: View {
-   
     var data: [HistoricalData]
     var keys: [String]
     @State var selectedIndex: String?
+    @State var showPercent: Bool
 
     init(data: [HistoricalData], keys: [String]) {
         self.data = data
         self.keys = keys
         _selectedIndex = .init(initialValue: nil)
+        _showPercent = .init(initialValue: false)
     }
     
     var body: some View {
-        GroupBox("Quiz") {
+        GroupBox(label: HStack{
+            Text("Quiz").foregroundColor(.secondary)
+            Image(systemName: "percent").padding(1).overlay(RoundedRectangle(cornerRadius: 4).stroke(lineWidth:2)).foregroundColor(.secondary).onTapGesture { showPercent.toggle() }.opacity(showPercent ? 1 : 0.4).scaleEffect(0.6).padding(.leading, 4)
+        }) {
+                let fData = flattenData(data: data)
                 Chart {
                     ForEach(keys, id: \.self) { k in
                         BarMark(x: .value("Id", short_answer(answer:k)),
                                 y: .value("res",0))
                     }
-                    ForEach(data, id: \.self) { d in
-                        if keys.contains(d.id) {
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.correct)
-                            ).foregroundStyle(ANSWER_COLORS[.correct]!)
+                    if showPercent{
+                        ForEach(fData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
+                            BarMark(x: .value("id", d.id),
+                                    y: .value("res", d.value),
+                                    stacking: .normalized
+                            ).foregroundStyle( by: .value("res", d.valueType))
                         }
-                    }
-                    ForEach(data, id: \.self) { d in
-                        if keys.contains(d.id) {
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.timeout)
-                            ).foregroundStyle(ANSWER_COLORS[.timeout]!)
-                        }
-                    }
-                    ForEach(data, id: \.self) { d in
-                        if keys.contains(d.id) {
-                            BarMark(x: .value("Id", d.id),
-                                    y: .value("res", d.incorrect)
-                            ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
+                    } else {
+                        ForEach(fData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
+                            BarMark(x: .value("id", d.id),
+                                    y: .value("res", d.value)
+                            ).foregroundStyle( by: .value("res", d.valueType))
                         }
                     }
                 }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
@@ -260,7 +258,7 @@ struct QuizzChart: View {
                     ])
                     .chartOverlay { pr in
                         if selectedIndex != nil {
-                            OverlayView(filteredData: data.filter{ $0.id == selectedIndex })
+                            OverlayView(filteredData: data.filter{ $0.id == selectedIndex }, showPercent: $showPercent)
                         }
                     }
         }
@@ -269,36 +267,52 @@ struct QuizzChart: View {
 
 struct OverlayView: View {
     var filteredData: [HistoricalData]
+    @Binding var showPercent: Bool
     
-    init(filteredData: [HistoricalData]) {
+    init(filteredData: [HistoricalData], showPercent: Binding<Bool>) {
         self.filteredData = filteredData
+        _showPercent = .init(projectedValue: showPercent)
     }
     
     var body: some View {
         if !filteredData.isEmpty{
+            let fData = flattenData(data: filteredData)
             RoundedRectangle(cornerRadius: 5).foregroundStyle(Color(UIColor.secondarySystemBackground).opacity(0.95)).scaleEffect(1.05)
             GroupBox(filteredData[0].id) {
-                Chart {
-                    BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
-                            y: .value("res", 0)
-                    )
-                    BarMark(x: .value("date", rounded_date(date: Date()).addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
-                            y: .value("res", 0)
-                    )
-                    ForEach(filteredData, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
-                                y: .value("res", d.correct)
-                        ).foregroundStyle(ANSWER_COLORS[.correct]!)
-                    }
-                    ForEach(filteredData, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
-                                y: .value("res", d.timeout)
-                        ).foregroundStyle(ANSWER_COLORS[.timeout]!)
-                    }
-                    ForEach(filteredData, id: \.self) { d in
-                        BarMark(x: .value("date", d.date, unit: .day),
-                                y: .value("res", d.incorrect)
-                        ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
+                if showPercent{
+                    Chart(fData) { d in
+                        AreaMark(x: .value("date", d.date, unit: .day),
+                                 y: .value("res", d.value),
+                                 stacking: .normalized
+                        ).foregroundStyle( by: .value("res", d.valueType))
+                    }.chartForegroundStyleScale([
+                        "correct" : ANSWER_COLORS[.correct]!,
+                        "error": ANSWER_COLORS[.incorrect]!,
+                        "timeout": ANSWER_COLORS[.timeout]!,
+                    ])
+                } else {
+                    Chart {
+                        BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
+                                y: .value("res", 0)
+                        )
+                        BarMark(x: .value("date", rounded_date(date: Date()).addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
+                                y: .value("res", 0)
+                        )
+                        ForEach(filteredData, id: \.self) { d in
+                            BarMark(x: .value("date", d.date, unit: .day),
+                                    y: .value("res", d.correct)
+                            ).foregroundStyle(ANSWER_COLORS[.correct]!)
+                        }
+                        ForEach(filteredData, id: \.self) { d in
+                            BarMark(x: .value("date", d.date, unit: .day),
+                                    y: .value("res", d.timeout)
+                            ).foregroundStyle(ANSWER_COLORS[.timeout]!)
+                        }
+                        ForEach(filteredData, id: \.self) { d in
+                            BarMark(x: .value("date", d.date, unit: .day),
+                                    y: .value("res", d.incorrect)
+                            ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
+                        }
                     }
                 }
             }
@@ -318,7 +332,7 @@ struct PracticeChart: View {
     }
     
     var body: some View {
-        GroupBox("Listening") {
+        GroupBox(label: Text("Listening").foregroundColor(.secondary)) {
             Chart {
                 BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
                         y: .value("practice+listening", 0))
@@ -348,4 +362,3 @@ struct PracticeChart: View {
         }
     }
 }
-
