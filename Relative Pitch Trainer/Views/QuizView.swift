@@ -119,9 +119,6 @@ struct QuizView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
-            }
-            ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {paramsPresented = true}){
                     Image(systemName: "gearshape.fill").padding([.trailing])
                 }
