@@ -265,7 +265,7 @@ struct QuizzChart: View {
                     "correct" : ANSWER_COLORS[.correct]!,
                     "error": ANSWER_COLORS[.incorrect]!,
                     "timeout": ANSWER_COLORS[.timeout]!,
-                ])
+                ]).chartLegend(position: .bottom, alignment: .leading)
             }
             Chart {
                 ForEach(keys, id: \.self) { k in
@@ -278,7 +278,7 @@ struct QuizzChart: View {
                             stacking: showPercent ? .normalized : .standard
                     ).foregroundStyle( by: .value("res", d.valueType))
                 }
-            }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
+            }.padding(.bottom).chartLegend(.hidden).chartXSelection(value: $selectedIndex)
                 .chartForegroundStyleScale([
                     "correct" : ANSWER_COLORS[.correct]!,
                     "error": ANSWER_COLORS[.incorrect]!,
