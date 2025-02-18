@@ -278,7 +278,7 @@ struct ScaleChooserView: View {
     }
 }
 
-struct QuickParamButtonsView: View {
+struct QuizzTopButtonsView: View {
     @AppStorage("showHelp") var showHelp: Bool = false
     
     @Binding var n_notes: Int

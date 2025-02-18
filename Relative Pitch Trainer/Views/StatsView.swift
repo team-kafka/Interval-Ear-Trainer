@@ -228,94 +228,62 @@ struct QuizzChart: View {
     var body: some View {
         GroupBox(label: HStack{
             Text("Quiz").foregroundColor(.secondary)
-            Image(systemName: "percent").padding(1).overlay(RoundedRectangle(cornerRadius: 4).stroke(lineWidth:2)).foregroundColor(.secondary).onTapGesture { showPercent.toggle() }.opacity(showPercent ? 1 : 0.4).scaleEffect(0.6).padding(.leading, 4)
+            Text(selectedIndex ?? "").foregroundColor(.secondary).fontWeight(.bold)
+            Spacer()
+            Image(systemName: "percent").padding(1).overlay(RoundedRectangle(cornerRadius: 4).stroke(lineWidth:2)).foregroundColor(.secondary).opacity(showPercent ? 1 : 0.5).scaleEffect(0.6)
+                .onTapGesture { showPercent.toggle() }
         }) {
-                let fData = flattenData(data: data)
-                Chart {
-                    ForEach(keys, id: \.self) { k in
-                        BarMark(x: .value("Id", short_answer(answer:k)),
-                                y: .value("res",0))
-                    }
-                    if showPercent{
-                        ForEach(fData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("res", d.value),
-                                    stacking: .normalized
-                            ).foregroundStyle( by: .value("res", d.valueType))
-                        }
-                    } else {
-                        ForEach(fData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
-                            BarMark(x: .value("id", d.id),
-                                    y: .value("res", d.value)
-                            ).foregroundStyle( by: .value("res", d.valueType))
-                        }
-                    }
-                }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
-                    .chartForegroundStyleScale([
-                        "correct" : ANSWER_COLORS[.correct]!,
-                        "error": ANSWER_COLORS[.incorrect]!,
-                        "timeout": ANSWER_COLORS[.timeout]!,
-                    ])
-                    .chartOverlay { pr in
-                        if selectedIndex != nil {
-                            OverlayView(filteredData: data.filter{ $0.id == selectedIndex }, showPercent: $showPercent)
-                        }
-                    }
-        }
-    }
-}
-
-struct OverlayView: View {
-    var filteredData: [HistoricalData]
-    @Binding var showPercent: Bool
-    
-    init(filteredData: [HistoricalData], showPercent: Binding<Bool>) {
-        self.filteredData = filteredData
-        _showPercent = .init(projectedValue: showPercent)
-    }
-    
-    var body: some View {
-        if !filteredData.isEmpty{
-            let fData = flattenData(data: filteredData)
-            RoundedRectangle(cornerRadius: 5).foregroundStyle(Color(UIColor.secondarySystemBackground).opacity(0.95)).scaleEffect(1.05)
-            GroupBox(filteredData[0].id) {
-                if showPercent{
-                    Chart(fData) { d in
+            let filteredData = flattenData(data: selectedIndex != nil ? data.filter{ $0.id == selectedIndex } : data, ignoreId: true)
+            let flatData = flattenData(data: data)
+            if showPercent{
+                Chart{
+                    ForEach(filteredData.sorted(by: {$0.valueType < $1.valueType}).sorted(by: {$0.date < $1.date}))  { d in
                         AreaMark(x: .value("date", d.date, unit: .day),
                                  y: .value("res", d.value),
                                  stacking: .normalized
                         ).foregroundStyle( by: .value("res", d.valueType))
-                    }.chartForegroundStyleScale([
-                        "correct" : ANSWER_COLORS[.correct]!,
-                        "error": ANSWER_COLORS[.incorrect]!,
-                        "timeout": ANSWER_COLORS[.timeout]!,
-                    ])
-                } else {
-                    Chart {
-                        BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
-                                y: .value("res", 0)
-                        )
-                        BarMark(x: .value("date", rounded_date(date: Date()).addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
-                                y: .value("res", 0)
-                        )
-                        ForEach(filteredData, id: \.self) { d in
-                            BarMark(x: .value("date", d.date, unit: .day),
-                                    y: .value("res", d.correct)
-                            ).foregroundStyle(ANSWER_COLORS[.correct]!)
-                        }
-                        ForEach(filteredData, id: \.self) { d in
-                            BarMark(x: .value("date", d.date, unit: .day),
-                                    y: .value("res", d.timeout)
-                            ).foregroundStyle(ANSWER_COLORS[.timeout]!)
-                        }
-                        ForEach(filteredData, id: \.self) { d in
-                            BarMark(x: .value("date", d.date, unit: .day),
-                                    y: .value("res", d.incorrect)
-                            ).foregroundStyle(ANSWER_COLORS[.incorrect]!)
-                        }
                     }
-                }
+                }.chartForegroundStyleScale([
+                    "correct" : ANSWER_COLORS[.correct]!,
+                    "error": ANSWER_COLORS[.incorrect]!,
+                    "timeout": ANSWER_COLORS[.timeout]!,
+                ])
+            } else {
+                Chart {
+                    BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
+                            y: .value("res", 0)
+                    )
+                    BarMark(x: .value("date", rounded_date(date: Date()).addingTimeInterval(TimeInterval(-86400*7)), unit: .day),
+                            y: .value("res", 0)
+                    )
+                    ForEach(filteredData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
+                        BarMark(x: .value("date", d.date, unit: .day),
+                                y: .value("res", d.value)
+                        ).foregroundStyle( by: .value("res", d.valueType))
+                    }
+                }.chartForegroundStyleScale([
+                    "correct" : ANSWER_COLORS[.correct]!,
+                    "error": ANSWER_COLORS[.incorrect]!,
+                    "timeout": ANSWER_COLORS[.timeout]!,
+                ])
             }
+            Chart {
+                ForEach(keys, id: \.self) { k in
+                    BarMark(x: .value("Id", short_answer(answer:k)),
+                            y: .value("res",0))
+                }
+                ForEach(flatData.sorted(by: {$0.valueType < $1.valueType}), id: \.self) { d in
+                    BarMark(x: .value("id", d.id),
+                            y: .value("res", d.value),
+                            stacking: showPercent ? .normalized : .standard
+                    ).foregroundStyle( by: .value("res", d.valueType))
+                }
+            }.padding(.bottom).chartLegend(position: .bottom, alignment: .leading).chartXSelection(value: $selectedIndex)
+                .chartForegroundStyleScale([
+                    "correct" : ANSWER_COLORS[.correct]!,
+                    "error": ANSWER_COLORS[.incorrect]!,
+                    "timeout": ANSWER_COLORS[.timeout]!,
+                ])
         }
     }
 }
@@ -324,15 +292,43 @@ struct PracticeChart: View {
     @State var histData: [HistoricalData]
     @State var detailledData: [HistoricalData]
     @State var keys: [String]
+    @State var selectedIndex: Date?
+    var formatter  = DateFormatter()
     
     init(histData: [HistoricalData], detailledData: [HistoricalData], keys: [String]) {
         _histData = .init(initialValue: histData)
         _detailledData = .init(initialValue: detailledData)
         _keys = .init(initialValue: keys)
+        _selectedIndex = .init(initialValue: nil)
+        formatter.dateStyle = .short
     }
     
     var body: some View {
-        GroupBox(label: Text("Listening").foregroundColor(.secondary)) {
+        GroupBox(label: HStack{
+            Text("Listening").foregroundColor(.secondary)
+            if selectedIndex != nil {Text(formatter.string(from: selectedIndex!)).foregroundColor(.secondary).fontWeight(.bold)}
+        }) {
+            Chart {
+                ForEach(keys, id: \.self) { k in
+                    BarMark(x: .value("Id", short_answer(answer:k)),
+                            y: .value("res",0))
+                }
+                if selectedIndex == nil {
+                    ForEach(detailledData, id: \.self) { d in
+                        if keys.contains(d.id) {
+                            BarMark(x: .value("id", d.id),
+                                    y: .value("practice+listening", d.listening))
+                        }
+                    }
+                } else {
+                    ForEach(detailledData.filter{ d in Calendar.current.isDate(d.date, equalTo: selectedIndex!, toGranularity: .day) }, id: \.self) { d in
+                        if keys.contains(d.id)  {
+                            BarMark(x: .value("id", d.id),
+                                    y: .value("practice+listening", d.listening))
+                        }
+                    }
+                }
+            }
             Chart {
                 BarMark(x: .value("date", rounded_date(date: Date()), unit: .day),
                         y: .value("practice+listening", 0))
@@ -343,22 +339,7 @@ struct PracticeChart: View {
                             y: .value("practice+listening", d.listening)
                     )
                 }
-            }
-//            .chartScrollableAxes(.horizontal)
-//            .chartScrollPosition(initialX: Date())
-//            .chartXVisibleDomain(length: 86400*20)
-            Chart {
-                ForEach(keys, id: \.self) { k in
-                    BarMark(x: .value("Id", short_answer(answer:k)),
-                            y: .value("res",0))
-                }
-                ForEach(detailledData, id: \.self) { d in
-                    if keys.contains(d.id) {
-                        BarMark(x: .value("id", d.id),
-                                y: .value("practice+listening", d.listening))
-                    }
-                }
-            }
+            }.chartXSelection(value: $selectedIndex)
         }
     }
 }

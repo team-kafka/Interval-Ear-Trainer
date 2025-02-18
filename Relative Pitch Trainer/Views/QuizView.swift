@@ -18,6 +18,7 @@ struct QuizView: View {
 
     @State private var orientation = UIDeviceOrientation.portrait
     @State var cacheData: [String: HistoricalData]
+    @AppStorage("showHelp") var showHelp: Bool = false
     
     @State private var params: Parameters
     @State private var paramsPresented: Bool
@@ -53,7 +54,7 @@ struct QuizView: View {
     }
     
     var body: some View {
-        QuickParamButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active).padding([.top])
+        QuizzTopButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active).padding([.top])
         NavigationStack{
             VStack {
                 if orientation.isPortrait {
@@ -118,13 +119,17 @@ struct QuizView: View {
         }
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
+                Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
                 Button(action: {paramsPresented = true}){
-                    Image(systemName: "gearshape.fill")
+                    Image(systemName: "gearshape.fill").padding([.trailing])
                 }
             }
             ToolbarItem(placement: .navigationBarLeading) {
                 StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
             }
+
         }
         .sheet(isPresented: $paramsPresented) {
                 ParametersView(params: $params)

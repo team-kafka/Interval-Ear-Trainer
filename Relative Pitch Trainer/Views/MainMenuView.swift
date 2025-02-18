@@ -26,11 +26,7 @@ struct MainMenu: View {
                     NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
-                    if showHelp {
-                        Image(systemName: "questionmark.circle.fill").foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
-                    } else {
-                        Image(systemName: "questionmark.circle").opacity(0.5).foregroundStyle(.gray).padding([.leading]).onTapGesture { showHelp.toggle() }
-                    }
+                    Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
