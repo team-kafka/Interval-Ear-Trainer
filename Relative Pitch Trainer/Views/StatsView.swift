@@ -11,18 +11,21 @@ import Charts
 import SwiftData
 
 let LABELS = ["Intervals", "Triads", "Scale degrees"]
+let INT_TYPES = ["Ascending", "Descending", "Harmonic"]
 
 struct StatView: View {
     
-    @State private var selectedIndex: Int = 0
-    
+    @State private var selectedIndex: Int
+    @State private var selectedIntervalType: Int
+
     init() {
         _selectedIndex = .init(initialValue: 0)
+        _selectedIntervalType = .init(initialValue: 0)
     }
     
     var body: some View {
         TabView(selection: $selectedIndex) {
-            StatsIntervalTopView()
+            StatsIntervalTopView(selectedIntervalType: $selectedIntervalType)
                 .tabItem {
                     Label(LABELS[0], systemImage: "arrow.up.and.down.square.fill")
                 }
@@ -39,7 +42,7 @@ struct StatView: View {
                 .tag(2)
         }
         .toolbarRole(.editor)
-        .navigationTitle(LABELS[selectedIndex]).navigationBarTitleDisplayMode(.inline)
+        .navigationTitle(Title()).navigationBarTitleDisplayMode(.inline)
         .tint(Color.gray)
         .onAppear(perform: {
             UITabBar.appearance().unselectedItemTintColor = .systemGray
@@ -48,17 +51,21 @@ struct StatView: View {
             UINavigationBar.appearance()
         })
     }
+    
+    func Title() -> String {
+        return selectedIndex == 0 ? INT_TYPES[selectedIntervalType] + " " + LABELS[selectedIndex] : LABELS[selectedIndex]
+    }
 }
 
 struct StatsIntervalTopView: View {
-    @State private var selectedIndex: Int
+    @Binding var selectedIntervalType: Int
     
-    init() {
-        _selectedIndex = .init(initialValue: 0)
+    init(selectedIntervalType: Binding<Int>) {
+        _selectedIntervalType = .init(projectedValue: selectedIntervalType)
     }
     
     var body: some View {
-        TabView(selection: $selectedIndex) {
+        TabView(selection: $selectedIntervalType) {
             StatsIntervalView(filter:"↑").modelContainer(for: HistoricalData.self)
                 .tabItem {}.tag(0)
             StatsIntervalView(filter:"↓").modelContainer(for: HistoricalData.self)
@@ -213,6 +220,8 @@ struct StatsScaleDegreeView: View {
 }
 
 struct QuizzChart: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
+
     var data: [HistoricalData]
     var keys: [String]
     @State var selectedIndex: String?
@@ -229,9 +238,9 @@ struct QuizzChart: View {
         GroupBox(label: HStack{
             Text("Quiz").foregroundColor(.secondary)
             Text(selectedIndex ?? "").foregroundColor(.secondary).fontWeight(.bold)
+            if showHelp {HelpMarkView{HelpQuizChartPOView()}.scaleEffect(0.8)}
             Spacer()
-            Image(systemName: "percent").padding(1).overlay(RoundedRectangle(cornerRadius: 4).stroke(lineWidth:2)).foregroundColor(.secondary).opacity(showPercent ? 1 : 0.5).scaleEffect(0.6)
-                .onTapGesture { showPercent.toggle() }
+            PercentButtonView().opacity(showPercent ? 1 : 0.5).onTapGesture { showPercent.toggle() }
         }) {
             let filteredData = flattenData(data: selectedIndex != nil ? data.filter{ $0.id == selectedIndex } : data, ignoreId: true)
             let flatData = flattenData(data: data)
@@ -288,7 +297,16 @@ struct QuizzChart: View {
     }
 }
 
+
+struct PercentButtonView: View {
+    var body: some View {
+        Image(systemName: "percent").padding(1).overlay(RoundedRectangle(cornerRadius: 4).stroke(lineWidth:2)).foregroundColor(.secondary).scaleEffect(0.6)
+    }
+}
+
 struct PracticeChart: View {
+    @AppStorage("showHelp") var showHelp: Bool = false
+
     @State var histData: [HistoricalData]
     @State var detailledData: [HistoricalData]
     @State var keys: [String]
@@ -307,6 +325,7 @@ struct PracticeChart: View {
         GroupBox(label: HStack{
             Text("Listening").foregroundColor(.secondary)
             if selectedIndex != nil {Text(formatter.string(from: selectedIndex!)).foregroundColor(.secondary).fontWeight(.bold)}
+            if showHelp {HelpMarkView{HelpListeningChartPOView()}.scaleEffect(0.8)}
         }) {
             Chart {
                 ForEach(keys, id: \.self) { k in

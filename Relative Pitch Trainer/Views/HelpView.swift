@@ -27,14 +27,90 @@ struct HelpListeningPOView: View {
     var body: some View {
         VStack(alignment: .leading)
         {
-            Text("Play streams of random intervals, chords, or ").textCase(.none)
-            Text("degrees, for passive studying.").textCase(.none)
-            Text("Use device controls to pause/resume, ").textCase(.none)
+            Text("Play a stream of random intervals, chords, or ").textCase(.none)
+            Text("degrees, for passive studying").textCase(.none)
+            Text("Use device controls to pause/resume").textCase(.none)
+        }.padding()
+    }
+}
+
+struct HelpListeningIntervalsPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Play random intervals").textCase(.none)
+            HStack(spacing:3){
+                Image(systemName: "00.square.hi")
+                Text(": Melodic intervals")
+            }
+            HStack(spacing:3){
+                Image(systemName: "00.square.hi").rotationEffect(.init(degrees: 90))
+                Text(": Harmonic intervals")
+            }
             HStack{
-                Text("and").textCase(.none)
+                Text("Use").textCase(.none)
                 Image(systemName: "backward")
                 Image(systemName: "forward")
-                Text("to cycle interval players").textCase(.none)
+                Text("to cycle players").textCase(.none)
+            }
+        }.padding()
+    }
+}
+
+struct HelpListeningIntervalComparisonPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Select a random note and play all selected\n intervals starting with that note").textCase(.none)
+            HStack{
+                Image(systemName: "shuffle.circle")
+                Text(": Play intervals in ascending order")
+            }
+            HStack{
+                Image(systemName: "shuffle.circle.fill")
+                Text(": Play intervals in random order")
+            }
+            HStack{
+                Image(systemName: "00.square.hi")
+                Text(": Melodic intervals")
+            }
+            HStack{
+                Image(systemName: "00.square.hi").rotationEffect(.init(degrees: 90))
+                Text(": Harmonic intervals")
+            }
+        }.padding()
+    }
+}
+
+struct HelpListeningTriadPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Play stream of triads with random root, random voicing and random chord quality").textCase(.none)
+            HStack{
+                Image(systemName: "00.square.hi")
+                Text(": Play notes sequentially")
+            }
+            HStack{
+                Image(systemName: "00.square.hi").rotationEffect(.init(degrees: 90))
+                Text(": Play as a chord")
+            }
+        }.padding()
+    }
+}
+
+struct HelpListeningScaleDegreePOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Play random degrees from the selected scale and key").textCase(.none)
+            HStack{
+                Image(systemName: "die.face.5")
+                Text(": Pick a random key")
+            }
+            HStack{
+                Image(systemName: "n.square")
+                Text(": Play sequences of N notes")
             }
         }.padding()
     }
@@ -146,7 +222,31 @@ struct HelpNotesPOView: View {
     }
 }
 
+struct HelpQuizChartPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Quiz results, grouped by day or by type").textCase(.none).font(.footnote).padding(.bottom, 3)
+            Text("Tap and hold the bottom graph to filter ").textCase(.none).font(.footnote)
+            HStack{
+                PercentButtonView()
+                Text("Display results as percentages").textCase(.none).font(.footnote)
+            }
+        }.padding()
+    }
+}
+
+struct HelpListeningChartPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("The number of sequences played in listening mode,").textCase(.none).font(.footnote).padding(.bottom, 3)
+            Text("grouped by type or by day").textCase(.none).font(.footnote).padding(.bottom, 3)
+            Text("Tap and hold the bottom graph to filter").textCase(.none).font(.footnote)
+        }.padding()
+    }
+}
 
 #Preview {
-    HelpMarkView{ HelpTimerPOView() }.environment(\.colorScheme, .dark)
+    HelpMarkView{ HelpListeningIntervalsPOView() }.environment(\.colorScheme, .dark)
 }

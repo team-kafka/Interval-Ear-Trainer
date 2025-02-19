@@ -85,12 +85,12 @@ struct MainMenuListeningView: View {
             Text("Listening")
             if showHelp { HelpMarkView(opacity:0.7){HelpListeningPOView()} }
         }) {
-            ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:"Play a stream of random intervals, starting from random notes").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsIL1), dftParams: $paramsIL1, saveUsageData: $saveUsageData, id:"LVI1", label:"Intervals", helpText:AnyView(HelpListeningIntervalsPOView())).modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsIL2), dftParams: $paramsIL2, saveUsageData: $saveUsageData, id:"LVI2").modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsIL3), dftParams: $paramsIL3, saveUsageData: $saveUsageData, id:"LVI3").modelContainer(for: HistoricalData.self)
-            ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:"Select a random starting note\nPlay all selected intervals starting with that note\nRepeat with a new random starting note\nIntervals are played in order or shuffled").modelContainer(for: HistoricalData.self)
-            ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:"Play a stream of random triads, with random root notes and voicings").modelContainer(for: HistoricalData.self)
-            ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:"For a given scale and key, play sequences of N diatonic notes").modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:AnyView(HelpListeningIntervalComparisonPOView())).modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:AnyView(HelpListeningTriadPOView())).modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
         }
     }
 }

@@ -59,37 +59,41 @@ struct ParametersView: View {
                             }.onChange(of: preset) {
                                 params.active_intervals = PRESET_MAPPING[preset_values[preset]]!
                             }
-                            Grid{
+                            Grid(horizontalSpacing: 2){
                                 GridRow {
+                                    Spacer()
                                     Text("")
-                                    Image(systemName: "arrow.up.square").onTapGesture {
+                                    Image(systemName: "arrow.up.square").padding(.bottom, 2).onTapGesture {
                                         toggle_active_intervals(intervals: [1, 3, 5, 7, 9, 11])
                                     }
-                                    Image(systemName: "arrow.down.square").onTapGesture {
+                                    Image(systemName: "arrow.down.square").padding(.bottom, 2).onTapGesture {
                                         toggle_active_intervals(intervals: [-1, -3, -5, -7, -9, -11])
                                     }
                                     Text(""); Text("")
-                                    Image(systemName: "arrow.up.square").onTapGesture {
+                                    Image(systemName: "arrow.up.square").padding(.bottom, 2).onTapGesture {
                                         toggle_active_intervals(intervals: [2, 4, 6, 8, 10, 12])
                                     }
-                                    Image(systemName: "arrow.down.square").onTapGesture {
+                                    Image(systemName: "arrow.down.square").padding(.bottom, 2).onTapGesture {
                                         toggle_active_intervals(intervals: [-2, -4, -6, -8, -10, -12])
                                     }
+                                    Spacer()
                                 }
                                 Divider()
                                 ForEach(1..<7){ interval_int in
                                     GridRow{
-                                        Text(interval_name(interval_int: 2*interval_int-1, oriented: false)).bold().gridColumnAlignment(.trailing).onTapGesture {
+                                        Spacer()
+                                        Text(interval_name(interval_int: 2*interval_int-1, oriented: false)).padding(.leading).bold().gridColumnAlignment(.leading).onTapGesture {
                                             toggle_active_intervals(intervals: [2*interval_int-1, -2*interval_int+1])
                                         }
                                         IntervalCheckBoxView(active: $params.active_intervals , interval_int: 2*interval_int-1)
                                         IntervalCheckBoxView(active: $params.active_intervals ,interval_int: -2*interval_int+1)
                                         Spacer()
-                                        Text(interval_name(interval_int: 2*interval_int, oriented: false)).bold().gridColumnAlignment(.trailing).onTapGesture {
+                                        Text(interval_name(interval_int: 2*interval_int, oriented: false)).padding(.leading).bold().gridColumnAlignment(.leading).onTapGesture {
                                             toggle_active_intervals(intervals: [2*interval_int, -2*interval_int])
                                         }
                                         IntervalCheckBoxView(active: $params.active_intervals , interval_int: 2*interval_int)
                                         IntervalCheckBoxView(active: $params.active_intervals ,interval_int: -2*interval_int)
+                                        Spacer()
                                     }
                                     if (interval_int < 6) {Divider()}
                                 }
@@ -174,7 +178,7 @@ struct ParametersView: View {
                 }.navigationTitle("Settings").navigationBarTitleDisplayMode(.inline)
             }
         }
-        .tint(.blue)
+        .tint(.gray)
         .toolbarRole(.editor)
     }
     

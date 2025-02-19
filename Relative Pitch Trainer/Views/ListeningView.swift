@@ -20,9 +20,9 @@ struct ListeningView: View {
     @Binding private var saveUsageData: Bool
     private var label: String?
     private var divider: Bool
-    private var helpText: String
+    private var helpText: AnyView
 
-    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String, label: String? = nil, divider: Bool = false, helpText: String = ""){
+    init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, id: String, label: String? = nil, divider: Bool = false, helpText: AnyView = AnyView(Text(""))){
         _params = .init(initialValue: params)
         _paramsPresented = .init(initialValue: false)
         _dftParams = .init(projectedValue: dftParams)
@@ -39,7 +39,7 @@ struct ListeningView: View {
             if label != nil {
                 HStack(alignment: .center, spacing: 4){
                     Text(label!).font(.footnote).bold().padding(.bottom, 5)
-                    if (showHelp && helpText != "") {HelpMarkView(){HelpTextView(text:helpText)}.font(.footnote).padding(.bottom, 5)}
+                    if (showHelp && label != nil) {HelpMarkView(){helpText}.font(.footnote).padding(.bottom, 5)}
                 }
             }
             HStack{
