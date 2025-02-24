@@ -28,7 +28,7 @@ struct HelpListeningPOView: View {
         VStack(alignment: .leading)
         {
             Text("Play a stream of random intervals, chords, or ").textCase(.none)
-            Text("degrees, for passive studying").textCase(.none)
+            Text("scale degrees, for passive studying").textCase(.none)
             Text("Use device controls to pause/resume").textCase(.none)
         }.padding()
     }
@@ -87,7 +87,8 @@ struct HelpListeningTriadPOView: View {
     var body: some View {
         VStack(alignment: .leading)
         {
-            Text("Play stream of triads with random root, random voicing and random chord quality").textCase(.none)
+            Text("Play stream of triads with random root, random voicing")
+            Text("and random chord quality").textCase(.none)
             HStack{
                 Image(systemName: "00.square.hi")
                 Text(": Play notes sequentially")
@@ -131,7 +132,7 @@ struct HelpQuizPOView: View {
     var body: some View {
         VStack(alignment: .leading)
         {
-            Text("Recognize intervals, chords and degrees").textCase(.none)
+            Text("Recognize intervals, chords and scale degrees").textCase(.none)
             HStack{
                 Text("Scores are saved in the stats page").textCase(.none)
                 Image(systemName: "chart.line.uptrend.xyaxis")
@@ -248,6 +249,20 @@ struct HelpListeningChartPOView: View {
     }
 }
 
+struct HelpStreakView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            HStack{
+                Text("Correct").foregroundStyle(.green).font(.footnote)
+                Text("Error").foregroundStyle(.red).font(.footnote)
+                Text("Timeout").foregroundStyle(.orange).font(.footnote)
+                Text("Total").foregroundStyle(.secondary).font(.footnote)
+            }
+            Text("The current streak. Tap to reset")
+        }.padding()
+    }
+}
 #Preview {
-    HelpMarkView{ HelpListeningIntervalComparisonPOView() }
+    HelpMarkView{ HelpStreakView() }
 }
