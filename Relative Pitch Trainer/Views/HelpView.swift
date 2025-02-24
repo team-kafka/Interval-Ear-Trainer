@@ -18,7 +18,7 @@ struct HelpMarkView<Content: View>: View {
             self.showingPopover.toggle()
         }
         .popover(isPresented: $showingPopover) {
-            content.presentationCompactAdaptation(.none).preferredColorScheme(.dark)
+            content.presentationCompactAdaptation(.none)
         }
     }
 }
@@ -61,7 +61,8 @@ struct HelpListeningIntervalComparisonPOView: View {
     var body: some View {
         VStack(alignment: .leading)
         {
-            Text("Select a random note and play all selected\n intervals starting with that note").textCase(.none)
+            Text("Select a random note and play all selected").textCase(.none)
+            Text("intervals from that note").textCase(.none)
             HStack{
                 Image(systemName: "shuffle.circle")
                 Text(": Play intervals in ascending order")
@@ -162,7 +163,7 @@ struct HelpNNotesPOView: View {
         VStack(alignment: .leading)
         {
             HStack{
-                Text("Play sequences of"); Image(systemName: "n.square"); Text("notes").textCase(.none)
+                Image(systemName: "n.square");Text("Play sequences of N notes")
             }
         }.padding()
     }
@@ -248,5 +249,5 @@ struct HelpListeningChartPOView: View {
 }
 
 #Preview {
-    HelpMarkView{ HelpListeningIntervalsPOView() }.environment(\.colorScheme, .dark)
+    HelpMarkView{ HelpListeningIntervalComparisonPOView() }
 }

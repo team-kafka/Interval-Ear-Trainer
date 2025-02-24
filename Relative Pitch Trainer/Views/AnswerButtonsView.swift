@@ -80,7 +80,6 @@ struct ButtonTextView: View {
     var label: String
     var fontSize: CGFloat
     var color: Color = Color(.systemGray)
-    var hasBox: Bool = true
     
     var body: some View {
         Text(label)
@@ -92,8 +91,8 @@ struct ButtonTextView: View {
             .minimumScaleFactor(0.5)
             .gridColumnAlignment(.leading)
             .padding().frame(maxWidth: .infinity, maxHeight: fontSize * 1.7)
-            .overlay(RoundedRectangle(cornerRadius: 10)
-                .stroke(color, lineWidth: hasBox ? 4 : 0))
+            .overlay(RoundedRectangle(cornerRadius: 10).stroke(color, lineWidth: 4))
+            .contentShape(Rectangle())
     }
 }
     

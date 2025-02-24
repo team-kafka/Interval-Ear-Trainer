@@ -33,7 +33,6 @@ struct MainMenu: View {
                 }
             }
         }
-        .environment(\.colorScheme, .dark)
         .tint(.gray)
         .onAppear(){
             compressPastData()
