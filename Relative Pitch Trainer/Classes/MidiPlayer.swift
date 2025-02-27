@@ -79,9 +79,11 @@ class MidiPlayer {
     }
     
     func playNotes(notes:[Int], duration: Double, chord:Bool = false){
-        let musicSequence = self.prepare_sequence(notes: notes, duration:duration, chord:chord)
-        self.prepare_song(musicSequence: musicSequence)
-        self.playSong()
+        if !notes.isEmpty {
+            let musicSequence = self.prepare_sequence(notes: notes, duration:duration, chord:chord)
+            self.prepare_song(musicSequence: musicSequence)
+            self.playSong()
+        }
     }
     
     func stop() {

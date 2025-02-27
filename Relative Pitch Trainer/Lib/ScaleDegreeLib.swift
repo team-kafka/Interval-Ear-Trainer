@@ -94,29 +94,6 @@ func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String,
     return (new_note, interval_name(interval_int:raw_int, oriented:false))
 }
 
-func scale_degree_filter_to_str(intervals:Set<Int>) -> String
-{
-    if intervals.isEmpty { return "" }
-    
-    let degrees_str = SCALE_DEGREES.filter{intervals.contains($1)}.keys//.map(String($0))
-    return degrees_str.joined(separator: " ")
-}
-
-func str_to_scale_degree_filter(filter_str: String) -> Set<Int>
-{
-    if (filter_str == "") {
-        return Set<Int>()
-    }
-    var rv = Set<Int>()
-    let degrees_str = filter_str.split(separator: " ")
-    for d in degrees_str {
-        if (SCALE_DEGREES.keys.contains(String(d))) {
-            rv.insert(SCALE_DEGREES[String(d)]!)
-        }
-    }
-    return rv
-}
-
 func scale_notes(scale:String, key:String, upper_bound:Int, lower_bound:Int) -> [Int]
 {
     let mid_note: Int = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)

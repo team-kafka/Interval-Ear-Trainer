@@ -12,6 +12,10 @@ class SequenceGenerator {
     func generateSequence(params: Parameters, n_notes:Int, chord:Bool, prev_note:Int=0) -> ([Int], Double, Double, [String], Int) {
         return ([], 0, 0, [], 0)
     }
+    
+    func generateGuessNotes(notes: [Int], guesses: [String], answers: [String]) -> [Int] {
+        return []
+    }
 }
 
 class IntervalGenerator : SequenceGenerator{
@@ -36,7 +40,6 @@ class IntervalGenerator : SequenceGenerator{
                 (notes[1], answers[0]) = draw_new_note(prev_note: notes[0], active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba)
                 note_duration = params.delay_sequence
                 seq_duration = params.delay_sequence
-                print(notes)
             } else {
                 notes.append(0)
                 notes[0] = prev_note
@@ -80,6 +83,20 @@ class IntervalGenerator : SequenceGenerator{
         }
         return (notes, note_duration, seq_duration, answers, 0)
     }
+    
+    override func generateGuessNotes(notes: [Int], guesses: [String], answers: [String]) -> [Int] {
+        if (answers.count > 0) && (guesses.count > 0) {
+            let answersInt: [Int] = answers.map { interval_int_from_name(name:$0) }
+            let answerSigns: [Int] = answersInt.map { $0 > 0 ? 1 : -1 }
+            let guessesInt: [Int] = guesses.map { abs(interval_int_from_name(name:$0)) }
+            let signedGuesses = zip(guessesInt, answerSigns).map{$0 * $1}
+            let errors = zip(signedGuesses, answersInt).map{$0 - $1}
+            var running_sum: [Int] = errors.enumerated().map{ errors.prefix($0).reduce($1, +) }
+            running_sum.insert(0, at: 0)
+            return zip(notes, running_sum).map{$0 + $1}
+        }
+        return []
+    }
 }
 
 
@@ -100,6 +117,24 @@ class TriadGenerator : SequenceGenerator{
         
         return (notes, note_duration, seq_duration, [answer_str], root_note)
     }
+    
+    override func generateGuessNotes(notes: [Int], guesses: [String], answers: [String]) -> [Int] {
+        if (answers.count == 1) && (guesses.count == 1) {
+            let split_answer = answers[0].split(separator: "/")
+            if split_answer.count == 3 {
+                let quality   = String(split_answer[0])
+                let inversion = String(split_answer[1])
+                let voicing   = String(split_answer[2])
+                let intervals_ans   = generate_triad_intervals(quality: quality,    inversion: inversion, voicing: voicing)
+                let intervals_guess = generate_triad_intervals(quality: guesses[0], inversion: inversion, voicing: voicing)
+                let root_idx = intervals_ans.2
+                let root_diff = intervals_guess.0[root_idx] - intervals_ans.0[root_idx]
+                let errors = zip(intervals_guess.0, intervals_ans.0).map{$0 - $1 - root_diff}
+                return zip(notes, errors).map{$0 + $1}
+            }
+        }
+        return []
+    }
 }
 
 class ScaleDegreeGenerator : SequenceGenerator{
@@ -114,5 +149,15 @@ class ScaleDegreeGenerator : SequenceGenerator{
         let delay = params.delay_sequence * Double(n_notes-1) 
         
         return (notes, duration, delay, answers, 0)
+    }
+    
+    override func generateGuessNotes(notes: [Int], guesses: [String], answers: [String]) -> [Int] {
+        if (answers.count > 0) && (guesses.count > 0) {
+            let answersInt: [Int] = answers.map { interval_int_from_name(name:$0) }
+            let guessesInt: [Int] = guesses.map { abs(interval_int_from_name(name:$0)) }
+            let errors = zip(guessesInt, answersInt).map{$0 - $1}
+            return zip(notes, errors).map{$0 + $1}
+        }
+        return []
     }
 }

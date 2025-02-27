@@ -26,7 +26,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     @ObservationIgnored() private var timer: Timer?
     @ObservationIgnored() private var timerAnswer: Timer?
     @ObservationIgnored() private var seqGen: SequenceGenerator!
-    @ObservationIgnored() private var params: Parameters!
+    var params: Parameters!
 
     private init() {
         self.timer = nil
@@ -59,13 +59,13 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         self.params = params
         updateNowPlaying()
     }
+    
     func setOwner(_ id: String) { self.owner = id }
     
     // *************************
     // Main interface
     // *************************
     func start() -> Bool {
-        print("Started")
         if (seqGen != nil && params != nil) {
             setAVSession(active: true)
             updateNowPlaying()
@@ -87,7 +87,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     }
 
     func stop(){
-        print("stopped")
         timer?.invalidate()
         timerAnswer?.invalidate()
         MidiPlayer.shared.stop()
@@ -97,7 +96,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     }
  
     func loopFunction() {
-        print("loop fn playing")
         timer?.invalidate()
         if answerVisible == 1.0 {
             answerVisible = 0.0
@@ -140,6 +138,11 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         let note_size = (params.type == .interval) ? max(self.params.n_notes, 2) : self.params.n_notes
         self.notes = [Int].init(repeating: 0, count: note_size)
     }
+
+    func playGuessNotes(guesses: [String], answers: [String]) {
+        let notesToPlay: [Int] = seqGen.generateGuessNotes(notes: notes, guesses: guesses, answers: answers)
+        MidiPlayer.shared.playNotes(notes: notesToPlay, duration: params.delay_sequence, chord: params.is_chord)
+    }
     
     // *************************
     // I/O management related
@@ -148,7 +151,6 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
         let commandCenter = MPRemoteCommandCenter.shared()
 
         commandCenter.playCommand.addTarget { [unowned self] event in
-            print(event)
             if !self.playing {
                 let success = self.start()
                 return success ? .success : .commandFailed
@@ -221,18 +223,12 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
 
     @objc func handleInterruption(notification: Notification) {
         guard let userInfo = notification.userInfo,
-              let reasonValue = userInfo[AVAudioSessionInterruptionReasonKey] as? UInt,
               let typeValue = userInfo[AVAudioSessionInterruptionTypeKey] as? UInt,
             let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
                 return
         }
-        print("interruption")
-        print(reasonValue) // 4 = routeDisconnected, 0 = default
         if type == .began {
-            print("interruption began")
             self.stop()
-        } else if type == .ended {
-            print("interruption ended")
         }
     }
     
@@ -242,17 +238,11 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
               let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
             return
         }
-
         switch reason {
-        case .newDeviceAvailable:
-            print("new device available")
         case .oldDeviceUnavailable:
-            print("old device unavailable")
             self.stop()
-        case .override:
-            print("route change override")
         default:
-            print("default route change")
+            print()
         }
     }
 

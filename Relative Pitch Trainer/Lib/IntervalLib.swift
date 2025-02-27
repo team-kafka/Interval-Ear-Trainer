@@ -40,6 +40,23 @@ func interval_name(interval_int: Int, oriented:Bool, octave:Bool=false) -> Strin
     }
 }
 
+func interval_int_from_name(name: String) -> Int
+{
+    let sign = name.contains("↓") ? -1 : 1
+    let unsignedInt = name.replacingOccurrences(of: "↓", with: "").replacingOccurrences(of: "↑", with: "").replacingOccurrences(of: "H", with: "")
+    if INTERVAL_NAME_TO_INT.keys.contains(unsignedInt) {
+        return INTERVAL_NAME_TO_INT[unsignedInt]! * sign
+    }
+    return 0
+}
+
+func interval_filter_to_str(intervals:Set<Int>, harmonic:Bool = false) -> String
+{
+    let intervals_abs = Set<Int>(intervals.map{$0 > 0 ? $0 : -$0}).sorted()
+    let intervals_strs = harmonic ? intervals_abs.map{"H" + interval_name(interval_int: $0, oriented: false, octave: false)} :  intervals_abs.map{helper_func(interval_abs: $0, intervals:intervals)}
+    return intervals_strs.joined(separator: " ")
+}
+
 func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double) -> (Int, String)
 {
     let acceptable_intervals = active_intervals.filter{(prev_note+$0 >= lower_bound) && (prev_note+$0 <= upper_bound)}
@@ -68,7 +85,7 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
         intervals.append(rnd_interval + octave)
     }
     
-    let running_sum: [Int] = intervals.enumerated().map { intervals.prefix($0).reduce($1, +) }
+    let running_sum: [Int] = intervals.enumerated().map{ intervals.prefix($0).reduce($1, +) }
     let ub2 = upper_bound - max(0, running_sum.max()!)
     let lb2 = lower_bound - min(0, running_sum.min()!)
     
@@ -97,13 +114,6 @@ func draw_random_chord(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, 
     return draw_notes(n_notes:n_notes, active_intervals:pos_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:largeIntevalsProba, answer_oriented: false, prev_note: prev_note)
 }
 
-func interval_filter_to_str(intervals:Set<Int>, harmonic:Bool = false) -> String
-{
-    let intervals_abs = Set<Int>(intervals.map{$0 > 0 ? $0 : -$0}).sorted()
-    let intervals_strs = harmonic ? intervals_abs.map{"H" + interval_name(interval_int: $0, oriented: false, octave: false)} :  intervals_abs.map{helper_func(interval_abs: $0, intervals:intervals)}
-    return intervals_strs.joined(separator: " ")
-}
-
 func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
 {
     var rv = interval_name(interval_int: interval_abs, oriented: false, octave: false)
@@ -115,35 +125,3 @@ func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
     return rv
 }
  
-func str_to_interval_filter(filter_str: String) -> Set<Int>
-{
-    var rv = [Int]()
-    for int_str in filter_str.split(separator: " ") {
-        if int_str.contains("↑"){
-            let this_str: String = int_str.replacingOccurrences(of: "↑", with: "")
-            rv.append(INTERVAL_NAME_TO_INT[this_str]!)
-        } else if int_str.contains("↓"){
-            let this_str: String = int_str.replacingOccurrences(of: "↓", with: "")
-            rv.append(-INTERVAL_NAME_TO_INT[this_str]!)
-        } else {
-            rv.append(INTERVAL_NAME_TO_INT[String(int_str)]!)
-            rv.append(-INTERVAL_NAME_TO_INT[String(int_str)]!)
-        }
-    }
-    return Set<Int>(rv)
-}
-
-func interval_answer_string(notes: [Int], chord: Bool, oriented: Bool) -> String
-{
-    var answers = [String]()
-    if chord{
-        for i in notes[1...] {
-            answers.append(interval_name(interval_int:i-notes[0], oriented: oriented))
-        }
-    } else{
-        for (e1, e2) in zip(notes, notes[1...]) {
-            answers.append(interval_name(interval_int:e2-e1, oriented: oriented))
-        }
-    }
-    return answers.joined(separator: " ")
-}

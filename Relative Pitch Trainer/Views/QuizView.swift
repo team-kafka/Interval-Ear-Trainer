@@ -35,6 +35,7 @@ struct QuizView: View {
     @Binding private var saveUsageData: Bool
 
     @State private var player: SequencePlayer
+    private var longestAnswer: String
 
     init(params: Parameters, dftParams: Binding<String>, saveUsageData: Binding<Bool>, n_notes: Int=2, fixed_n_notes: Bool=false,  chord_active: Bool=true, chord: Bool=false){
         _params = .init(initialValue: params)
@@ -51,9 +52,19 @@ struct QuizView: View {
         _saveUsageData = .init(projectedValue: saveUsageData)
         _cacheData = .init(initialValue: [:])
         _player = .init(initialValue: SequencePlayer.shared)
+        self.longestAnswer = switch params.type {
+        case .scale_degree : "7♭"
+        case .interval : "↑7♭"
+        case .triad : " Augmented "
+        }
     }
     
     var body: some View {
+        let gridSize = switch params.type {
+        case .scale_degree : params.n_notes
+        case .interval : max(1, params.n_notes - 1)
+        case .triad : 1
+        }
         QuizzTopButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active).padding([.top])
         NavigationStack{
             VStack {
@@ -68,12 +79,7 @@ struct QuizView: View {
                         NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0).padding([.top, .bottom])
                         HStack{
                             Spacer()
-                            let gridSize = switch params.type {
-                            case .scale_degree : params.n_notes
-                            case .interval : max(1, params.n_notes - 1)
-                            case .triad : 1
-                            }
-                            IntervalResultView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord).padding([.leading, .trailing])
+                            GuessAndAnswerView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord, longestAnswer: longestAnswer).padding([.leading, .trailing])
                             Spacer()
                         }.padding([.bottom])
                     }
@@ -91,7 +97,7 @@ struct QuizView: View {
                         }.foregroundColor(Color(.systemGray)).padding([.leading, .trailing, .bottom])
                         NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0)
                         
-                        IntervalResultView(fontSize: 30, gridSize: params.type == .scale_degree ? 4 : 3, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord).padding([.leading, .trailing])
+                        GuessAndAnswerView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord, longestAnswer: longestAnswer).padding([.leading, .trailing])
                         Spacer()
                     }.padding([.top])
 
@@ -135,7 +141,9 @@ struct QuizView: View {
         .onDisappear {
             player.stop()
         }.onChange(of: SequencePlayer.shared.playing) {
-            if (SequencePlayer.shared.playing == false) {
+            if (SequencePlayer.shared.playing) {
+                clear_cache()
+            } else {
                 persist_cache()
             }
         }.onChange(of: paramsPresented) {
@@ -163,27 +171,6 @@ struct QuizView: View {
         .onChange(of: use_timer) { resetState() }
         .onChange(of: params.scale) { resetState(); save_dft_params(newParams: params) }
         .onChange(of: params.key) { resetState(); save_dft_params(newParams: params) }
-    }
-    
-    func answerView() -> AnyView {
-        let guess_eval = evaluate_guess(guess: guesses, answer: player.answers)
-        return AnyView(
-            HStack{
-                Text(" ").font(.system(size: 40))
-                ForEach(Array(player.answers.enumerated()), id: \.offset) { i, ans in
-                    Text(short_answer(answer: ans)).font(.system(size: 40)).foregroundStyle(ANSWER_COLORS[guess_eval[i]]!)
-                }
-            })
-    }
-    
-    func guessView() -> AnyView {
-        return AnyView(
-            HStack{
-                Text(" ").font(.system(size: 40))
-                ForEach(Array(guesses.enumerated()), id: \.offset) { _, g in
-                    Text(short_answer(answer: g)).foregroundColor(Color(.systemGray)).font(.system(size: 40))
-                }
-            })
     }
     
     func toggle_start_stop() {
@@ -217,6 +204,10 @@ struct QuizView: View {
         } else {
             player.loopFunction()
         }
+    }
+    
+    func clear_cache() {
+        cacheData = [:]
     }
     
     func save_to_cache() {

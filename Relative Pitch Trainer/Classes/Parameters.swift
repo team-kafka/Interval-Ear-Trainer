@@ -50,19 +50,6 @@ struct Parameters : Codable {
     var active_scale_degrees: Set<Int> = Set<Int>(SCALE_DEGREES.values)
     var key: String = "A"
     
-    
-    func generateFilterString() -> String{
-        if type == .interval{
-            return interval_filter_to_str(intervals: self.active_intervals)
-        } else if type == .triad{
-            return triad_filters_to_str(active_qualities: self.active_qualities, active_inversions: self.active_inversions, active_voicings: self.active_voicings)
-        } else if type == .scale_degree{
-            return scale_degree_filter_to_str(intervals: self.active_scale_degrees)
-        } else {
-            return ""
-        }
-    }
-    
     func generateLabelString(harmonic:Bool=false) -> String{
         if type == .interval{
             return interval_filter_to_str(intervals: self.active_intervals, harmonic: harmonic)
@@ -77,14 +64,6 @@ struct Parameters : Codable {
 }
 
 extension Parameters {
-    
-//    init(from decoder: Decoder) throws {
-//        let container = try decoder.container(keyedBy: CodingKeys.self)
-//        if let compare_intervals = try container.decodeIfPresent(Bool.self, forKey: .compare_intervals) {
-//            self.compare_intervals = compare_intervals
-//        }
-//    }
-    
     func encode() -> String {
         let encoder = JSONEncoder()
         encoder.outputFormatting = .prettyPrinted

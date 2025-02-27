@@ -117,7 +117,7 @@ struct DeleteButtonView: View {
 }
 
 
-struct IntervalResultView: View {
+struct GuessAndAnswerView: View {
     
     var fontSize: Double
     var gridSize: Int
@@ -125,58 +125,77 @@ struct IntervalResultView: View {
     @Binding var answers: [String]
     @Binding var answerVisible: Double
     var oriented: Bool
+    var longestAnswer: String
     
     var body: some View {
         let guess_eval = evaluate_guess(guess: guesses, answer: answers)
-        Grid(horizontalSpacing: 1, verticalSpacing: 1){
+        Grid(horizontalSpacing: 4, verticalSpacing: 4){
             GridRow {
                 ForEach(0...gridSize-1, id: \.self) { i in
                     let ans = i < answers.count ? answers[i] : " "
-                    let color = i < guess_eval.count ? ANSWER_COLORS[guess_eval[i]]! : Color(.systemGray)
+                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4).overlay(
                     Text(short_answer(answer: ans, oriented: oriented))
-                        .bold()
-                        .foregroundColor(color)
-                        .font(.system(size: fontSize))
-                        .lineLimit(1)
-                        .scaledToFill()
-                        .minimumScaleFactor(0.5)
-                        .gridColumnAlignment(.leading)
-                        .frame(maxWidth: fontSize * 1.7, maxHeight: fontSize * 1.3)
-                }
-            }.opacity(answerVisible)
-            GridRow {
-                ForEach(0...gridSize-1, id: \.self) { i in
-                    let guess = i < guesses.count ? guesses[i] : " "
-                    Text(guess)
                         .bold()
                         .foregroundColor(Color(.systemGray))
                         .font(.system(size: fontSize))
                         .lineLimit(1)
                         .scaledToFill()
                         .minimumScaleFactor(0.5)
-                        .gridColumnAlignment(.leading)
-                        .frame(maxWidth: fontSize * 1.7, maxHeight: fontSize * 1.3)
+                        .gridColumnAlignment(.leading))
                 }
-            }
+            }.opacity(answerVisible).onTapGesture {
+                if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                    MidiPlayer.shared.playNotes(notes: SequencePlayer.shared.notes, duration: SequencePlayer.shared.params.delay_sequence, chord: SequencePlayer.shared.params.is_chord)
+                }
+            }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            GridRow {
+                ForEach(0...gridSize-1, id: \.self) { i in
+                    let color = i < guess_eval.count ? ANSWER_COLORS[guess_eval[i]]! : Color(.systemGray)
+                    let guess = i < guesses.count ? guesses[i] : " "
+                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4).overlay(
+                    Text(guess)
+                        .bold()
+                        .foregroundColor(answerVisible == 1.0 ? color : Color(.systemGray))
+                        .font(.system(size: fontSize))
+                        .lineLimit(1)
+                        .scaledToFill()
+                        .minimumScaleFactor(0.5)
+                        .gridColumnAlignment(.leading))
+                }
+            }.onTapGesture {
+                if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                    SequencePlayer.shared.playGuessNotes(guesses: guesses, answers: answers)
+                }
+            }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }
     }
 }
 
 struct IntervalAnswerButtonView: View {
-    
+    @Binding var guesses: [String]
+
     var intervalInt: Int
     var active: Bool
     var fontSize: Double
-    @Binding var guesses: [String]
     var notes: [Int]
-    var visible: Double = 1.0
+    var visible: Double = 1.0 
     
+    init(intervalInt: Int, active: Bool, fontSize: Double, guesses: Binding<[String]>, notes: [Int], visible: Double=1) {
+        _guesses = .init(projectedValue: guesses)
+        self.intervalInt = intervalInt
+        self.active = active
+        self.fontSize = fontSize
+        self.notes = notes
+        self.visible = visible
+    }
     var body: some View {
         ButtonTextView(label:interval_name(interval_int: intervalInt, oriented: false), fontSize: fontSize)
             .opacity(active ? visible: 0.5 * visible).onTapGesture{
                     if (active) {
-                        if (guesses.count < notes.count-1){
-                            guesses.append(interval_name(interval_int: intervalInt, oriented: false))
+                        if SequencePlayer.shared.answerVisible == 0.0 {
+                            if (guesses.count < notes.count-1){
+                                guesses.append(interval_name(interval_int: intervalInt, oriented: false))
+                            }
                         }
                     }
                 }
@@ -184,14 +203,22 @@ struct IntervalAnswerButtonView: View {
 }
 
 struct TriadAnswerButtonsView: View {
-
+    @Binding var guesses: [String]
+    
     var params: Parameters
     var active: Bool
-    @Binding var guesses: [String]
     var use_timer: Bool
     var notes: [Int]
     var portrait: Bool
     
+    init(params: Parameters, active: Bool, guesses: Binding<[String]>, use_timer: Bool, notes: [Int], portrait: Bool) {
+        _guesses = .init(projectedValue: guesses)
+        self.params = params
+        self.active = active
+        self.use_timer = use_timer
+        self.notes = notes
+        self.portrait = portrait
+    }
     var body: some View {
         let activeTriads = params.active_qualities
         let nLines = portrait ? 2 : 1
@@ -207,8 +234,10 @@ struct TriadAnswerButtonsView: View {
                             Text(thisTriad.prefix(3)).bold().foregroundColor(Color(.systemGray)).font(.system(size: 30)).gridColumnAlignment(.leading).padding().frame(maxWidth: .infinity).overlay(
                                 RoundedRectangle(cornerRadius: 10)
                                     .stroke(.gray, lineWidth: 4)).opacity(active ? 1: 0.5).onTapGesture{
-                                        if active {
-                                            guesses = [thisTriad]
+                                        if SequencePlayer.shared.answerVisible == 0.0 {
+                                            if active {
+                                                guesses = [thisTriad]
+                                            }
                                         }
                                     }
                         } else {
@@ -225,14 +254,24 @@ struct TriadAnswerButtonsView: View {
 
 
 struct ScaleDegreeAnswerButtonsView: View {
-
+    @Binding var guesses: [String]
+    
     var activeDegrees: Set<Int>
     var scale: String
     var active: Bool
     var notes: [Int]
-    @Binding var guesses: [String]
     var use_timer: Bool
     var portrait: Bool
+    
+    init(activeDegrees: Set<Int>, scale: String, active: Bool, notes: [Int], guesses: Binding<[String]>, use_timer: Bool, portrait: Bool) {
+        _guesses = .init(projectedValue: guesses)
+        self.activeDegrees = activeDegrees
+        self.scale = scale
+        self.active = active
+        self.notes = notes
+        self.use_timer = use_timer
+        self.portrait = portrait
+    }
     
     var body: some View {
         Grid {
@@ -252,8 +291,10 @@ struct ScaleDegreeAnswerButtonsView: View {
                             ButtonTextView(label:scale_degree_answer_str(degrees: [thisDegree], scale:scale), fontSize: 30).opacity(reallyActive ? 1: 0.5)
                             .onTapGesture{
                                 if (reallyActive) {
-                                    if (guesses.count < notes.count){
-                                        guesses.append(scale_degree_answer_str(degrees: [thisDegree], scale:scale))
+                                    if SequencePlayer.shared.answerVisible == 0.0 {
+                                        if (guesses.count < notes.count){
+                                            guesses.append(scale_degree_answer_str(degrees: [thisDegree], scale:scale))
+                                        }
                                     }
                                 }
                             }
