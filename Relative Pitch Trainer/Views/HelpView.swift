@@ -263,6 +263,19 @@ struct HelpStreakView: View {
         }.padding()
     }
 }
+
+
+struct HelpGuessView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Tap the to play the incorrect guess")
+            Text("or the correct answer")
+        }.padding()
+    }
+}
+
+
 #Preview {
     HelpMarkView{ HelpStreakView() }
 }

@@ -80,6 +80,7 @@ struct QuizView: View {
                         HStack{
                             Spacer()
                             GuessAndAnswerView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord, longestAnswer: longestAnswer).padding([.leading, .trailing])
+                            if showHelp {HelpMarkView(){HelpGuessView()}.padding(4)}
                             Spacer()
                         }.padding([.bottom])
                     }
@@ -98,6 +99,7 @@ struct QuizView: View {
                         NoteButtonsView(params: params, notes: player.notes, root_note: player.rootNote, chord: params.is_chord, active: player.playing && use_timer, answer_visible: player.answerVisible, hasChord:chord_active, visible: use_timer ? 0.0 : 1.0)
                         
                         GuessAndAnswerView(fontSize: 30, gridSize: gridSize, guesses: $guesses, answers: $player.answers, answerVisible: $player.answerVisible, oriented: !params.is_chord, longestAnswer: longestAnswer).padding([.leading, .trailing])
+                        if showHelp {HelpMarkView(){HelpGuessView()}.padding(4)}
                         Spacer()
                     }.padding([.top])
 
