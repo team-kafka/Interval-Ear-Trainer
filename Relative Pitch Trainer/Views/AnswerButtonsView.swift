@@ -129,7 +129,7 @@ struct GuessAndAnswerView: View {
     
     var body: some View {
         let guess_eval = evaluate_guess(guess: guesses, answer: answers)
-        Grid(horizontalSpacing: 4, verticalSpacing: 4){
+        Grid(horizontalSpacing: 4, verticalSpacing: 6){
             GridRow {
                 ForEach(0...gridSize-1, id: \.self) { i in
                     let ans = i < answers.count ? answers[i] : " "
@@ -143,31 +143,38 @@ struct GuessAndAnswerView: View {
                         .minimumScaleFactor(0.5)
                         .gridColumnAlignment(.leading))
                 }
-            }.opacity(answerVisible).onTapGesture {
-                if !SequencePlayer.shared.playing && answerVisible == 1.0 {
-                    MidiPlayer.shared.playNotes(notes: SequencePlayer.shared.notes, duration: SequencePlayer.shared.params.delay_sequence, chord: SequencePlayer.shared.params.is_chord)
-                }
-            }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+            }.opacity(answerVisible).background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous)).contentShape(Rectangle())
             GridRow {
                 ForEach(0...gridSize-1, id: \.self) { i in
                     let color = i < guess_eval.count ? ANSWER_COLORS[guess_eval[i]]! : Color(.systemGray)
                     let guess = i < guesses.count ? guesses[i] : " "
                     Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4).overlay(
-                    Text(guess)
-                        .bold()
-                        .foregroundColor(answerVisible == 1.0 ? color : Color(.systemGray))
-                        .font(.system(size: fontSize))
-                        .lineLimit(1)
-                        .scaledToFill()
-                        .minimumScaleFactor(0.5)
-                        .gridColumnAlignment(.leading))
+                        Text(guess)
+                            .bold()
+                            .foregroundColor(answerVisible == 1.0 ? color : Color(.systemGray))
+                            .font(.system(size: fontSize))
+                            .lineLimit(1)
+                            .scaledToFill()
+                            .minimumScaleFactor(0.5)
+                            .gridColumnAlignment(.leading))
                 }
-            }.onTapGesture {
-                if !SequencePlayer.shared.playing && answerVisible == 1.0 {
-                    SequencePlayer.shared.playGuessNotes(guesses: guesses, answers: answers)
+            }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous)).contentShape(Rectangle())
+        }.overlay(
+            Grid(verticalSpacing: 1){
+                let is_wrong = Array(Set<AnswerType>(guess_eval)) != [.correct]
+                let lw = (!SequencePlayer.shared.playing && answerVisible > 0 && is_wrong && answers.count > 0) ? CGFloat(4) : CGFloat(0)
+                GridRow {Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw)).onTapGesture {
+                    if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                        SequencePlayer.shared.playGuessNotes(guesses: guesses, answers: answers)
+                    }
                 }
-            }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-        }
+                GridRow {Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw)).onTapGesture {
+                    if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                        MidiPlayer.shared.playNotes(notes: SequencePlayer.shared.notes, duration: SequencePlayer.shared.params.delay_sequence, chord: SequencePlayer.shared.params.is_chord)
+                    }
+                }
+            }
+        )
     }
 }
 
