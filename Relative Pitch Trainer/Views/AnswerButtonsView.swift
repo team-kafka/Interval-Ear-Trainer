@@ -129,12 +129,15 @@ struct GuessAndAnswerView: View {
     
     var body: some View {
         let guess_eval = evaluate_guess(guess: guesses, answer: answers)
+        let is_wrong = Array(Set<AnswerType>(guess_eval)) != [.correct]
+        let button_active = !SequencePlayer.shared.playing && answerVisible == 1.0 && is_wrong && answers.count > 0
+
         Grid(horizontalSpacing: 8, verticalSpacing: 8){
             GridRow {
                 ForEach(0...gridSize-1, id: \.self) { i in
                     let ans = i < answers.count ? answers[i] : " "
-                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4).overlay(
-                    Text(short_answer(answer: ans, oriented: oriented))
+                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4)
+                        .overlay(Text(short_answer(answer: ans, oriented: oriented))
                         .bold()
                         .foregroundColor(Color(.systemGray))
                         .font(.system(size: fontSize))
@@ -148,8 +151,8 @@ struct GuessAndAnswerView: View {
                 ForEach(0...gridSize-1, id: \.self) { i in
                     let color = i < guess_eval.count ? ANSWER_COLORS[guess_eval[i]]! : Color(.systemGray)
                     let guess = i < guesses.count ? guesses[i] : " "
-                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4).overlay(
-                        Text(guess)
+                    Text(longestAnswer).font(.system(size: fontSize)).opacity(0.0).padding([.leading, .trailing], 4)
+                        .overlay(Text(guess)
                             .bold()
                             .foregroundColor(answerVisible == 1.0 ? color : Color(.systemGray))
                             .font(.system(size: fontSize))
@@ -161,18 +164,17 @@ struct GuessAndAnswerView: View {
             }.background(.secondary.opacity(0.2)).clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
         }.padding(2).overlay(
             Grid(verticalSpacing: 1){
-                let is_wrong = Array(Set<AnswerType>(guess_eval)) != [.correct]
-                let lw = (!SequencePlayer.shared.playing && answerVisible > 0 && is_wrong && answers.count > 0) ? CGFloat(4) : CGFloat(0)
-                GridRow {Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw).onTapGesture {
-                    if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                let lw = button_active ? CGFloat(4) : CGFloat(0)
+                GridRow{Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw).contentShape(Rectangle()).onTapGesture {
+                    if button_active {
                         MidiPlayer.shared.playNotes(notes: SequencePlayer.shared.notes, duration: SequencePlayer.shared.params.delay_sequence, chord: SequencePlayer.shared.params.is_chord)
                     }
-                }.contentShape(Rectangle()))
-                GridRow {Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw).onTapGesture {
-                    if !SequencePlayer.shared.playing && answerVisible == 1.0 {
+                })
+                GridRow{Text(" ").frame(maxWidth: .infinity, maxHeight: .infinity)}.overlay(RoundedRectangle(cornerRadius: 8).stroke(Color(.systemGray), lineWidth: lw).contentShape(Rectangle()).onTapGesture {
+                    if button_active{
                         SequencePlayer.shared.playGuessNotes(guesses: guesses, answers: answers)
                     }
-                }.contentShape(Rectangle()))
+                })
             }
         )
     }
