@@ -7,19 +7,19 @@
 
 import Foundation
 
-let NOTE_KEYS = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+let NOTE_KEYS = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"]
 let MIDI_NOTE_MAPPING: [Int: String] = [
     0:"C",
-    1:"C#",
+    1:"D♭",
     2:"D",
-    3:"D#",
+    3:"E♭",
     4:"E",
     5:"F",
-    6:"F#",
+    6:"G♭",
     7:"G",
-    8:"G#",
+    8:"A♭",
     9:"A",
-    10:"A#",
+    10:"B♭",
     11:"B",
 ]
 

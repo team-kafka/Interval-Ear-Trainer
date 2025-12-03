@@ -22,14 +22,32 @@ struct MainMenu: View {
                 MainMenuListeningView()
                 MainMenuQuizView().navigationTitle(Text("Relative Pitch Trainer")).navigationBarTitleDisplayMode(.inline)
             }.toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
+                    }.sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .navigationBarLeading) {
+                        NavigationLink(destination: StatView()) { Image(systemName: "chart.line.uptrend.xyaxis") }.padding([.leading])
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
+                    }.sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        Image(systemName: showHelp ? "questionmark.circle.fill" : "questionmark.circle" ).foregroundStyle(.gray).opacity(showHelp ? 1 : 0.5).padding([.leading]).onTapGesture { showHelp.toggle() }
+                    }
                 }
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
+                if #available(iOS 26.0, *) {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
+                    }.sharedBackgroundVisibility(.hidden)
+                } else {
+                    ToolbarItem(placement: .navigationBarTrailing) {
+                        NavigationLink(destination: SettingsView(saveUsageData: $saveUsageData).modelContainer(for: HistoricalData.self)) { Image(systemName: "gearshape.fill") }.padding([.trailing])
+                    }
                 }
             }
         }

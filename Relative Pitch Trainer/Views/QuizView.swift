@@ -128,15 +128,28 @@ struct QuizView: View {
             orientation = UIDevice.current.orientation.isLandscape ? UIDeviceOrientation.landscapeLeft : UIDeviceOrientation.portrait
         }
         .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button(action: {paramsPresented = true}){
-                    Image(systemName: "gearshape.fill").padding([.trailing])
+            if #available(iOS 26.0, *) {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {paramsPresented = true}){
+                        Image(systemName: "gearshape.fill").padding([.trailing])
+                    }
+                }.sharedBackgroundVisibility(.hidden)
+            } else{
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(action: {paramsPresented = true}){
+                        Image(systemName: "gearshape.fill").padding([.trailing])
+                    }
                 }
             }
-            ToolbarItem(placement: .navigationBarLeading) {
-                StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
+            if #available(iOS 26.0, *) {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
+                }.sharedBackgroundVisibility(.hidden)
+            } else{
+                ToolbarItem(placement: .navigationBarLeading) {
+                    StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
+                }
             }
-
         }
         .sheet(isPresented: $paramsPresented) {
                 ParametersView(params: $params)
