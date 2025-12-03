@@ -32,7 +32,11 @@ class IntervalGenerator : SequenceGenerator{
             return generateSequenceComparison(params: params, chord:chord, prev_note:prev_note)
         }
         
-        if (n_notes == 1) {
+        if params.type == .melody {
+            (notes, answers) = draw_notes(n_notes: n_notes, active_intervals: params.active_intervals, upper_bound: params.upper_bound, lower_bound: params.lower_bound, largeIntevalsProba: params.largeIntevalsProba, prev_note: prev_note, relative_to_first_note: true)
+            note_duration = params.delay_sequence
+            seq_duration = params.delay_sequence * Double(n_notes-1)
+        } else if (n_notes == 1) {
             if (prev_note == 0) {
                 notes.append(0)
                 answers.append("")

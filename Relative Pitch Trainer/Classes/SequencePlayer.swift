@@ -52,6 +52,8 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 self.seqGen = IntervalGenerator()
             } else if (params.type == .triad){
                 self.seqGen = TriadGenerator()
+            } else if (params.type == .melody){
+                self.seqGen = IntervalGenerator()
             } else {
                 self.seqGen = ScaleDegreeGenerator()
             }
@@ -198,6 +200,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 case .interval      : "Intervals: "
                 case .triad         : "Triads: "
                 case .scale_degree  : "Scale Degrees: "
+                case .melody        : "Melody: "
             }
             artist_info += params.generateLabelString()
             nowPlayingInfo[MPMediaItemPropertyArtist] = artist_info

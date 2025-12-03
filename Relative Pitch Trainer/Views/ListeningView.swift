@@ -69,6 +69,8 @@ struct ListeningView: View {
                         }
                     }
                     NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
+                } else if (params.type == .melody) {
+                    NumberOfNotesView(n_notes: $params.n_notes, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
                 } else{
                     ChordArpSwitchView(chord: $params.is_chord, active: !(SequencePlayer.shared.playing && self.id == SequencePlayer.shared.owner))
                     NumberOfNotesView(n_notes: $params.n_notes, active: false).opacity(0)
@@ -136,12 +138,14 @@ struct ListeningView: View {
 
     func persist_cache()
     {
-        if saveUsageData {
-            for hd in cacheData.values{
-                modelContext.insert(hd)
+        if params.type != .melody{
+            if saveUsageData {
+                for hd in cacheData.values{
+                    modelContext.insert(hd)
+                }
+                try! modelContext.save()
+                cacheData = [String:HistoricalData]()
             }
-            try! modelContext.save()
-            cacheData = [String:HistoricalData]()
         }
     }
 }

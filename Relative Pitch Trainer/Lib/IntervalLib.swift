@@ -76,9 +76,32 @@ func draw_new_note(prev_note:Int, active_intervals:Set<Int>, upper_bound:Int, lo
     return (prev_note + rnd_interval + octave, interval_name(interval_int: rnd_interval, oriented: true, octave: false))
 }
 
-func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0, first_note_in:Int=0) -> ([Int], [String])
+func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, largeIntevalsProba:Double, answer_oriented:Bool=true, prev_note:Int=0, first_note_in:Int=0, relative_to_first_note:Bool=false) -> ([Int], [String])
 {
+    var first_note: Int
     var intervals = [Int]()
+    if relative_to_first_note {
+        var notes = [Int]()
+        var prev_note_ = prev_note
+        if prev_note == 0 {
+            prev_note_ = Int.random(in: lower_bound..<upper_bound)
+        }
+        for _ in (1...n_notes) {
+            let octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 : 0
+            let interval_octave = active_intervals.map{$0 + octave * $0.signum()}
+            let candidates = interval_octave.filter{prev_note_ + $0 >= lower_bound && prev_note_ + $0 <= upper_bound }
+            let interval = candidates.randomElement() ?? 0
+            intervals.append(interval)
+            notes.append(prev_note_ + interval)
+            prev_note_ = prev_note_ + interval
+        }
+        var answers = intervals.map{interval_name(interval_int: $0, oriented: answer_oriented, octave: false)}
+        if prev_note == 0 {
+            answers[0] = ""
+        }
+        return (notes, answers)
+    }
+    
     for _ in (1...n_notes-1) {
         let rnd_interval = active_intervals.randomElement()!
         let octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 * (rnd_interval > 0 ? 1 : -1) : 0
@@ -89,7 +112,7 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     let ub2 = upper_bound - max(0, running_sum.max()!)
     let lb2 = lower_bound - min(0, running_sum.min()!)
     
-    var first_note: Int
+    
     if first_note_in == 0 {
         if lb2 < ub2 {
             var draw_set = Set(lb2...ub2)
@@ -124,4 +147,21 @@ func helper_func(interval_abs: Int, intervals:Set<Int>) -> String
     }
     return rv
 }
- 
+
+func draw_melody(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> ([Int], [String])
+{
+    var notes = [Int]()
+    var answers = [String]()
+    var this_prev_note:Int = prev_note
+    
+    for _ in 0..<n_notes
+    {
+        var new_note:[Int]
+        var new_answer:[String]
+        (new_note, new_answer) = draw_notes(n_notes:1, active_intervals:active_intervals, upper_bound:upper_bound, lower_bound:lower_bound, largeIntevalsProba:large_interval_proba, prev_note:this_prev_note)
+        notes.append(new_note[0])
+        answers.append(new_answer[0])
+        this_prev_note = new_note[0]
+    }
+    return (notes, answers)
+}

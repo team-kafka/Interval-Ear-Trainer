@@ -42,7 +42,7 @@ struct ParametersView: View {
                             HStack{Text("Delay (seconds)");Spacer()}
                             HStack{ParamSlider(value: $params.delay, valueRange: 0.2...5.0);Text("\(params.delay, specifier:"%0.1f")")}
                         }
-                        if ((params.type == .interval) || (params.type == .scale_degree)) {
+                        if ((params.type == .interval) || (params.type == .scale_degree) || (params.type == .melody)) {
                             VStack{
                                 HStack{Text("Probability of large intervals (>octave)");Spacer()}
                                 HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
@@ -50,7 +50,7 @@ struct ParametersView: View {
                         }
 
                     }
-                    if (params.type == .interval) {
+                    if ((params.type == .interval) || (params.type == .melody)) {
                         Section(header: Text("filters")) {
                             Picker("Preset", selection: $preset) {
                                 ForEach(0..<preset_values.count, id: \.self) {

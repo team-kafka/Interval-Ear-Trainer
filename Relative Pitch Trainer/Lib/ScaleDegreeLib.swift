@@ -75,6 +75,8 @@ func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int
     return (notes, answers)
 }
 
+
+
 func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> (Int, String)
 {
     let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
