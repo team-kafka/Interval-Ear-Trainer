@@ -110,8 +110,8 @@ struct MainMenuListeningView: View {
             ListeningView(params:Parameters.decode(paramsILC), dftParams: $paramsILC, saveUsageData: $saveUsageData, id:"LVIC", label:"Interval Comparison", helpText:AnyView(HelpListeningIntervalComparisonPOView())).modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:AnyView(HelpListeningTriadPOView())).modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
-            ListeningView(params:Parameters.decode(paramsMel), dftParams: $paramsMel, saveUsageData: $saveUsageData, id:"LMel", label:"Melody (chromatic)", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
-            ListeningView(params:Parameters.decode(paramsMelD), dftParams: $paramsMelD, saveUsageData: $saveUsageData, id:"LMelD", label:"Melody (diatonic)", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsMel), dftParams: $paramsMel, saveUsageData: $saveUsageData, id:"LMel", label:"Melody (chromatic)", helpText:AnyView(HelpListeningMelodyChromaPOView())).modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsMelD), dftParams: $paramsMelD, saveUsageData: $saveUsageData, id:"LMelD", label:"Melody (diatonic)", helpText:AnyView(HelpListeningMelodyDiatoPOView())).modelContainer(for: HistoricalData.self)
         }
     }
 }

@@ -118,6 +118,39 @@ struct HelpListeningScaleDegreePOView: View {
     }
 }
 
+struct HelpListeningMelodyDiatoPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Play random sequences of notes from the selected scale").textCase(.none)
+            Text("Successive notes can only be separated").textCase(.none)
+            Text("by one of the selected diatonic interval").textCase(.none)
+            HStack{
+                Image(systemName: "die.face.5")
+                Text(": Pick a random key")
+            }
+            HStack{
+                Image(systemName: "n.square")
+                Text(": Play sequences of N notes")
+            }
+        }.padding()
+    }
+}
+struct HelpListeningMelodyChromaPOView: View {
+    var body: some View {
+        VStack(alignment: .leading)
+        {
+            Text("Play random sequences of notes").textCase(.none)
+            Text("Successive notes can only be separated").textCase(.none)
+            Text("by one of the selected interval").textCase(.none)
+            HStack{
+                Image(systemName: "n.square")
+                Text(": Play sequences of N notes")
+            }
+        }.padding()
+    }
+}
+
 struct HelpTextView: View {
     var text: String = "Help text"
     var body: some View {
