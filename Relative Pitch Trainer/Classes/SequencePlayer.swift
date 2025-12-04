@@ -54,6 +54,8 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 self.seqGen = TriadGenerator()
             } else if (params.type == .melody){
                 self.seqGen = IntervalGenerator()
+            } else if (params.type == .melody_diato){
+                self.seqGen = ScaleDegreeGenerator()
             } else {
                 self.seqGen = ScaleDegreeGenerator()
             }
@@ -115,7 +117,10 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
     func play_sequence() -> Double {
         var seq_duration: Double
         var note_duration: Double
-        let prev_note = params.n_notes == 1 ? notes.last ?? 0 : notes.first ?? 0
+        var prev_note = notes.first ?? 0
+        if (params.n_notes == 1) || (params.type == .melody) || (params.type == .melody_diato) {
+            prev_note = notes.last ?? 0
+        } 
         (notes, note_duration, seq_duration, answers, rootNote) = seqGen.generateSequence(params: params, n_notes:params.n_notes, chord:params.is_chord,  prev_note:prev_note)
         updateNowPlaying()
         let notesToPlay = (params.n_notes == 1 && prev_note != 0) ? [notes.last!] : notes
@@ -200,7 +205,8 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
                 case .interval      : "Intervals: "
                 case .triad         : "Triads: "
                 case .scale_degree  : "Scale Degrees: "
-                case .melody        : "Melody: "
+                case .melody        : "Melody (chromatic): "
+                case .melody_diato  : "Melody (diatonic): "
             }
             artist_info += params.generateLabelString()
             nowPlayingInfo[MPMediaItemPropertyArtist] = artist_info

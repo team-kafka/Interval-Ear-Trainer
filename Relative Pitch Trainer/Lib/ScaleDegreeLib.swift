@@ -57,7 +57,7 @@ func middle_note(key: String, upper_bound:Int, lower_bound:Int) -> Int{
     return Int(floor(Double(mid_note - pitch_int) / 12)) * 12 + pitch_int
 }
 
-func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> ([Int], [String])
+func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int, relative_to_prev_note:Bool=false) -> ([Int], [String])
 {
     var notes = [Int]()
     var answers = [String]()
@@ -67,7 +67,7 @@ func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int
     {
         var new_note:Int
         var new_answer:String
-        (new_note, new_answer) = draw_random_scale_degree(scale:scale, active_degrees:active_degrees, key:key, upper_bound:upper_bound, lower_bound:lower_bound, large_interval_proba:large_interval_proba, prev_note:this_prev_note)
+        (new_note, new_answer) = draw_random_scale_degree(scale:scale, active_degrees:active_degrees, key:key, upper_bound:upper_bound, lower_bound:lower_bound, large_interval_proba:large_interval_proba, prev_note:this_prev_note, relative_to_prev_note: relative_to_prev_note)
         notes.append(new_note)
         answers.append(new_answer)
         this_prev_note = new_note
@@ -75,11 +75,32 @@ func draw_random_scale_degrees(n_notes:Int, scale:String, active_degrees:Set<Int
     return (notes, answers)
 }
 
-
-
-func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int) -> (Int, String)
+func diatonic_interval(start_degree:Int, interval:Int, scale:String) -> Int
 {
+    let scale_degrees = SCALES[scale]!
+    let scale_degrees_padded = scale_degrees.map{$0-12} + scale_degrees + scale_degrees.map{$0+12}
+    let start_index = scale_degrees_padded.firstIndex(of: start_degree)!
+    return scale_degrees_padded[start_index + interval] - start_degree
+}
+
+func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String, upper_bound:Int, lower_bound:Int, large_interval_proba:Double, prev_note:Int, relative_to_prev_note:Bool=false) -> (Int, String)
+{
+    let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
     let mid_note = middle_note(key: key, upper_bound: upper_bound, lower_bound: lower_bound)
+    
+    if relative_to_prev_note {
+        if prev_note == 0 {
+            return (mid_note, "")
+        }
+        let prev_degree = (prev_note - mid_note) % 12 + ((prev_note - mid_note) % 12 < 0 ? 12 : 0)
+        let candidate_rel_ints = active_degrees.map{diatonic_interval(start_degree: prev_degree, interval: -$0, scale: scale)} + active_degrees.map{diatonic_interval(start_degree: prev_degree, interval: $0, scale: scale)}
+        let candidate_notes = candidate_rel_ints.map{$0 + prev_note + octave * $0.signum()}.filter({$0 >= lower_bound && $0 <= upper_bound})
+        let new_note = candidate_notes.randomElement() ?? prev_note
+        let new_interval = new_note - prev_note > 12 ? new_note - prev_note - 12 : (new_note - prev_note < (-12) ? new_note - prev_note + 12 : new_note - prev_note)
+        return (new_note, interval_name(interval_int:new_interval, oriented:true))
+    }
+    
+    
 
     var draw_choices = active_degrees
     if ((active_degrees.count > 1) && prev_note != 0){
@@ -89,7 +110,7 @@ func draw_random_scale_degree(scale:String, active_degrees:Set<Int>, key:String,
     }
 
     let this_degree = draw_choices.randomElement() ?? 0
-    let octave: Int = (Double.random(in: 0...1) < large_interval_proba ? 12 : 0) * (Double.random(in: 0...1) < 0.5 ? 1 : -1)
+    
     let raw_int = SCALES[scale]![this_degree]
     let new_note = mid_note + raw_int + octave
 

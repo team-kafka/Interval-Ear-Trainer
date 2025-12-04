@@ -97,7 +97,8 @@ struct MainMenuListeningView: View {
     @AppStorage("paramsTL") var paramsTL: String = Parameters(type:.triad, n_notes:3, is_chord:true).encode()
     @AppStorage("paramsSL") var paramsSL: String = Parameters(type:.scale_degree, n_notes:1).encode()
     @AppStorage("paramsMel") var paramsMel: String = Parameters(type:.melody, n_notes:2).encode()
-    
+    @AppStorage("paramsMelD") var paramsMelD: String = Parameters(type:.melody_diato, n_notes:2).encode()
+
     var body: some View {
         Section(header: HStack{
             Text("Listening")
@@ -110,6 +111,7 @@ struct MainMenuListeningView: View {
             ListeningView(params:Parameters.decode(paramsTL), dftParams: $paramsTL, saveUsageData: $saveUsageData, id:"LVT1", label:"Triads", helpText:AnyView(HelpListeningTriadPOView())).modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsSL), dftParams: $paramsSL, saveUsageData: $saveUsageData, id:"LVS1", label:"Scale Degrees", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
             ListeningView(params:Parameters.decode(paramsMel), dftParams: $paramsMel, saveUsageData: $saveUsageData, id:"LMel", label:"Melody (chromatic)", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
+            ListeningView(params:Parameters.decode(paramsMelD), dftParams: $paramsMelD, saveUsageData: $saveUsageData, id:"LMelD", label:"Melody (diatonic)", helpText:AnyView(HelpListeningScaleDegreePOView())).modelContainer(for: HistoricalData.self)
         }
     }
 }

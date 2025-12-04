@@ -26,7 +26,7 @@ struct ParametersView: View {
             VStack{
                 List{
                     Section(header: Text("general")) {
-                        if (params.type == .scale_degree){
+                        if ((params.type == .scale_degree) || (params.type == .melody_diato)){
                             Picker("Scale", selection: $params.scale) {
                                 ForEach(SCALE_KEYS, id: \.self) {
                                     Text($0)
@@ -42,7 +42,7 @@ struct ParametersView: View {
                             HStack{Text("Delay (seconds)");Spacer()}
                             HStack{ParamSlider(value: $params.delay, valueRange: 0.2...5.0);Text("\(params.delay, specifier:"%0.1f")")}
                         }
-                        if ((params.type == .interval) || (params.type == .scale_degree) || (params.type == .melody)) {
+                        if ((params.type == .interval) || (params.type == .scale_degree) || (params.type == .melody) || (params.type == .melody_diato)) {
                             VStack{
                                 HStack{Text("Probability of large intervals (>octave)");Spacer()}
                                 HStack{ParamSlider(value: $params.largeIntevalsProba, valueRange: 0.0...1.0);Text("\(params.largeIntevalsProba*100, specifier:"%0.f")")}
@@ -135,8 +135,8 @@ struct ParametersView: View {
                             }
                         }
                     }
-                    if (params.type == .scale_degree) {
-                        Section(header: Text("Scale degrees")) {
+                    if (params.type == .scale_degree) ||  (params.type == .melody_diato) {
+                        Section(header: Text(params.type == .scale_degree ? "Scale degrees" : "Diatonic Intervals")) {
                             Grid{
                                 ForEach(0..<4){ degree_int in
                                     GridRow{

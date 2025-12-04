@@ -82,10 +82,7 @@ func draw_notes(n_notes:Int, active_intervals:Set<Int>, upper_bound:Int, lower_b
     var intervals = [Int]()
     if relative_to_first_note {
         var notes = [Int]()
-        var prev_note_ = prev_note
-        if prev_note == 0 {
-            prev_note_ = Int.random(in: lower_bound..<upper_bound)
-        }
+        var prev_note_ = prev_note == 0 ? Int.random(in: lower_bound..<upper_bound) : prev_note
         for _ in (1...n_notes) {
             let octave = Double.random(in: 0...1) < largeIntevalsProba ? 12 : 0
             let interval_octave = active_intervals.map{$0 + octave * $0.signum()}

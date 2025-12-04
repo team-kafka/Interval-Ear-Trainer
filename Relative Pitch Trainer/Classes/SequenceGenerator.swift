@@ -147,7 +147,8 @@ class ScaleDegreeGenerator : SequenceGenerator{
         var notes = [Int]()
         var answers = [String]()
 
-        (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba, prev_note: prev_note)
+        let relative_to_previous = params.type == .melody_diato
+        (notes, answers) = draw_random_scale_degrees(n_notes:n_notes, scale:params.scale, active_degrees:params.active_scale_degrees, key:params.key, upper_bound:params.upper_bound, lower_bound:params.lower_bound, large_interval_proba:params.largeIntevalsProba, prev_note: prev_note, relative_to_prev_note: relative_to_previous)
 
         let duration = params.delay_sequence
         let delay = params.delay_sequence * Double(n_notes-1) 

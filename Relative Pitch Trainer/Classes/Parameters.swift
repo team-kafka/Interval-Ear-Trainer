@@ -12,6 +12,7 @@ enum ExerciseType: Codable {
     case triad
     case scale_degree
     case melody
+    case melody_diato
 }
 
 func ex_type_to_str(ex_type:ExerciseType) -> String
@@ -22,6 +23,7 @@ func ex_type_to_str(ex_type:ExerciseType) -> String
         case .interval:      "interval"
         case .triad:         "triad"
         case .melody:        "melody"
+        case .melody_diato:  "melody_diato"
     }
 }
 
@@ -61,6 +63,8 @@ struct Parameters : Codable {
             return self.key + " " + SCALE_SHORT_NAMES[self.scale]! + ", " + scale_degree_answer_str(degrees: Array(self.active_scale_degrees).sorted(), scale: self.scale)
         } else if type == .melody{
             return interval_filter_to_str(intervals: self.active_intervals, harmonic: false)
+        } else if type == .melody_diato{
+            return self.key + " " + SCALE_SHORT_NAMES[self.scale]! + ", " + scale_degree_answer_str(degrees: Array(self.active_scale_degrees).sorted(), scale: self.scale)
         } else {
             return ""
         }

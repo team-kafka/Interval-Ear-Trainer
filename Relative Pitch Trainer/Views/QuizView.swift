@@ -57,6 +57,7 @@ struct QuizView: View {
         case .interval : "↑7♭"
         case .triad : " Augmented "
         case .melody : "↑7♭"
+        case .melody_diato: "↑7♭"
         }
     }
     
@@ -66,6 +67,7 @@ struct QuizView: View {
         case .interval : max(1, params.n_notes - 1)
         case .triad : 1
         case .melody : 1
+        case .melody_diato : 1
         }
         QuizzTopButtonsView(n_notes: $params.n_notes, chord: $params.is_chord, use_timer: $use_timer, fixed_n_notes: $fixed_n_notes, chord_active:$chord_active).padding([.top])
         NavigationStack{
