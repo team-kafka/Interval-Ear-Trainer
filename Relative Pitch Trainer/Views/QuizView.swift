@@ -136,18 +136,15 @@ struct QuizView: View {
                         Image(systemName: "gearshape.fill").padding([.trailing])
                     }
                 }.sharedBackgroundVisibility(.hidden)
+                ToolbarItem(placement: .navigationBarLeading) {
+                    StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
+                }.sharedBackgroundVisibility(.hidden)
             } else{
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: {paramsPresented = true}){
                         Image(systemName: "gearshape.fill").padding([.trailing])
                     }
                 }
-            }
-            if #available(iOS 26.0, *) {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
-                }.sharedBackgroundVisibility(.hidden)
-            } else{
                 ToolbarItem(placement: .navigationBarLeading) {
                     StreakView(streak_c: $streak_c, streak_i: $streak_i, streak_t: $streak_t)
                 }

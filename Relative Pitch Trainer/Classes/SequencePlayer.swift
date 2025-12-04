@@ -76,7 +76,7 @@ let ANSWER_TIME = 0.8 // (s) how long does the answer shows before moving on to 
             playing = true
             updateNowPlaying()
             timer?.invalidate()
-            if (params.type == .scale_degree && notes[0] == 0) {
+            if ((params.type == .scale_degree || params.type == .melody_diato) && notes[0] == 0) {
                 MidiPlayer.shared.playNotes(notes: scale_notes(scale: params.scale, key: params.key, upper_bound: params.upper_bound, lower_bound: params.lower_bound), duration:SCALE_DELAY)
                 timer = Timer.scheduledTimer(withTimeInterval:SCALE_DELAY * 9, repeats: false) { t in
                     self.loopFunction()

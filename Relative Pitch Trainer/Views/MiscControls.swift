@@ -326,10 +326,10 @@ struct StreakView: View {
     
     var body: some View {
         HStack{
-            Text("\(streak_c)").foregroundStyle(ANSWER_COLORS[.correct]!).font(.footnote)
-            Text("\(streak_i)").foregroundStyle(ANSWER_COLORS[.incorrect]!).font(.footnote)
-            Text("\(streak_t)").foregroundStyle(ANSWER_COLORS[.timeout]!).font(.footnote)
-            Text("\(streak_c + streak_i + streak_t)").foregroundStyle(.secondary).font(.footnote)
+            Text("\(streak_c)").foregroundStyle(ANSWER_COLORS[.correct]!).font(.footnote).fixedSize(horizontal: true, vertical: false)
+            Text("\(streak_i)").foregroundStyle(ANSWER_COLORS[.incorrect]!).font(.footnote).fixedSize(horizontal: true, vertical: false)
+            Text("\(streak_t)").foregroundStyle(ANSWER_COLORS[.timeout]!).font(.footnote).fixedSize(horizontal: true, vertical: false)
+            Text("\(streak_c + streak_i + streak_t)").foregroundStyle(.secondary).font(.footnote).fixedSize(horizontal: true, vertical: false)
             if showHelp {HelpMarkView(){HelpStreakView()}.padding(4).scaleEffect(0.7)}
         }.onTapGesture {
             streak_c = 0
